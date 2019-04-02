@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=basico
+Name=basico
+Comment=SAP Notes manager for SAP Consultants
+Icon=basico-component
+Categories=GTK;GNOME;Utility;
+StartupNotify=True
