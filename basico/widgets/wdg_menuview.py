@@ -21,7 +21,7 @@ from gi.repository.GdkPixbuf import Pixbuf
 from dateutil import parser as dateparser
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.core.mod_wdg import BasicoWidget
-from basico.services.srv_cols import COL_DOWNLOADED
+from basico.services.srv_collections import COL_DOWNLOADED
 
 class Row(IntEnum):
     ROWID = 0
@@ -100,7 +100,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.set_enable_search(True)
         self.set_hover_selection(False)
         self.set_grid_lines(Gtk.TreeViewGridLines.NONE)
-        self.set_search_entry(self.srvgui.get_widget('stySearchInfo'))
+        # ~ self.set_search_entry(self.srvgui.get_widget('stySearchInfo'))
         self.set_search_column(1)
         #~ self.set_row_separator_func(self.row_separator_func)
 
@@ -236,19 +236,19 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
 
     def refresh(self):
-        visor = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         try:
             if self.row_type is not None:
                 matches = self.srvdtb.get_notes_by_node(self.row_type, self.cid)
-                visor.populate_sapnotes(matches)
+                visor_sapnotes.populate(matches)
         except Exception as error:
             pass
 
 
     def row_changed(self, selection):
         if self.current_status is None:
-            visor = self.srvgui.get_widget('visor_sapnotes')
-            self.srvclb.gui_show_visor_sapnotes()
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+            # ~ self.log.warning("gui_show_visor_sapnotes!!!")
 
             try:
                 model, treeiter = selection.get_selected()
@@ -261,19 +261,19 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                     self.set_current_collection(self.cid)
                     if not iter_has_child:
                         matches = self.srvdtb.get_notes_by_node(self.row_type, self.cid)
-                        visor.populate_sapnotes(matches, self.cid)
+                        visor_sapnotes.populate(matches, self.cid)
                     else:
                         matches = set()
                         cols = self.srvclt.get_collections_by_row_title(row_title)
                         for col in cols:
                             for sid in self.srvdtb.get_notes_by_node(self.row_type, col):
                                 matches.add(sid)
-                        visor.populate_sapnotes(list(matches))
+                        visor_sapnotes.populate(list(matches))
                 else:
                     self.set_current_collection(None)
                     matches = self.srvdtb.get_notes_by_node(self.row_type, self.cid)
-                    visor.populate_sapnotes(matches, self.cid)
-                self.srvuif.statusbar_msg("View populated with %d SAP Notes" % (len(matches)))
+                    visor_sapnotes.populate(matches, self.cid)
+                # ~ self.srvuif.statusbar_msg("View populated with %d SAP Notes" % (len(matches)))
             except Exception as error:
                 pass
 
@@ -492,7 +492,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         elif self.view == 'collection':
             self.populate_by_collection(sapnotes)
         elif self.view == 'annotation':
-            self.populate_annotations()
+            self.populate()
         else:
             self.populate_by_components(sapnotes)
 
@@ -512,8 +512,8 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 matches.append(sid)
         matches.sort()
 
-        visor = self.srvgui.get_widget('visor_sapnotes')
-        visor.populate_sapnotes(matches)
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes.populate(matches)
         self.srvuif.statusbar_msg("View <i>%s</i> populated with %d SAP Notes" % (self.row_type, len(matches)))
 
 
@@ -678,7 +678,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         scomp = set()
         dcomp = {}
         self.model.clear()
-        
+
         # Add Downloaded collection
         cid = self.srvclt.get_cid_by_name('Downloaded')
         count = len(self.srvdtb.get_notes_by_node('collection', cid))
@@ -725,8 +725,8 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
 
     def populate_annotations(self, annotations=None):
-        visor = self.srvgui.get_widget('visor_annotations')
-        visor.populate_annotations(annotations)
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        visor_annotations.populate(annotations)
 
 
     def populate_by_chronologic(self, sapnotes):

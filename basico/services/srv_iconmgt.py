@@ -87,3 +87,16 @@ class IconManager(Service):
             self.imgdict[key] = icon
 
         return icon
+
+
+    def find_mime_type_pixbuf(self, mimetype, width=36, height=36):
+        """
+        Get icon by mimetype
+        """
+        icon = Gio.content_type_get_icon(mimetype)
+        info = self.theme.choose_icon(icon.get_names(), width, 0)
+        if info is not None:
+            icon_name = os.path.basename(info.get_filename()[:-4])
+            return self.get_pixbuf_icon(icon_name, width, height)
+        else:
+            return self.get_pixbuf_icon('text-x-generic', width, height)

@@ -91,6 +91,32 @@ class BackupRestoreMan(Service):
             return bckname
 
 
+    def backup_annotations(self, bck_file, aids):
+        # Do a reorg before a new backup
+        # ~ self.reorg()
+
+        # copy database structure to a temp directory except annotations
+        with TemporaryDirectory(dir=LPATH['TMP']) as TEMPORARY_DIRECTORY:
+            SOURCE_DIRECTORY = LPATH['DB']
+            self.log.debug("Copying database structure to a temp directory:")
+            self.log.debug("From: %s", SOURCE_DIRECTORY)
+            self.log.debug("  To: %s", TEMPORARY_DIRECTORY)
+            shutil.rmtree(TEMPORARY_DIRECTORY)
+            shutil.copytree(SOURCE_DIRECTORY, TEMPORARY_DIRECTORY)
+            self.log.debug("Contents copied successfully")
+
+            if not backup_annotations:
+                self.log.debug("Deleting annotations directory in temporary foleder:")
+                TEMPORARY_ANNOTATION_DIRECTORY = TEMPORARY_DIRECTORY + SEP + 'annotations'
+                self.log.debug(TEMPORARY_ANNOTATION_DIRECTORY)
+                shutil.rmtree(TEMPORARY_ANNOTATION_DIRECTORY)
+                self.log.debug("Annotations deleted successfully")
+
+            # create backup from temporary directory
+            bckname = self.srvutl.zip(bck_file, TEMPORARY_DIRECTORY)
+            self.log.info("Database successfully backed up in: %s" % bckname)
+            return bckname
+
     def test(self, bckfile=None):
         self.log.info("Testing backup: %s", bckfile)
         try:
@@ -160,7 +186,7 @@ class BackupRestoreMan(Service):
                 fimpcols = tmpdir + SEP + "collections" + SEP + "collections.json"
                 with open(fimpcols, 'r') as fp:
                     # Get collections from backup
-                    impcols = json.load(fp)                    
+                    impcols = json.load(fp)
                     # Add imported collections to database
                     for cid in impcols:
                         self.srvclt.create(impcols[cid], cid, batch=True)

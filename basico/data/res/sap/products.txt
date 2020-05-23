@@ -1,0 +1,91 @@
+eCATT
+Engineering Construction & Operations (EC&O)
+Enterprise Central Component (ECC)
+OpenUI5
+SAP Advanced Business Application Programming (ABAP)
+SAP Advanced Planner and Optimizer (APO)
+SAP Analytics
+SAP Anywhere
+SAP Apparel and Footwear Solution (AFS)
+SAP Ariba
+SAP Auto-ID Infrastructure
+SAP Banking
+SAP Business Information Warehouse (BW)
+SAP Business Intelligence (BI)
+SAP Business Objects (BO)
+SAP Business One
+SAP Business Partner Screening
+SAP Catalog Content Management
+SAP CCMS
+SAP Central Process Scheduling
+SAP Composite Application Framework
+SAP Concur
+SAP Converged Cloud
+SAP Convergent Charging (CC)
+SAP Customer Relationship Management (CRM)
+SAP Environment Health Safety Management (EHSM)
+SAP Enterprise Buyer Professional (EBP)
+SAP Enterprise Learning
+SAP Enterprise Resource Planning (ERP)
+SAP Enterprise Services Architecture
+SAP Exchange Infrastructure (XI)
+SAP Extended Warehouse Management (EWM)
+SAP Fieldglass
+SAP Financial Services Network (FSN)
+SAP Fiori
+SAP for Healthcare (ISH)
+SAP for Insurance (SAP for Insurance)
+SAP for Media (ISM)
+SAP for Oil & Gas (IS Oil & Gas)
+SAP for Public Sector (IS PSCD)
+SAP for Retail
+SAP for Telecommunications (IST)
+SAP for Utilities (ISU)
+SAP Governance, Risk and Compliance (GRC)
+SAP HANA
+SAP Human Resource Management Systems (HRMS)
+SAP Hybris
+SAP Incentive and Commission Management (ICM)
+SAP Internet Transaction Server (ITS)
+SAP IS Airlines & Defense
+SAP IT Operations Analytics (ITOA)
+SAP Jam
+SAP Knowledge Warehouse (KW)
+SAP Manufacturing
+SAP Master Data Governance (MDG)
+SAP Master Data Management (MDM)
+SAP NetWeaver Application Server (Web AS)
+SAP NetWeaver Development Infrastructure
+SAP NetWeaver Identity Management
+SAP NetWeaver Platform
+SAP NetWeaver Portal
+SAP NetWeaver Single Sign-On
+SAP NetWeaver Visual Composer
+SAP Portal (EP)
+SAP PRD2 (P2)
+SAP Product Lifecycle Management (PLM)
+SAP Profitability and Cost Management (PCM)
+SAP R/2
+SAP R/3
+SAP Rapid Deployment Solutions (RDS)
+SAP S/4HANA
+SAP S/4HANA Cloud
+SAP Sales Cloud
+SAP Service and Asset Management
+SAP Shipping Services Network (SSN)
+SAP Solution Composer
+SAP Solution Manager (SM)
+SAP Solutions for mobile business
+SAP Strategic Enterprise Management (SEM)
+SAP SuccessFactors
+SAP Supplier Relationship Management (SRM)
+SAP Supply Chain Management (SCM)
+SAP Supply Chain Management (SCM)
+SAP Supply Chain Performance Management (SCPM)
+SAP Supply Network Collaboration (SNC)
+SAP Sustainability Performance Management (SUPM)
+SAP Test Data Migration Server (TDMS)
+SAP Training and Event Management (TEM)
+SAP xApps
+SAP GUI
+Sybase ASE

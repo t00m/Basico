@@ -37,7 +37,7 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         self.statusbar.set_property('margin-bottom', 6)
         self.statusbar.set_xalign(0.0)
         viewport.add(self.statusbar)
-        vbox.pack_start(separator, True, False, 0)
+        # ~ vbox.pack_start(separator, True, False, 0)
         vbox.pack_start(viewport, True, False, 0)
         self.add(vbox)
 

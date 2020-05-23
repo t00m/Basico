@@ -28,6 +28,8 @@ class BasicoWidget(object):
             self.app = app
 
         self.log = get_logger(logname)
+        self.init_section(logname)
+        # ~ self.log.debug("Loading widget: %s", logname)
 
 
     def get_traceback(self):
@@ -52,8 +54,8 @@ class BasicoWidget(object):
         config = self.srvstg.load()
 
         try:
-            config['Widgets']
+            config['Widget#%s' % name]
         except:
-            config['Widgets'] = {}
+            config['Widget#%s' % name] = {}
             self.srvstg.save(config)
-            self.log.debug("Section '%s' initialized in config file" % section)
+            self.log.debug("Section '%s' initialized in config file" % name)

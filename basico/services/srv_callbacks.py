@@ -16,21 +16,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
+from gi.repository import GObject
 
 from basico.core.mod_srv import Service
 from basico.core.mod_env import FILE, LPATH, ATYPES, APP
-from basico.widgets.wdg_visor_sapnotes import SAPNotesVisor
-from basico.widgets.wdg_visor_toolbar import VisorToolbar
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.widgets.wdg_settingsview import SettingsView
 
-# PROPKEYS = CSV headers. SAP Note metadata
-PROPKEYS = ['id', 'title', 'type', 'componentkey',
-            'componenttxt', 'category', 'priority', 'releasedon',
-            'language', 'version']
-
-# Extend PROPKEYS with custom basico metadata
-PROPKEYS.extend (['Bookmark'])
 
 class Callback(Service):
     def initialize(self):
@@ -47,61 +39,71 @@ class Callback(Service):
         self.srvant = self.get_service('Annotation')
         self.srvbnr = self.get_service('BNR')
         self.srvclt = self.get_service('Collections')
+        self.srvatc = self.get_service('Attachment')
 
 
-    def gui_visor_switch_page(self, notebook, page, page_num):
-        # 0|1|(2) -> SAP Notes Visor | Annotations Visor | (Help)
-        self.srvgui.set_key_value('current_visor_tab', page_num)
-        notebook_viewmenu = self.srvgui.get_widget('gtk_notebook_menuview')
-        paned = self.srvgui.get_widget('gtk_hpaned')
+    def stack_visor_changed(self, stack, gparam):
+        visible_stack_name = stack.get_visible_child_name()
+        if visible_stack_name is None:
+            return
 
-        if page_num == 0:
-            self.srvuif.set_widget_visibility('gtk_button_menu_views', True)
+        if visible_stack_name == 'visor-sapnotes':
             self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor = self.srvgui.get_widget('visor_sapnotes')
-            visible_filter = visor.get_visible_filter()
-            visor.update_total_sapnotes_count()
-            paned.set_position(400)
-            notebook_viewmenu.set_current_page(0)
-        elif page_num == 1:
-            self.srvuif.set_widget_visibility('gtk_button_menu_views', False)
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+            visor_sapnotes.update_total_sapnotes_count()
+        elif visible_stack_name == 'visor-annotations':
             self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor = self.srvgui.get_widget('visor_annotations')
-            visor.populate_annotations()
-            paned.set_position(200)
-            notebook_viewmenu.set_current_page(1)
+            visor_annotations = self.srvgui.get_widget('visor_annotations')
+            visor_annotations.populate()
+        else:
+            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
+            visor_attachments = self.srvgui.get_widget('visor_attachments')
+            visor_attachments.populate()
 
 
     def gui_show_visor_sapnotes(self):
-        notebook = self.srvgui.get_widget('gtk_notebook_visor')
-        notebook.set_current_page(0)
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        stack_main.set_visible_child_name('dashboard')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        stack_visors.set_visible_child_name('visor-sapnotes')
 
 
     def gui_show_visor_annotations(self):
-        notebook = self.srvgui.get_widget('gtk_notebook_visor')
-        notebook.set_current_page(1)
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        stack_main.set_visible_child_name('dashboard')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        stack_visors.set_visible_child_name('visor-annotations')
+
+
+    def gui_show_visor_attachments(self):
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        stack_main.set_visible_child_name('dashboard')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        stack_visors.set_visible_child_name('visor-attachments')
 
 
     def action_search(self, entry):
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_annotations = self.srvgui.get_widget('visor_annotations')
         term = entry.get_text()
-        page = self.srvgui.get_key_value('current_visor_tab')
+
+        stack_visor = stack_visors.get_visible_child_name()
         completion = self.srvgui.get_widget('gtk_entrycompletion_visor')
         completion_model = completion.get_model()
         completion_model.clear()
 
-        if page == 0:
+        if stack_visor == 'visor-sapnotes':
             bag = self.srvdtb.search(term)
-            visor_sapnotes.populate_sapnotes(bag)
+            visor_sapnotes.populate(bag)
             ebuffer = entry.get_buffer()
             ebuffer.delete_text(0, -1)
             msg = "Found %d SAP Notes for term '%s'" % (len(bag), term)
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg)
-        elif page == 1:
+        elif stack_visor == 'visor-annotations':
             annotations = self.srvant.search_term(term)
-            visor_annotations.populate_annotations(annotations)
+            visor_annotations.populate(annotations)
             msg = "Found %d annotations for term '%s'" % (len(annotations), term)
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg)
@@ -112,6 +114,7 @@ class Callback(Service):
         self.log.info("Browsing SAP Note %d" % int(sid))
         SAP_NOTE_URL = self.srvstg.get('SAP', 'SAP_NOTE_URL')
         url = SAP_NOTE_URL % sid
+        self.srvuif.grab_focus()
         self.srvutl.browse(url)
 
 
@@ -123,28 +126,28 @@ class Callback(Service):
 
 
     def sapnote_delete(self, button, sid):
-        visor = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         viewmenu = self.srvgui.get_widget('viewmenu')
 
         answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', [sid])
         if answer is True:
             self.srvdtb.delete(sid)
             self.srvuif.statusbar_msg("SAP Note %s deleted" % sid, True)
-            visor.reload()
+            visor_sapnotes.reload()
         else:
             self.log.info("SAP Note %s not deletd", sid)
 
 
     def sapnote_delete_view(self, button):
-        visor = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         viewmenu = self.srvgui.get_widget('viewmenu')
 
-        bag = visor.get_filtered_bag()
+        bag = visor_sapnotes.get_filtered_bag()
         answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', bag)
         if answer is True:
             for sid in bag:
                 self.srvdtb.delete(sid)
-            visor.reload()
+            visor_sapnotes.reload()
             msg = "Deleted %d SAP Notes" % len(bag)
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg, True)
@@ -152,8 +155,9 @@ class Callback(Service):
             msg = "None of the %d SAP Notes has been deleted" % len(bag)
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg, True)
-        visor.reload()
+        visor_sapnotes.reload()
         viewmenu.populate()
+
 
     def gui_hide_popover(self, popover):
         popover.hide()
@@ -179,7 +183,7 @@ class Callback(Service):
         dialog.set_default_size(800, 400)
         res_bck_file = dialog.run()
         self.log.debug("Backup file: %s", dialog.get_filename())
-        
+
         if res_bck_file == Gtk.ResponseType.OK:
             backup_filename = dialog.get_filename()
             if res_bck_annot == Gtk.ResponseType.YES:
@@ -192,7 +196,7 @@ class Callback(Service):
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg, True)
             self.srvuif.copy_text_to_clipboard(bckname)
-        
+
         else:
             self.srvuif.statusbar_msg("Backup aborted by user", True)
             self.log.info("Backup aborted")
@@ -248,7 +252,7 @@ class Callback(Service):
                     self.srvbnr.restore_from_backup(backup, overwrite)
                     self.srvdtb.load_notes()
                     self.srvclt.load_collections()
-                    visor_annotations.populate_annotations()
+                    visor_annotations.populate()
                     self.gui_refresh_view()
                     self.gui_show_visor_sapnotes()
                     self.srvuif.statusbar_msg("Backup restored successfully", True)
@@ -265,63 +269,51 @@ class Callback(Service):
 
 
     def gui_show_about(self, *args):
-        notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
         about = self.srvgui.get_widget('widget_about')
         stack = self.srvgui.get_widget('gtk_stack_main')
-
         stack.set_visible_child_name('about')
         self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
-        self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
-
-        notebook_menuview.hide()
-        self.gui_annotation_widget_hide()
-        about.grab_focus()
+        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
+        self.srvuif.grab_focus()
 
 
     def gui_show_log(self, *args):
-        notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
         logviewer = self.srvgui.get_widget('widget_logviewer')
         stack = self.srvgui.get_widget('gtk_stack_main')
-
         logviewer.update()
         self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         stack.set_visible_child_name('log')
-        self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
-
-        notebook_menuview.hide()
-        self.gui_annotation_widget_hide()
-        logviewer.grab_focus()
+        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
         self.srvuif.statusbar_msg("Displaying application log")
+        self.srvuif.grab_focus()
 
 
     def gui_show_settings(self, button):
         notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
         stack = self.srvgui.get_widget('gtk_stack_main')
         view_settings = self.srvgui.get_widget('widget_settings')
-
         stack.set_visible_child_name('settings')
         view_settings.update()
         self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
-        self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
+        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
 
         notebook_menuview.hide()
-        self.gui_annotation_widget_hide()
         view_settings.grab_focus()
         self.srvuif.statusbar_msg("Displaying application settings")
 
 
     def gui_show_dashboard(self, *args):
         stack = self.srvgui.get_widget('gtk_stack_main')
-        notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
+        # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
         viewmenu = self.srvgui.get_widget('viewmenu')
         current_view = viewmenu.get_view()
 
-        notebook_menuview.show_all()
-        stack.set_visible_child_name('visor')
+        # ~ notebook_menuview.show_all()
+        stack.set_visible_child_name('dashboard')
         self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
+        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
 
         if current_view == 'annotation':
             self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
@@ -347,32 +339,51 @@ class Callback(Service):
         self.srvutl.browse("file://%s" % FILE['HELP_INDEX'])
 
 
-    def gui_annotation_widget_show(self, widget, sid='0000000000', action='create'):
+    def gui_annotation_widget_show(self, aid, action='create'):
+        notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
         widget_annotation = self.srvgui.get_widget('widget_annotation')
-        widget = self.srvgui.get_widget('gtk_entry_annotation_title')
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        widget = self.srvgui.get_widget('gtk_label_timestamp_created')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+
+        stack_visors.set_visible_child_name("visor-annotations")
+        notebook.set_current_page(1)
+        self.srvuif.set_widget_visibility('visortoolbar', False)
 
         if action == 'create':
-            self.gui_annotation_widget_clear()
-            aid = self.srvant.gen_aid(sid)
+            widget_annotation.clear()
+            if aid == '':
+                aid = self.srvant.gen_aid()
+            else:
+                sid = aid
+                aid = self.srvant.gen_aid(sid)
+            widget_annotation.set_visible_stack('editor')
         elif action == 'edit':
-            aid = sid
+            widget_annotation.set_visible_stack('editor')
+        elif action == 'preview':
+            widget_annotation.set_visible_stack('preview')
+
+        self.log.debug("Action: %s annotation with Id: %s", action, aid)
 
         widget_annotation.set_metadata_to_widget(aid, action)
+        # ~ stack_main.set_visible_child_name('annotations')
 
-        self.srvuif.set_widget_visibility('gtk_vbox_container_annotations', True)
-        widget.grab_focus()
+        self.srvuif.grab_focus()
 
 
     def gui_show_popover(self, button, popover):
+        self.srvgui.set_key_value('LAST_POPOVER', popover)
         if popover.get_visible():
+            popover.popdown()
             popover.hide()
         else:
             popover.show_all()
+            popover.popup()
 
 
     def switch_bookmark_current_view(self, *args):
-        visor = self.srvgui.get_widget('visor_sapnotes')
-        bag = visor.get_filtered_bag()
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        bag = visor_sapnotes.get_filtered_bag()
         try:
             for sid in bag:
                 metadata = self.srvdtb.get_sapnote_metadata(sid)
@@ -384,14 +395,14 @@ class Callback(Service):
         except:
             self.log.error("Could not bookmark SAP Note %s" % sid)
             self.log.error(self.get_traceback())
-        visor.populate_sapnotes(bag)
+        visor_sapnotes.populate(bag)
         msg = "%d SAP Notes (un)bookmarked" % len(bag)
         self.log.info(msg)
         self.srvuif.statusbar_msg(msg, True)
 
 
     def switch_bookmark(self, button, lsid, popover):
-        visor = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         try:
             for sid in lsid:
                 metadata = self.srvdtb.get_sapnote_metadata(sid)
@@ -406,7 +417,7 @@ class Callback(Service):
         except:
             self.log.error("Could not bookmark SAP Note %s" % sid)
             self.log.error(self.get_traceback())
-        visor.populate_sapnotes()
+        visor_sapnotes.populate()
 
 
     def sapnote_bookmark(self, lsid):
@@ -421,17 +432,18 @@ class Callback(Service):
         db = self.get_service('DB')
         webdriver = self.get_service('Driver')
         textview = self.srvgui.get_widget('gtk_textview_download_launchpad')
-        visor = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
 
         bag = []
         all_notes = []
         sapnotes = []
-
         dlbuffer = textview.get_buffer()
         istart, iend = dlbuffer.get_bounds()
         text = dlbuffer.get_text(istart, iend, False)
+        self.log.debug(text)
         lines = text.replace(' ', ',')
         lines = lines.replace('\n', ',')
+        self.log.debug(lines)
         for sid in lines.split(','):
             sid = sid.strip()
             if len(sid) > 0:
@@ -477,8 +489,8 @@ class Callback(Service):
                 time.sleep(0.2)
 
         dlbuffer.set_text('')
-        popover = self.srvgui.get_widget('gtk_popover_toolbutton_import')
-        self.gui_hide_popover(popover)
+        # ~ popover = self.srvgui.get_widget('gtk_popover_toolbutton_import')
+        # ~ self.gui_hide_popover(popover)
         if len(bag) > 0:
             webdriver.close(driver)
 
@@ -487,7 +499,7 @@ class Callback(Service):
         db.build_stats()
         self.log.info("Download completed.")
         self.srvuif.statusbar_msg("Download completed", True)
-        visor.populate_sapnotes(all_notes)
+        visor_sapnotes.populate(all_notes)
         self.gui_show_visor_sapnotes()
         return result
 
@@ -531,19 +543,21 @@ class Callback(Service):
         selection.select_path("0")
 
 
-    def gui_filter_visor(self, entry):
-        page = self.srvgui.get_key_value('current_visor_tab')
-        if page == 0:
-            visor = self.srvgui.get_widget('visor_sapnotes')
-            visible_filter = visor.get_visible_filter()
+    def gui_filter_visor(self, entry=None):
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        visible_stack_name = stack_visors.get_visible_child_name()
+
+        if visible_stack_name == 'visor-sapnotes':
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+            visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
             visible_filter.refilter()
-            visor.update_total_sapnotes_count()
-        elif page == 1:
-            visor = self.srvgui.get_widget('visor_annotations')
-            visor.populate_annotations()
-            visible_filter = visor.get_visible_filter()
+            visor_sapnotes.update_total_sapnotes_count()
+        elif visible_stack_name == 'visor-annotations':
+            visor_annotations = self.srvgui.get_widget('visor_annotations')
+            visor_annotations.populate()
+            visible_filter = self.srvgui.get_widget('visor_annotation_visible_filter')
             visible_filter.refilter()
-            visor.update_total_annotations_count()
+            visor_annotations.update_total_annotations_count()
 
 
     def gui_refresh_view(self, button=None, view=None):
@@ -591,8 +605,25 @@ class Callback(Service):
             window.unfullscreen()
 
 
+    def action_annotation_create(self):
+        self.gui_annotation_widget_show('', 'create')
+
+
+    def action_annotation_create_from_template(self, aid):
+        new_aid = self.srvant.duplicate_from_template(aid)
+        self.action_annotation_edit(new_aid)
+
+
+    def action_annotation_create_for_sapnote(self, sid):
+        self.gui_annotation_widget_show(sid, 'create')
+
+
     def action_annotation_edit(self, aid):
-        self.gui_annotation_widget_show(None, aid, 'edit')
+        self.gui_annotation_widget_show(aid, 'edit')
+
+
+    def action_annotation_preview(self, aid):
+        self.gui_annotation_widget_show(aid, 'preview')
 
 
     def action_annotation_duplicate(self, *args):
@@ -600,20 +631,16 @@ class Callback(Service):
 
 
     def action_annotation_delete(self, *args):
-        visor = self.srvgui.get_widget('visor_annotations')
-        widget_annotation = self.srvgui.get_widget('widget_annotation')
-        aid = widget_annotation.get_aid_from_widget()
-
-        answer = self.srvuif.warning_message_delete_annotations(None, 'Deleting annotations', 'Are you sure?', [aid])
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        aids = visor_annotations.rows_toggled()
+        answer = self.srvuif.warning_message_delete_annotations(None, 'Deleting annotations', 'Are you sure?', aids)
         if answer is True:
-            title = self.srvant.get_title(aid)
-            self.srvant.delete(aid)
-            self.gui_annotation_widget_clear()
-            self.srvuif.set_widget_visibility('gtk_vbox_container_annotations', False)
-            visor.populate_annotations()
-            self.srvuif.statusbar_msg("Annotation <i>'%s'</i> deleted" % title, True)
+            for aid in aids:
+                self.srvant.delete(aid)
+            visor_annotations.populate()
+            self.srvuif.statusbar_msg("Annotations deleted", True)
         else:
-            self.log.info("Annotation %s hasn't been deleted" % title)
+            self.log.info("Annotations hasn't been deleted")
             self.srvuif.statusbar_msg("Action canceled. Nothing deleted.", True)
 
         self.srvuif.grab_focus()
@@ -624,6 +651,8 @@ class Callback(Service):
         visor_annotations = self.srvgui.get_widget('visor_annotations')
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         viewmenu = self.srvgui.get_widget('viewmenu')
+        notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
+        notebook.set_current_page(0)
 
         aid = widget_annotation.get_aid_from_widget()
         annotation = widget_annotation.get_metadata_from_widget()
@@ -636,19 +665,38 @@ class Callback(Service):
             self.srvant.create(annotation)
             title = self.srvant.get_title(aid)
             self.srvuif.statusbar_msg('New annotation created: %s' % title, True)
-        visor_annotations.populate_annotations()
-        visor_sapnotes.populate_sapnotes()
-        self.gui_annotation_widget_clear()
-        self.srvuif.set_widget_visibility('gtk_vbox_container_annotations', False)
+        visor_annotations.populate()
+        visor_sapnotes.populate()
+        widget_annotation.clear()
+        self.srvuif.set_widget_visibility('visortoolbar', True)
         self.srvuif.grab_focus()
+
+
+    def action_annotation_save(self):
+        widget_annotation = self.srvgui.get_widget('widget_annotation')
+        aid = widget_annotation.get_aid_from_widget()
+        annotation = widget_annotation.get_metadata_from_widget()
+
+        if self.srvant.is_valid(aid):
+            self.srvant.update(annotation)
+            title = self.srvant.get_title(aid)
+            self.srvuif.statusbar_msg("Updated annotation: %s" % title, True)
 
 
     def action_annotation_cancel(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')
-        self.gui_annotation_widget_clear()
-        self.srvuif.set_widget_visibility('gtk_vbox_container_annotations', False)
-        self.log.debug('Annotation canceled')
+        widget_annotation = self.srvgui.get_widget('widget_annotation')
+        notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
+        notebook.set_current_page(0)
+
+        widget_annotation.clear()
+        self.srvuif.set_widget_visibility('visortoolbar', True)
+        # ~ page = self.srvgui.get_key_value('current_visor_tab')
+        # ~ notebook = self.srvgui.get_widget('gtk_notebook_visor')
+        # ~ notebook.set_current_page(page)
+        # ~ self.log.debug('Annotation canceled')
         self.srvuif.statusbar_msg("Annotation canceled")
+        self.gui_show_dashboard()
         self.srvuif.grab_focus()
 
 
@@ -773,27 +821,14 @@ class Callback(Service):
         self.srvuif.statusbar_msg(msg, True)
 
 
-    def gui_annotation_widget_clear(self):
-        a_wdg_timestamp = self.srvgui.get_widget('gtk_label_human_timestamp')
-        a_wdg_title = self.srvgui.get_widget('gtk_entry_annotation_title')
-        a_wdg_type = self.srvgui.get_widget('gtk_combobox_annotation_type')
-        a_wdg_text = self.srvgui.get_widget('gtk_textview_annotation_text')
-        a_wdg_link = self.srvgui.get_widget('gtk_entry_annotation_link')
-        a_wdg_link_button = self.srvgui.get_widget('gtk_link_button_annotation_link')
-        a_wdg_link_type = self.srvgui.get_widget('gtk_combobox_annotation_link_type')
-
-        a_wdg_timestamp.set_text('')
-        a_wdg_title.set_text('')
-        textbuffer = a_wdg_text.get_buffer()
-        textbuffer.set_text('')
-        a_wdg_link.set_text('')
-        a_wdg_link_button.set_uri('')
-        self.gui_annotation_widget_hide()
+    def gui_annotation_previous_row(self, *args):
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        visor_annotations.row_previous()
 
 
-    def gui_annotation_widget_hide(self):
-        self.srvuif.set_widget_visibility('gtk_vbox_container_annotations', False)
-
+    def gui_annotation_next_row(self, *args):
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        visor_annotations.row_next()
 
     def gui_copy_to_clipboard_sapnote(self, widget, lsid, popover):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
@@ -810,7 +845,7 @@ class Callback(Service):
 
     def gui_jump_to_sapnote(self, widget, sid):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        visor_sapnotes.populate_sapnotes([sid])
+        visor_sapnotes.populate([sid])
         self.gui_show_visor_sapnotes()
         self.srvuif.grab_focus()
         msg = "Jumping to SAP Note %s" % sid
@@ -818,28 +853,31 @@ class Callback(Service):
         self.srvuif.statusbar_msg(msg)
 
 
+    def gui_jump_to_annotation(self, widget, aid):
+        paned = self.srvgui.get_widget('gtk_hpaned')
+        notebook = self.srvgui.get_widget('gtk_notebook_visor')
+        notebook_viewmenu = self.srvgui.get_widget('gtk_notebook_menuview')
+        notebook_viewmenu.set_current_page(1)
+        signal = self.srvgui.get_signal('gtk_notebook_visor', 'switch-page')
+        GObject.signal_handler_block(notebook, signal)
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        visor_annotations.populate([aid])
+        self.gui_show_visor_annotations()
+        self.srvuif.grab_focus()
+        msg = "Jumping to annotation %s" % aid
+        self.log.info(msg)
+        self.srvuif.statusbar_msg(msg)
+        GObject.signal_handler_unblock(notebook, signal)
+        paned.set_position(400)
+
+
     def gui_link_to_sapnote(self, *args):
         pass
 
-    def gui_switch_selection_atypes(self, switch, state):
-        label = self.srvgui.get_widget('gtk_label_switch_select_atypes')
-        switched = switch.get_active()
-        switch.set_state(switched)
-        if switched is True:
-            label.set_text ("All selected")
-
-        else:
-            label.set_text("None selected")
-
-        for name in ATYPES:
-            button = self.srvgui.get_widget('gtk_button_type_%s' % name.lower())
-            button.set_state(switched)
-            button.set_active(switched)
-
 
     def gui_sapnotes_select_all_none(self, witch, state):
-        visor = self.srvgui.get_widget('visor_sapnotes')
-        model = visor.get_model()
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        model = visor_sapnotes.get_model()
 
         def get_selected_sapnotes(model, path, itr):
             component = model.get(itr, 5)
@@ -847,3 +885,162 @@ class Callback(Service):
                 model.set(itr, 2, state)
 
         model.foreach(get_selected_sapnotes)
+
+
+    # ~ def gui_maximize_annotation_window(self, *args):
+        # ~ vpaned = self.srvgui.get_widget('gtk_vpaned_visor')
+        # ~ stack_main = self.srvgui.get_widget('gtk_stack_main')
+        # ~ toggle_button = self.srvgui.get_widget('gtk_togglebutton_maximize_annotation_widget')
+        # ~ if toggle_button.get_active():
+            # ~ stack_main.hide()
+            # ~ vpaned.set_position(0)
+        # ~ else:
+            # ~ stack_main.show_all()
+            # ~ vpaned.set_position(450)
+
+
+    def gui_attachment_add_to_sapnote(self, button, sid):
+        visor_attachemnts = self.srvgui.get_widget('visor_attachments')
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+
+        # Create annotation
+        aid = self.srvant.gen_aid(sid)
+        annotation = {}
+        annotation["AID"] = aid
+        annotation["Title"] = "Attachments added for SAP Note %s" % str(int(sid))
+        annotation["Component"] = "Annotation"
+        annotation["Type"] = "Note"
+        annotation["Category"] = "Inbox"
+        annotation["Priority"] = "Low"
+        annotation["Link"] = ""
+        annotation["LinkType"] = "Website"
+        annotation["Origin"] = "Service-Attachment"
+
+        # Get attachments from filechooser dialog
+        attachments = self.gui_attachment_show_filechooser()
+
+        # Add them to Basico database
+        if attachments is not None:
+            content = '== Attachments\n\n'
+            for attachment in attachments:
+                # only allow files (avoid directories)
+                if os.path.isfile(attachment):
+                    content += "* %s\n" % attachment
+                    tid = self.srvatc.create(attachment, aid)
+                    annotation["TID"] = tid
+                    # ~ self.log.debug(annotation)
+                annotation["Content"] = content
+                self.srvant.create(annotation)
+            visor_attachemnts.populate()
+            visor_annotations.populate()
+            visor_sapnotes.populate()
+        else:
+            self.log.warning("No files selected to attach")
+
+
+    def gui_attachment_add_to_annotation(self, button):
+        widget_annotation = self.srvgui.get_widget('widget_annotation')
+        visor_attachemnts = self.srvgui.get_widget('visor_attachments')
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        aid = widget_annotation.get_aid_from_widget()
+
+        # Create annotation
+        sid = self.srvant.get_sid(aid)
+        new_aid = self.srvant.gen_aid(sid)
+        annotation = {}
+        annotation["AID"] = new_aid
+        annotation["Title"] = "Attachments added for annotation: %s" % self.srvant.get_title(aid)
+        annotation["Component"] = "Annotation"
+        annotation["Type"] = "Note"
+        annotation["Category"] = "Inbox"
+        annotation["Priority"] = "Low"
+        annotation["Link"] = ""
+        annotation["LinkType"] = "Website"
+        annotation["Origin"] = "Service-Attachment"
+
+        # Get attachments from filechooser dialog
+        attachments = self.gui_attachment_show_filechooser()
+
+        # Add them to Basico database
+        if attachments is not None:
+            content = '== Attachments\n\n'
+            for attachment in attachments:
+                # only allow files (avoid directories)
+                if os.path.isfile(attachment):
+                    content += "* %s\n" % attachment
+                    tid = self.srvatc.create(attachment, aid)
+                    annotation["TID"] = tid
+                    # ~ self.log.debug(annotation)
+                annotation["Content"] = content
+                self.srvant.create(annotation)
+                self.srvant.update_timestamp(aid)
+            visor_attachemnts.populate()
+            visor_annotations.populate()
+        else:
+            self.log.warning("No files selected to attach")
+
+
+    def gui_attachment_add(self, *args):
+        visor_attachemnts = self.srvgui.get_widget('visor_attachments')
+        visor_annotations = self.srvgui.get_widget('visor_annotations')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+
+        # Create annotation
+        aid = self.srvant.gen_aid('0000000000')
+        annotation = {}
+        annotation["AID"] = aid
+        annotation["Title"] = "Attachments added"
+        annotation["Component"] = "Annotation"
+        annotation["Type"] = "Note"
+        annotation["Category"] = "Inbox"
+        annotation["Priority"] = "Low"
+        annotation["Link"] = ""
+        annotation["LinkType"] = "Website"
+        annotation["Origin"] = "Service-Attachment"
+
+        # Get attachments from filechooser dialog
+        attachments = self.gui_attachment_show_filechooser()
+
+        # Add them to Basico database
+        if attachments is not None:
+            content = '== Attachments\n\n'
+            for attachment in attachments:
+                # only allow files (avoid directories)
+                if os.path.isfile(attachment):
+                    content += "* %s\n" % attachment
+                    tid = self.srvatc.create(attachment, aid)
+                    annotation["TID"] = tid
+                    # ~ self.log.debug(annotation)
+                annotation["Content"] = content
+                self.srvant.create(annotation)
+            visor_attachemnts.populate()
+            visor_annotations.populate()
+        else:
+            self.log.warning("No files selected to attach")
+
+
+    def gui_attachment_show_filechooser(self):
+        filenames = None
+        parentwin = self.srvgui.get_window()
+        dialog = Gtk.FileChooserDialog(title="Open file(s) ...",
+                                       parent=parentwin,
+                                       action=Gtk.FileChooserAction.OPEN,
+                                       buttons=("_Cancel",
+                                                Gtk.ResponseType.CANCEL,
+                                        "_Open", Gtk.ResponseType.ACCEPT))
+        dialog.set_select_multiple(True)
+        response = dialog.run()
+        if response == Gtk.ResponseType.ACCEPT:
+            filenames = dialog.get_filenames()
+            i = 0
+            while i < len(filenames):
+                filename = filenames[i]
+                self.log.debug("%s was selected", filename)
+                i += 1
+        dialog.destroy()
+        return filenames
+
+    def copy_text_to_clipboard(self, widget, text):
+        self.srvuif.copy_text_to_clipboard(text)
+        self.srvuif.grab_focus()

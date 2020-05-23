@@ -12,7 +12,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 from basico.core.mod_wdg import BasicoWidget
-from basico.services.srv_cols import COL_DOWNLOADED
+from basico.services.srv_collections import COL_DOWNLOADED
 
 
 class CollectionsMgtView(BasicoWidget, Gtk.VBox):
@@ -20,10 +20,10 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
     """
     Missing class docstring (missing-docstring)
     """
-    def __init__(self, app, sid, overwrite=False): 
+    def __init__(self, app, sid, overwrite=False):
         super().__init__(app, __class__.__name__)
         Gtk.VBox.__init__(self)
-        self.sid = sid     
+        self.sid = sid
         self.current_cid = None
         self.overwrite = overwrite
         self.log.debug("CollectionsMgtView widget overwrite mode is %s", overwrite)
@@ -61,7 +61,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         if self.sid == '0000000000':
             title.set_markup('<big><b>Manage collections</b></big>')
         elif self.sid == 'view':
-            title.set_markup('<big><b>Manage collections for this view</b></big>') 
+            title.set_markup('<big><b>Manage collections for this view</b></big>')
         else:
             title.set_markup('<big><b>Collections for SAP Note %s</b></big>' % str(int(self.sid)))
         title.set_xalign(0.0)
@@ -172,7 +172,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         self.trv_signal_changed = self.selection.connect('changed', self.row_changed)
 
         # Filter
-        # ~ self.visible_filter = self.model.filter_new()
+        # ~ self.visible_filter = self.sorted_model.filter_new()
         # ~ self.visible_filter.set_visible_func(self.visible_function)
         # ~ treeview.set_model(self.visible_filter)
 
@@ -208,7 +208,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
                     self.log.debug("Collection to be linked: %s (%s)", self.srvclt.get_name_by_cid(cid), cid)
 
         self.model.foreach(get_linked_collections)
-        
+
         if len(selected) == 0:
             selected.append(COL_DOWNLOADED)
 
@@ -217,18 +217,18 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
             self.srvdtb.set_collections(self.sid, selected, self.overwrite)
             self.srvuif.statusbar_msg("Selected collection linked to SAP Note %s" % str(int(self.sid)), True)
         except:
-            visor = self.srvgui.get_widget('visor_sapnotes')
-            bag = visor.get_filtered_bag()
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+            bag = visor_sapnotes.get_filtered_bag()
             for sid in bag:
                 self.srvdtb.set_collections(sid, selected, self.overwrite)
             self.srvuif.statusbar_msg("Selected collections linked to all SAP Note in this view", True)
-                
-        visor = self.srvgui.get_widget('visor_sapnotes')
-        visor.populate_sapnotes()
+
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes.populate()
         viewmenu = self.srvgui.get_widget('viewmenu')
         viewmenu.populate()
         viewmenu.grab_focus()
-        
+
 
 
     def row_changed(self, selection):
@@ -256,9 +256,9 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
 
         if entry is not None and isinstance(entry, Gtk.Entry):
             name = entry.get_text()
-            res, msg = self.srvclt.create(name)            
+            res, msg = self.srvclt.create(name)
             self.srvuif.statusbar_msg(msg, True)
-            
+
         self.model.clear()
         collections = self.srvclt.get_all()
         if len(collections) > 0:
@@ -271,7 +271,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
             self.current_cid = None
 
         self.srvuif.statusbar_msg("Collections updated")
-        
+
 
     def delete(self, button):
         """
@@ -309,6 +309,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         text = entry.get_text()
         title = model.get(itr, 2)[0]
         match = text.upper() in title.upper()
+        self.log.debug("%s in %s is %s", text.upper(), title.upper(), match)
         return match
 
 
@@ -316,7 +317,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         entry = self.srvgui.get_widget('gtk_entry_collection_new')
         filter = entry.get_text()
         selection = self.treeview.get_selection()
-
+        # ~ self.visible_filter.refilter()
 
         def gui_iterate_over_data(model, path, itr):
             title = self.sorted_model.get(itr, 2)[0]
@@ -339,7 +340,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         if cid == COL_DOWNLOADED:
             self.srvuif.statusbar_msg("You can't rename this collection")
             return
-            
+
         name_old = self.srvclt.get_name_by_cid(cid)
         iter_has_child = model.iter_has_child(treeiter)
 

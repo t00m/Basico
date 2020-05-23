@@ -12,7 +12,7 @@ import traceback
 from shutil import which
 from basico.core.mod_srv import Service
 from basico.core.mod_env import LPATH
-from basico.services.srv_cols import COL_DOWNLOADED
+from basico.services.srv_collections import COL_DOWNLOADED
 
 # Default settings for SAP module
 LOGIN_PAGE_URL = "https://accounts.sap.com"
@@ -109,7 +109,7 @@ class SAP(Service):
                     n += 1
             except KeyError:
                 self.log.debug("SAP Note %s doesn't has 'collections' property. Fixing...", sid)
-                self.srvdtb.set_collections(sid, [COL_DOWNLOADED])    
+                self.srvdtb.set_collections(sid, [COL_DOWNLOADED])
             except Exception as error:
                 self.log.error(error)
                 self.log.error(self.get_traceback())
@@ -118,13 +118,16 @@ class SAP(Service):
         self.log.debug("Fix 2. Unlik 'Downloaded' collections for SAP Notes with more than one collection")
         n = 0
         for sid in sapnotes:
-            collections = sapnotes[sid]['collections']
-            if COL_DOWNLOADED in collections and len(collections) > 1:
-                self.log.debug("Fixing SAP Note %s by unlinking 'Downloaded' collection.", sid)
-                n += 1
+            try:
+                collections = sapnotes[sid]['collections']
+                if COL_DOWNLOADED in collections and len(collections) > 1:
+                    self.log.debug("Fixing SAP Note %s by unlinking 'Downloaded' collection.", sid)
+                    n += 1
+            except:
+                pass
         self.log.debug("Fixed %d SAP Notes", n)
-        
-        
+
+
 
     def analyze_sapnote(self, sid, content):
         '''

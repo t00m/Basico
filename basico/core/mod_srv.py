@@ -32,6 +32,7 @@ class Service(object):
 
         self.started = False
 
+
     def is_started(self):
         """Return True or False if service is running / not running
         """
@@ -69,7 +70,7 @@ class Service(object):
         except Exception as error:
             self.log.debug (self.get_traceback())
 
-        self.log.debug("Module %s started" , logname)
+        # ~ self.log.debug("Module %s started" , logname)
 
 
     def end(self):
@@ -123,3 +124,7 @@ class Service(object):
     def get_config(self):
         self.srvstg = self.get_service('Settings')
         return self.srvstg.load()
+
+
+    def get_splash(self):
+        return self.app.get_splash()

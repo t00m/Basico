@@ -55,6 +55,9 @@ class SeleniumDriver(Service):
         GECKO_INSTALL_DIR = LPATH['DRIVERS']
         os.environ["PATH"] += os.pathsep + GECKO_INSTALL_DIR
 
+        # Asciidoctor installed?
+        ASCIIDOCTOR = utils.which('asciidoctor')
+
         # Then, look for Geckodriver
         GECKODRIVER = utils.which('geckodriver')
 

@@ -36,7 +36,7 @@ class Settings(Service):
     def get(self, section, key):
         config = self.load()
         try:
-            return config[section][key]            
+            return config[section][key]
         except Exception as error:
             self.log.error(error)
             return None
@@ -47,7 +47,7 @@ class Settings(Service):
         try:
             config[section][key] = value
             self.log.debug("[%s][%s] = %s" % (section, key, value))
-            self.save(config)            
+            self.save(config)
         except:
             self.log.error("Setting not saved")
             self.log.error(self.get_traceback())
@@ -71,4 +71,4 @@ class Settings(Service):
             return
         with open(FILE['CNF'], 'w') as fp:
             json.dump(config, fp)
-        self.log.debug("Settings saved successfully")
+        # ~ self.log.debug("Settings saved successfully")

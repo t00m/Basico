@@ -10,6 +10,9 @@
 import os
 import re
 import sys
+import json
+from html import escape
+from stat import ST_SIZE
 import subprocess
 import tarfile
 import zipfile
@@ -18,7 +21,8 @@ import requests
 import webbrowser
 import feedparser
 from datetime import datetime
-from basico.core.mod_env import GPATH, LPATH
+from gi.repository import Gio
+from basico.core.mod_env import GPATH, LPATH, FILE
 from basico.core.mod_srv import Service
 
 class Utils(Service):
@@ -37,8 +41,136 @@ class Utils(Service):
         """
         Missing method docstring (missing-docstring)
         """
-        self.srvdtb = self.get_service('DB')
+        # ~ self.srvdtb = self.get_service('DB')
+        pass
 
+
+    def get_file_metadata(self, path):
+        self.log.debug("Getting metadata from: %s", path)
+        metadata = {}
+        metadata['Title'] = escape(self.get_file_name_with_ext(path))
+        metadata['Basename'] = escape(self.get_file_basename(path))
+        metadata['Extension'] = escape(self.get_file_extension(path))
+        metadata['Size'] = self.get_file_size(path)
+        metadata['Mimetype'] = escape(self.get_file_mimetype(path))
+        metadata['Description'] = escape(self.get_file_description(metadata['Mimetype']))
+        metadata['Doctype'] = escape(self.get_file_doctype(metadata['Mimetype']))
+        return metadata
+
+
+    def get_file_size(self, path):
+        # Get size in bytes
+        size = os.stat(path)[ST_SIZE]
+        self.log.debug("\tSize: %s", str(size))
+        return size
+
+
+    def get_file_extension(self, path):
+        # Get extension
+        rest, extension = os.path.splitext(path)
+        ext = (extension[1:]).lower()
+        ext = ext.strip()
+        if len(ext) > 0:
+            return '%s' % ext
+        else:
+            return '#noext#'
+
+
+    def get_file_basename(self, path):
+        # Get basename
+        rest, extension = os.path.splitext(path)
+        basename = os.path.basename(rest)
+        self.log.debug("\tBasename: %s", basename)
+        return basename
+
+
+    def get_file_name_with_ext(self, path):
+        # Filename
+        basename = self.get_file_basename(path)
+        extension = self.get_file_extension(path)
+        if extension == '#noext#':
+            title = basename
+        else:
+            title = '%s.%s' % (basename, extension)
+        self.log.debug("\tTitle: %s", title)
+        return title
+
+
+    def get_file_mimetype(self, path):
+        mimetype, val = Gio.content_type_guess('filename=%s' % path, data=None)
+        return mimetype
+
+
+    def get_file_doctype(self, mimetype):
+        mtype = mimetype[:mimetype.rfind('/')]
+        doctype = mtype.title()
+        self.log.debug("\tDoctype: %s", doctype)
+        return doctype
+
+
+    def get_file_description(self, mimetype):
+        description = Gio.content_type_get_description(mimetype)
+        return description
+
+
+    def get_disk_usage(self, path):
+        """
+        Get disk usage for a given path
+        """
+        return shutil.disk_usage(path)
+
+
+    def get_disk_usage_fraction(self, path):
+        """
+        Get disk usage as a fraction for using with Gtk.Progressbar)
+        """
+        total, used, free = self.get_disk_usage(path)
+        return used/total
+
+
+    def get_kilobytes(self, integer_bytes):
+        kilo, bites = divmod(int(abs(integer_bytes)), 1024)
+        # ~ self.log.debug("%d bytes -> %d Kb", integer_bytes, kilo)
+        return kilo
+
+
+    def get_megabytes(self, integer_bytes):
+        kilo = self.get_kilobytes(integer_bytes)
+        mega, kilo = divmod(kilo, 1024)
+        # ~ self.log.debug("%d bytes -> %d Mb", integer_bytes, mega)
+        return mega
+
+
+    def get_gigabytes(self, integer_bytes):
+        mega = self.get_megabytes(integer_bytes)
+        giga, mega = divmod(mega, 1024)
+        # ~ self.log.debug("%d bytes -> %d Gb", integer_bytes, giga)
+        return giga
+
+
+    def get_human_sizes(self, integer_bytes):
+        if integer_bytes < 1024:
+            return "%d bytes" % integer_bytes
+        elif integer_bytes > 1024 and integer_bytes < (1024*1024):
+            return "%d Kb" % self.get_kilobytes(integer_bytes)
+        elif integer_bytes > 1024*1024 and integer_bytes < (1024*1024*1024):
+            return "%d Mb" % self.get_megabytes(integer_bytes)
+        elif integer_bytes > 1024*1024*1024 and integer_bytes < (1024*1024*1024*1024):
+            return "%d Gb" % self.get_gigabytes(integer_bytes)
+
+
+    def get_disk_usage_human(self, path):
+        """
+        Get disk usage as a fraction for using with Gtk.Progressbar)
+        Some bytes borrowed from:
+        https://github.com/juancarlospaco/anglerfish/blob/master/anglerfish/bytes2human.py
+        """
+        total, used, free = self.get_disk_usage(path)
+        tgb = self.get_gigabytes(total)
+        ugb = self.get_gigabytes(used)
+        fgb = self.get_gigabytes(total-used)
+        humansize = "Using %dGb of %dGb (Free space: %dGb)" % (int(ugb), int(tgb), int(fgb))
+        return humansize
 
     def timestamp(self):
         """
@@ -48,6 +180,14 @@ class Utils(Service):
         timestamp = "%4d%02d%02d_%02d%02d%02d" % (now.year, now.month, now.day, now.hour, now.minute, now.second)
 
         return timestamp
+
+
+    def get_file_modification_date(self, filename):
+        """
+        Get modification datetime for a given filename.
+        """
+        t = os.path.getmtime(filename)
+        return datetime.fromtimestamp(t)
 
 
     def get_datetime(self, timestamp):
@@ -64,13 +204,13 @@ class Utils(Service):
         """
         if timestamp is None:
             timestamp = self.timestamp()
-            
+
         adate = self.get_datetime(timestamp)
         return "%s" % adate.strftime("%Y/%m/%d %H:%M")
 
 
     def get_excel_date(self, timestamp):
-        timestamp = timestamp.replace('-', '/')        
+        timestamp = timestamp.replace('-', '/')
         timestamp = timestamp.replace('T', ' ')
         adate = datetime.strptime(timestamp, "%Y/%m/%d %H:%M:%S")
         excel_date = "%s" % adate.strftime("%d/%m/%Y")

@@ -1,0 +1,74 @@
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>About KB4IT</h1>
+<div class="details">
+<span id="author" class="author">t00mlabs</span><br>
+<span id="revnumber">version v0.2,</span>
+<span id="revdate">2018-09-05</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">Introduction</a></li>
+<li><a href="#_metadata">Metadata</a></li>
+<li><a href="#_how_it_works">How it works</a></li>
+<li><a href="#_execution">Execution</a>
+<ul class="sectlevel2">
+<li><a href="#_notes">Notes</a></li>
+</ul>
+</li>
+<li><a href="#_download">Download</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+
+<div class="sect1"><h2 id="_introduction">Introduction</h2>
+  <div class="sectionbody">
+  <pre>
+Using /home/t00m/.local/lib/python3.6/site-packages
+Finished processing dependencies for kb4it==0.5.3
+  </pre>
+  </div>
+</div>
+
+<div class="sect1"><h2 id="_metadata">Metadata</h2>
+  <div class="sectionbody">
+	<ul class="nav nav-tabs" id="myTab" role="tablist">
+	  <li class="nav-item">
+		<a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Welcome</a>
+	  </li>
+	  <li class="nav-item">
+		<a class="nav-link" id="scope-tab" data-toggle="tab" href="#scope" role="tab" aria-controls="scope" aria-selected="false">Scope</a>
+	  </li>
+	  <li class="nav-item">
+		<a class="nav-link" id="tag-tab" data-toggle="tab" href="#tag" role="tab" aria-controls="tag" aria-selected="false">Tag cloud</a>
+	  </li>
+	</ul>
+	<div class="tab-content" id="myTabContent">
+	  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">%s</div>
+	  <div class="tab-pane fade" id="scope" role="tabpanel" aria-labelledby="scope-tab">%s</div>
+	  <div class="tab-pane fade" id="tag" role="tabpanel" aria-labelledby="tag-tab">%s</div>
+	</div>
+  </div>
+</div>
+
+
+<!--
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">hola</div>
+  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">cara</div>
+  <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">bola</div>
+</div>
+-->

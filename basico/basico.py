@@ -10,6 +10,7 @@
 import os
 import sys
 import signal
+import shutil
 from gi.repository import GObject
 from basico.core.mod_env import APP, LPATH, GPATH, FILE
 from basico.core.mod_log import get_logger
@@ -22,11 +23,14 @@ from basico.services.srv_settings import Settings
 from basico.services.srv_uif import UIFuncs
 from basico.services.srv_callbacks import Callback
 from basico.services.srv_notify import Notification
-from basico.services.srv_db import Database
+from basico.services.srv_database import Database
 from basico.services.srv_driver import SeleniumDriver
-from basico.services.srv_cols import Collections
-from basico.services.srv_annot import Annotation
+from basico.services.srv_collections import Collections
+from basico.services.srv_annotations import Annotation
+from basico.services.srv_attachment import Attachment
 from basico.services.srv_notify import Notification
+from basico.services.srv_asciidoctor import Asciidoctor
+from basico.widgets.wdg_splash import Splash
 
 
 #DOC: http://stackoverflow.com/questions/16410852/keyboard-interrupt-with-with-python-gtk
@@ -40,9 +44,20 @@ class Basico(object):
         """
         Basico class
         """
+
         self.setup_environment()
         self.setup_logging()
         self.setup_services()
+        self.setup_splash()
+        self.setup_post()
+
+
+    def get_splash(self):
+        return self.splash
+
+
+    def setup_splash(self):
+        self.splash = Splash(title="Basico\n0.4", font='Roboto Slab 24', font_weight='bold', font_color="#FFFFFF", background_image=FILE['SPLASH'], app=self)
 
 
     def setup_environment(self):
@@ -51,7 +66,7 @@ class Basico(object):
         """
         # Add webdriver path to System PATH
         os.environ["PATH"] += os.pathsep + LPATH['DRIVERS']
-        
+
         # Create local paths if they do not exist
         for entry in LPATH:
             if not os.path.exists(LPATH[entry]):
@@ -66,8 +81,8 @@ class Basico(object):
         if os.path.exists(FILE['LOG']):
             with open(FILE['LOG'], 'w') as flog:
                 pass
-                
-        #Initialize logging        
+
+        #Initialize logging
         self.log = get_logger(__class__.__name__)
         self.log.info("Basico %s started", APP['version'])
         self.log.debug("Global path: %s", GPATH['ROOT'])
@@ -80,7 +95,7 @@ class Basico(object):
         """
         Setup Basico Services
         """
-        
+
         # Declare and register services
         self.services = {}
         try:
@@ -97,8 +112,10 @@ class Basico(object):
                 'Driver'        :   SeleniumDriver(),
                 'Collections'   :   Collections(),
                 'Annotation'    :   Annotation(),
+                'Attachment'    :   Attachment(),
                 'BNR'           :   BackupRestoreMan(),
-                'Notify'        :   Notification()
+                'Notify'        :   Notification(),
+                'Asciidoctor'   :   Asciidoctor(),
             }
 
             for name in services:
@@ -106,6 +123,12 @@ class Basico(object):
         except Exception as error:
             self.log.error(error)
             raise
+
+
+    def setup_post(self):
+        if not os.path.exists(FILE['L_SAP_PRODUCTS']):
+            shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
+            self.log.debug("SAP Products file copied to local database resources directory")
 
 
     def get_service(self, name):
@@ -147,6 +170,7 @@ class Basico(object):
         (if any) to finalize them properly.
         """
 
+        self.splash.show()
         # Deregister all services loaded starting by the GUI service
         self.deregister_service('GUI')
         for name in self.services:
@@ -156,6 +180,7 @@ class Basico(object):
             except Exception as error:
                 self.log.error(error)
                 raise
+        self.splash.destroy()
         self.log.info("Basico %s finished", APP['version'])
 
 
@@ -163,9 +188,8 @@ class Basico(object):
         """
         Start Basico
         """
-        self.srvdrv = self.get_service('Driver')
-        self.srvgui = self.get_service('GUI')
-        self.srvgui.run()
+        GUI = self.get_service('GUI')
+        GUI.run()
 
 
 def main():

@@ -29,16 +29,28 @@ with open('README.adoc') as f:
     long_description = f.read()
 
 
-def add_data():
+def add_data_basico():
     try:
-        data_files = [
+        data_files_basico = [
             ('share/applications', ['basico/data/desktop/basico.desktop']),
             ('share/icons', ['basico/data/icons/basico-component.svg']),
             ('basico/data/res/selenium/drivers',
                 [
                     'basico/data/res/selenium/drivers/geckodriver',
-                    'basico/data/res/selenium/drivers/geckodriver.exe',
                     'basico/data/res/selenium/drivers/geckodriver.README'
+                ]),
+            ('basico/data/res/css',
+                [
+                    'basico/data/res/css/basico.css',
+                    'basico/data/res/css/custom-asciidoc.css',
+                ]),
+            ('basico/data/res/splash',
+                [
+                    'basico/data/res/splash/basico-splash-400x250.png',
+                ]),
+            ('basico/data/res/sap',
+                [
+                    'basico/data/res/sap/products.txt',
                 ]),
             ('basico/data/tpl', ['basico/data/tpl/report.html']),
             ('basico/data/icons',
@@ -48,6 +60,7 @@ def add_data():
                     'basico/data/icons/basico-add.svg',
                     'basico/data/icons/basico-annotation.svg',
                     'basico/data/icons/basico-annotation-type-bookmark.svg',
+                    'basico/data/icons/basico-edit.svg',
                     'basico/data/icons/basico-annotation-type-note.svg',
                     'basico/data/icons/basico-annotation-type-fixme.svg',
                     'basico/data/icons/basico-annotation-type-incident.svg',
@@ -57,7 +70,10 @@ def add_data():
                     'basico/data/icons/basico-annotation-type-todo.svg',
                     'basico/data/icons/basico-annotation-type-email.svg',
                     'basico/data/icons/basico-annotation-type-meeting.svg',
+                    'basico/data/icons/basico-arrow-up.svg',
+                    'basico/data/icons/basico-arrow-down.svg',
                     'basico/data/icons/basico-archived.svg',
+                    'basico/data/icons/basico-attachment.svg',
                     'basico/data/icons/basico-backup.svg',
                     'basico/data/icons/basico-backup-text-generic.svg',
                     'basico/data/icons/basico-backup-text-csv.svg',
@@ -69,12 +85,16 @@ def add_data():
                     'basico/data/icons/basico-browse.svg',
                     'basico/data/icons/basico-category.svg',
                     'basico/data/icons/basico-chart.svg',
+                    'basico/data/icons/basico-check-all.svg',
+                    'basico/data/icons/basico-check-none.svg',
+                    'basico/data/icons/basico-check-invert.svg',
                     'basico/data/icons/basico-check-accept.svg',
                     'basico/data/icons/basico-check-cancel.svg',
                     'basico/data/icons/basico-chronologic.svg',
                     'basico/data/icons/basico-clipboard.svg',
                     'basico/data/icons/basico-comments.svg',
                     'basico/data/icons/basico-component.svg',
+                    'basico/data/icons/basico-copy-paste.svg',
                     'basico/data/icons/basico-dashboard.svg',
                     'basico/data/icons/basico-drafts.svg',
                     'basico/data/icons/basico-delete.svg',
@@ -95,12 +115,19 @@ def add_data():
                     'basico/data/icons/basico-jump-sapnote.svg',
                     'basico/data/icons/basico-logviewer.svg',
                     'basico/data/icons/basico-menu-system.svg',
+                    'basico/data/icons/basico-preview.svg',
                     'basico/data/icons/basico-priority.svg',
                     'basico/data/icons/basico-annotation-priority-high.svg',
                     'basico/data/icons/basico-annotation-priority-normal.svg',
                     'basico/data/icons/basico-annotation-priority-low.svg',
                     'basico/data/icons/basico-refresh.svg',
                     'basico/data/icons/basico-restore.svg',
+                    'basico/data/icons/basico-sapnote.svg',
+                    'basico/data/icons/basico-sap-knowledge-base-article.svg',
+                    'basico/data/icons/basico-sap-note.svg',
+                    'basico/data/icons/basico-sap-security-note.svg',
+                    'basico/data/icons/basico-sap-standard-note.svg',
+                    'basico/data/icons/basico-scope.svg',
                     'basico/data/icons/basico-select.svg',
                     'basico/data/icons/basico-settings.svg',
                     'basico/data/icons/basico-sid.svg',
@@ -122,42 +149,18 @@ def add_data():
                     'Changelog'
                     ]),
             ]
-
-        # ~ if not os.path.isdir('mo'):
-            # ~ os.mkdir('mo')
-        # ~ for pofile in os.listdir('po'):
-            # ~ if pofile.endswith('po'):
-                # ~ lang = pofile.strip('.po')
-                # ~ modir = os.path.join('mo', lang)
-                # ~ if not os.path.isdir(modir):
-                    # ~ os.mkdir(modir)
-                # ~ mofile = os.path.join(modir, 'basico.mo')
-                # ~ subprocess.call('msgfmt {} -o {}'.format(os.path.join('po', pofile), mofile), shell=True)
-                # ~ data_files.append(['share/locale/{}/LC_MESSAGES/'.format(lang), [mofile]])
-        return data_files
+        return data_files_basico
     except:
         return []
 
-if os.name == 'posix':
-    data_files = add_data()
-else:
-    data_files = []
-
-# ~ try:
-    # ~ bcommit = subprocess.check_output("svn info", shell=True)
-    # ~ ucommit = bcommit.decode(encoding='UTF-8')
-    # ~ icommit = int(ucommit.split('\n')[6].split(':')[1])
-    # ~ dcommit = ucommit.split('\n')[11][19:29]
-# ~ except Exception as error:
-    # ~ print (error)
-    # ~ dcommit = 'None'
-    # ~ icommit = 0
+data_files = []
+data_files += add_data_basico()
 
 
 def main():
     setup(
         name='basico',
-        version='0.3',
+        version='0.4',
         author='Tomás Vírseda',
         author_email='tomasvirseda@gmail.com',
         url='http://subversion.t00mlabs.net/basico',
@@ -174,6 +177,7 @@ def main():
               'feedparser',
               'requests',
               'openpyxl',
+              'rdflib',
         ],
         include_package_data=True,
         data_files=data_files,

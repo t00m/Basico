@@ -9,9 +9,10 @@
 
 import os
 from os.path import sep as SEP
-from cgi import escape
+from html import escape
 import glob
 import json
+from enum import IntEnum
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -25,21 +26,43 @@ from gi.repository import Pango
 
 from basico.core.mod_wdg import BasicoWidget
 from basico.core.mod_env import LPATH, ATYPES
-from basico.services.srv_cols import COL_DOWNLOADED
+from basico.services.srv_collections import COL_DOWNLOADED
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.widgets.wdg_import import ImportWidget
 from basico.core.mod_log import get_logger
+from basico.widgets.wdg_menuview import MenuView
+
+
+class COLUMN(IntEnum):
+    KEY = 0
+    ICON = 1
+    CHECKBOX = 2
+    SID = 3
+    TITLE = 4
+    COMPONENT = 5
+    CATEGORY = 6
+    TYPE = 7
+    PRIORITY = 8
+    UPDATED = 9
+    UPDATED_TIMESTAMP = 10
 
 
 class SAPNotesVisor(BasicoWidget, Gtk.Box):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
-        Gtk.Box.__init__(self, app)        
+        Gtk.Box.__init__(self, app)
         self.get_services()
         self.bag = []
         self.icons = {}
         self.icons['type'] = {}
-        self.setup()
+        panel = self.setup_panel()
+        visor = self.setup_visor()
+        paned = Gtk.HPaned()
+        paned.add1(panel)
+        paned.add2(visor)
+        paned.set_position(400)
+        paned.show_all()
+        self.add(paned)
         self.log.debug("SAP Notes Visor initialized")
 
 
@@ -53,26 +76,134 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         self.srvuif = self.get_service("UIF")
         self.srvutl = self.get_service("Utils")
         self.srvant = self.get_service('Annotation')
-
-
-    def get_treeview(self):
-        return self.treeview
+        self.srvatc = self.get_service('Attachment')
 
 
     def sort_by_timestamp(self):
-        self.sorted_model.set_sort_column_id(11, Gtk.SortType.DESCENDING)
+        sorted_model = self.srvgui.get_widget('visor_sapnotes_sorted_model')
+        sorted_model.set_sort_column_id(COLUMN.UPDATED_TIMESTAMP, Gtk.SortType.ASCENDING)
 
 
-    def setup(self):
+    def setup_panel(self):
+        ## Left view - SAP Notes Menu view
+        box = self.srvgui.add_widget('gtk_vbox_container_menu_view', Gtk.VBox())
+        # ~ self.pack_start(box, False, True, 3)
+        # ~ separator = Gtk.Separator(orientation = Gtk.Orientation.VERTICAL)
+        # ~ self.pack_start(separator, False, False, 3)
+        box.set_property('margin-left', 0)
+        box.set_property('margin-right', 0)
+        box.set_property('margin-bottom', 0)
+
+        # View combobox button/popover
+        lhbox = Gtk.HBox()
+        menuviews = self.srvgui.add_widget('gtk_button_menu_views', Gtk.Button())
+        menuviews.set_relief(Gtk.ReliefStyle.NONE)
+        hbox = Gtk.HBox()
+        label = self.srvgui.add_widget('gtk_label_current_view', Gtk.Label())
+        label.set_xalign(0.0)
+        image = self.srvgui.add_widget('gtk_image_current_view', Gtk.Image())
+        hbox.pack_start(image, False, False, 3)
+        hbox.pack_start(label, True, True, 3)
+        menuviews.add(hbox)
+        lhbox.pack_start(menuviews, True, True, 3)
+        lhbox.show_all()
+        box.pack_start(lhbox, False, False, 3)
+
+        ### Popover menuviews
+        popover = self.srvgui.add_widget('gtk_popover_button_menu_views', Gtk.Popover.new(menuviews))
+        menuviews.connect('clicked', self.srvclb.gui_show_popover, popover)
+        box_views = Gtk.Box(spacing = 0, orientation="vertical")
+        popover.add(box_views)
+
+        box_views.pack_start(self.srvuif.create_menuview_button('collection'), False, False, 0)
+        separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)
+        box_views.pack_start(separator, False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('component'), False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('description'), False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('bookmarks'), False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('category'), False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('chronologic'), False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('priority'), False, False, 0)
+        box_views.pack_start(self.srvuif.create_menuview_button('type'), False, False, 0)
+
+        ### Toolbar
+        toolbar = Gtk.Toolbar()
+        toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_PRIMARY_TOOLBAR)
+
+        #### Filter entry tool
+        tool = Gtk.ToolItem.new()
+
+        hbox = Gtk.HBox()
+        viewfilter = self.srvgui.add_widget('gtk_entry_filter_view', Gtk.Entry())
+        viewmenu = self.srvgui.add_widget('viewmenu', MenuView(self.app))
+        viewmenu.set_vexpand(True)
+        completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
+        viewfilter.set_completion(completion)
+        viewfilter.connect('activate', self.srvclb.gui_viewmenu_filter)
+
+        icon = self.srvicm.get_pixbuf_icon('basico-refresh')
+        viewfilter.set_icon_from_pixbuf(Gtk.EntryIconPosition.PRIMARY, icon)
+        viewfilter.set_icon_sensitive(Gtk.EntryIconPosition.PRIMARY, True)
+        viewfilter.set_icon_tooltip_markup (Gtk.EntryIconPosition.PRIMARY, "Refresh and collapse")
+
+        icon = self.srvicm.get_pixbuf_icon('basico-filter')
+        viewfilter.set_icon_from_pixbuf(Gtk.EntryIconPosition.SECONDARY, icon)
+        viewfilter.set_icon_sensitive(Gtk.EntryIconPosition.SECONDARY, True)
+        viewfilter.set_icon_tooltip_markup (Gtk.EntryIconPosition.SECONDARY, "Click here to expand the tree")
+        viewfilter.set_placeholder_text("Filter this view...")
+
+        def on_icon_pressed(entry, icon_pos, event):
+            if icon_pos == Gtk.EntryIconPosition.PRIMARY:
+                viewmenu = self.srvgui.get_widget('viewmenu')
+                viewmenu.refresh()
+            elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
+                self.srvclb.expand_menuview()
+
+        viewfilter.connect("icon-press", on_icon_pressed)
+
+        hbox.pack_start(viewfilter, True, True, 0)
+        tool.add(hbox)
+        tool.set_expand(True)
+        toolbar.insert(tool, -1)
+
+        box.pack_start(toolbar, False, False, 0)
+
+        ### View treeview
+        box_trv = Gtk.VBox()
+        box_trv.set_property('margin-left', 3)
+        box_trv.set_property('margin-right', 3)
+        box_trv.set_property('margin-bottom', 0)
+        scr = Gtk.ScrolledWindow()
+        # ~ scr.set_hexpand(True)
+        scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scr.set_shadow_type(Gtk.ShadowType.IN)
+        vwp = Gtk.Viewport()
+        vwp.set_hexpand(True)
+        viewsbox = self.srvgui.add_widget('gtk_box_container_views', Gtk.Box())
+        # ~ viewsbox.set_hexpand(True)
+        viewsbox.pack_start(viewmenu, True, True, 0)
+        vwp.add(viewsbox)
+        scr.add(vwp)
+        box_trv.pack_start(scr, True, True, 0)
+        box.pack_start(box_trv, True, True, 0)
+        # ~ box.show_all()
+        # ~ box.add(viewmenu)
+        return box
+
+
+
+    def setup_visor(self):
+        visor = Gtk.VBox()
         scr = Gtk.ScrolledWindow()
         scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scr.set_shadow_type(Gtk.ShadowType.IN)
-        self.treeview = Gtk.TreeView()
-        scr.add(self.treeview)
-        self.pack_start(scr, True, True, 0)
+        treeview = self.srvgui.add_widget('visor_sapnotes_treeview', Gtk.TreeView())
+        scr.add(treeview)
+        visor.pack_start(scr, True, True, 0)
+        visor.show_all()
 
         # Setup model
-        self.model = Gtk.TreeStore(
+        model = Gtk.TreeStore(
             int,        # key
             Pixbuf,     # Icon
             int,        # checkbox
@@ -83,12 +214,12 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             str,        # type
             str,        # priority
             str,        # last update
-            str,        # Annotation Id (extra key)
             str,        # Timestamp
         )
+        self.srvgui.add_widget('gtk_model_sapnotes', model)
 
         # Setup columns
-        def get_column_header_widget(title, icon_name=None, width=24, height=24):
+        def get_column_header_widget(title, icon_name=None, width=28, height=28):
             hbox = Gtk.HBox()
             icon = self.srvicm.get_new_image_icon(icon_name, width, height)
             label = Gtk.Label()
@@ -100,188 +231,193 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             return hbox
 
         # SAP Note key
-        self.renderer_key = Gtk.CellRendererText()
-        self.renderer_key.set_property('height', 32)
-        self.column_key = Gtk.TreeViewColumn('Key', self.renderer_key, text=0)
-        self.column_key.set_visible(False)
-        self.column_key.set_expand(False)
-        self.column_key.set_clickable(False)
-        self.column_key.set_sort_indicator(False)
-        self.treeview.append_column(self.column_key)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_key', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_key', Gtk.TreeViewColumn('Key', renderer, text=COLUMN.KEY))
+        renderer.set_property('height', 32)
+        column.set_visible(False)
+        column.set_expand(False)
+        column.set_clickable(False)
+        column.set_sort_indicator(False)
+        treeview.append_column(column)
 
         # Icon
-        self.renderer_icon = Gtk.CellRendererPixbuf()
-        self.renderer_icon.set_alignment(0.0, 0.5)
-        self.column_icon = Gtk.TreeViewColumn('Bookmark', self.renderer_icon, pixbuf=1)
-        widget = get_column_header_widget('', 'basico-bookmarks')
-        self.column_icon.set_widget(widget)
-        self.column_icon.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_icon.set_visible(True)
-        self.column_icon.set_expand(False)
-        self.column_icon.set_clickable(False)
-        self.column_icon.set_sort_indicator(False)
-        self.treeview.append_column(self.column_icon)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_icon', Gtk.CellRendererPixbuf())
+        column = self.srvgui.add_widget('visor_sapnotes_column_icon', Gtk.TreeViewColumn('', renderer, pixbuf=COLUMN.ICON))
+        renderer.set_alignment(0.0, 0.5)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_visible(True)
+        column.set_expand(False)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.TYPE)
+        column.set_sort_order(Gtk.SortType.ASCENDING)
+        treeview.append_column(column)
 
         # SAP Note Checkbox
-        self.renderer_checkbox = Gtk.CellRendererToggle()
-        self.renderer_checkbox.connect("toggled", self.toggle_checkbox)
-        self.column_checkbox = Gtk.TreeViewColumn('', self.renderer_checkbox, active=2)
-        self.column_checkbox.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_checkbox.set_visible(True)
-        self.column_checkbox.set_expand(False)
-        self.column_checkbox.set_clickable(True)
-        self.column_checkbox.set_sort_indicator(False)
-        self.column_checkbox.set_property('spacing', 50)
-        self.treeview.append_column(self.column_checkbox)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_checkbox', Gtk.CellRendererToggle())
+        column = self.srvgui.add_widget('visor_sapnotes_column_checkbox', Gtk.TreeViewColumn('', renderer, active=COLUMN.CHECKBOX))
+        renderer.connect("toggled", self.__clb_row_toggled)
+        column = Gtk.TreeViewColumn('', renderer, active=COLUMN.CHECKBOX)
+        widget = get_column_header_widget('', 'basico-check-accept')
+        column.set_widget(widget)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_visible(True)
+        column.set_expand(False)
+        column.set_clickable(True)
+        column.set_sort_indicator(False)
+        column.set_property('spacing', 50)
+        treeview.append_column(column)
 
         # SAP Note Id
-        self.renderer_sid = Gtk.CellRendererText()
-        self.renderer_sid.set_property('xalign', 1.0)
-        self.renderer_sid.set_property('height', 36)
-        self.renderer_sid.set_property('background', '#F0E3E3')
-        self.column_sid = Gtk.TreeViewColumn('SAP Note Id', self.renderer_sid, markup=3)
-        widget = get_column_header_widget('SAP Note Id', 'basico-sid')
-        self.column_sid.set_widget(widget)
-        self.column_sid.set_visible(True)
-        self.column_sid.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_sid.set_expand(False)
-        self.column_sid.set_clickable(True)
-        self.column_sid.set_sort_indicator(True)
-        self.column_sid.set_sort_column_id(0)
-        self.column_sid.set_sort_order(Gtk.SortType.ASCENDING)
-        self.model.set_sort_column_id(0, Gtk.SortType.ASCENDING)
-        self.treeview.append_column(self.column_sid)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_sid', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_sid', Gtk.TreeViewColumn('SAP Note', renderer, markup=COLUMN.SID))
+        renderer.set_property('xalign', 1.0)
+        renderer.set_property('height', 36)
+        renderer.set_property('background', '#F0E3E3')
+        column.set_visible(True)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_expand(False)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.KEY)
+        column.set_sort_order(Gtk.SortType.ASCENDING)
+        treeview.append_column(column)
 
         # SAP Note title
-        self.renderer_title = Gtk.CellRendererText()
-        self.renderer_title.set_property('background', '#FFFEEA')
-        self.renderer_title.set_property('ellipsize', Pango.EllipsizeMode.MIDDLE)
-        self.column_title = Gtk.TreeViewColumn('Title', self.renderer_title, markup=4)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_title', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_title', Gtk.TreeViewColumn('Title', renderer, markup=COLUMN.TITLE))
+        renderer.set_property('background', '#FFFEEA')
+        renderer.set_property('ellipsize', Pango.EllipsizeMode.MIDDLE)
+        column = Gtk.TreeViewColumn('Title', renderer, markup=COLUMN.TITLE)
         widget = get_column_header_widget('Title', 'basico-tag')
-        self.column_title.set_widget(widget)
-        self.column_title.set_visible(True)
-        self.column_title.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_title.set_expand(True)
-        self.column_title.set_clickable(True)
-        self.column_title.set_sort_indicator(True)
-        self.column_title.set_sort_column_id(4)
-        self.treeview.append_column(self.column_title)
+        column.set_widget(widget)
+        column.set_visible(True)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_expand(True)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.TITLE)
+        treeview.append_column(column)
 
         # SAP Note Component
-        self.renderer_component = Gtk.CellRendererText()
-        self.renderer_component.set_property('background', '#E3E3F0')
-        self.column_component = Gtk.TreeViewColumn('Component', self.renderer_component, markup=5)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_component', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_component', Gtk.TreeViewColumn('Component', renderer, markup=COLUMN.COMPONENT))
+        renderer.set_property('background', '#E3E3F0')
         widget = get_column_header_widget('Component', 'basico-component')
-        self.column_component.set_widget(widget)
-        self.column_component.set_visible(True)
-        self.column_component.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_component.set_expand(False)
-        self.column_component.set_clickable(True)
-        self.column_component.set_sort_indicator(True)
-        self.column_component.set_sort_column_id(5)
-        self.treeview.append_column(self.column_component)
+        column.set_widget(widget)
+        column.set_visible(True)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_expand(False)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.COMPONENT)
+        treeview.append_column(column)
 
         # SAP Note Category
-        self.renderer_category = Gtk.CellRendererText()
-        self.renderer_category.set_property('background', '#E3F1E3')
-        self.column_category = Gtk.TreeViewColumn('Category', self.renderer_category, markup=6)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_category', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_category', Gtk.TreeViewColumn('Category', renderer, markup=COLUMN.CATEGORY))
+        renderer.set_property('background', '#E3F1E3')
         widget = get_column_header_widget('Category', 'basico-category')
-        self.column_category.set_widget(widget)
-        self.column_category.set_visible(False)
-        self.column_category.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_category.set_expand(False)
-        self.column_category.set_clickable(True)
-        self.column_category.set_sort_indicator(True)
-        self.column_category.set_sort_column_id(6)
-        self.treeview.append_column(self.column_category)
+        column.set_widget(widget)
+        column.set_visible(False)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_expand(False)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.CATEGORY)
+        treeview.append_column(column)
 
         # SAP Note Type
-        self.renderer_type = Gtk.CellRendererText()
-        self.renderer_type.set_property('background', '#e4f1f1')
-        self.column_type = Gtk.TreeViewColumn('Type', self.renderer_type, markup=7)
-        self.column_type.set_visible(True)
-        self.column_type.set_expand(False)
-        self.column_type.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_type.set_clickable(True)
-        self.column_type.set_sort_indicator(True)
-        self.column_type.set_sort_column_id(7)
-        self.treeview.append_column(self.column_type)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_type', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_type', Gtk.TreeViewColumn('Type', renderer, markup=COLUMN.TYPE))
+        renderer.set_property('background', '#e4f1f1')
+        widget = get_column_header_widget('Type', 'basico-type')
+        column.set_widget(widget)
+        column.set_visible(True)
+        column.set_expand(False)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.TYPE)
+        treeview.append_column(column)
 
         # SAP Note Priority
-        self.renderer_priority = Gtk.CellRendererText()
-        self.column_priority = Gtk.TreeViewColumn('Priority', self.renderer_priority, markup=8)
-        self.column_priority.set_visible(False)
-        self.column_priority.set_expand(True)
-        self.column_priority.set_clickable(True)
-        self.column_priority.set_sort_indicator(True)
-        self.column_priority.set_sort_column_id(8)
-        self.treeview.append_column(self.column_priority)
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_priority', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_priority', Gtk.TreeViewColumn('Priority', renderer, markup=COLUMN.PRIORITY))
+        renderer.set_property('background', '#f1e4f1')
+        widget = get_column_header_widget('Priority', 'basico-priority')
+        column.set_widget(widget)
+        column.set_visible(True)
+        column.set_expand(False)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.PRIORITY)
+        treeview.append_column(column)
 
-        # SAP Note UpdatedOn
-        self.renderer_updated = Gtk.CellRendererText()
-        self.renderer_updated.set_property('background', '#FFE6D1')
-        self.column_updated = Gtk.TreeViewColumn('Updated On', self.renderer_updated, markup=9)
-        self.column_updated.set_visible(True)
-        self.column_updated.set_expand(False)
-        self.column_updated.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
-        self.column_updated.set_clickable(True)
-        self.column_updated.set_sort_indicator(True)
-        self.column_updated.set_sort_column_id(11)
-        self.treeview.append_column(self.column_updated)
+        # SAP Note Updated
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_updated', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_updated', Gtk.TreeViewColumn('Updated', renderer, markup=COLUMN.UPDATED))
+        renderer.set_property('background', '#FFE6D1')
+        widget = get_column_header_widget('Updated', 'basico-chronologic')
+        column.set_widget(widget)
+        column.set_visible(True)
+        column.set_expand(False)
+        column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
+        column.set_clickable(True)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.UPDATED_TIMESTAMP)
+        column.set_sort_order(Gtk.SortType.DESCENDING)
+        model.set_sort_column_id(COLUMN.UPDATED_TIMESTAMP, Gtk.SortType.DESCENDING)
+        treeview.append_column(column)
 
-        # Annotation Id
-        self.renderer_annotation = Gtk.CellRendererText()
-        self.column_annotation = Gtk.TreeViewColumn('Annotation Id', self.renderer_annotation, markup=10)
-        self.column_annotation.set_visible(False)
-        self.column_annotation.set_expand(False)
-        self.column_annotation.set_clickable(False)
-        self.column_annotation.set_sort_indicator(False)
-        self.treeview.append_column(self.column_annotation)
-
-        # Timestamp
-        self.renderer_timestamp = Gtk.CellRendererText()
-        self.column_timestamp = Gtk.TreeViewColumn('Annotation Id', self.renderer_timestamp, text=11)
-        self.column_timestamp.set_visible(False)
-        self.column_timestamp.set_expand(False)
-        self.column_timestamp.set_clickable(False)
-        self.column_timestamp.set_sort_indicator(False)
-        self.treeview.append_column(self.column_timestamp)
+        # Timestamp updated
+        renderer = self.srvgui.add_widget('visor_sapnotes_renderer_updated_timestamp', Gtk.CellRendererText())
+        column = self.srvgui.add_widget('visor_sapnotes_column_updated_timestamp', Gtk.TreeViewColumn('Updated', renderer, markup=COLUMN.UPDATED_TIMESTAMP))
+        column.set_visible(False)
+        column.set_expand(False)
+        column.set_clickable(False)
+        column.set_sort_indicator(True)
+        column.set_sort_column_id(COLUMN.UPDATED_TIMESTAMP)
+        column.set_sort_order(Gtk.SortType.ASCENDING)
+        treeview.append_column(column)
 
         # Treeview properties
-        self.treeview.set_can_focus(False)
-        self.treeview.set_enable_tree_lines(True)
-        self.treeview.set_headers_visible(True)
-        self.treeview.set_enable_search(True)
-        self.treeview.set_hover_selection(False)
-        self.treeview.set_grid_lines(Gtk.TreeViewGridLines.NONE)
-        self.treeview.set_enable_tree_lines(True)
-        self.treeview.set_level_indentation(10)
-        # ~ self.treeview.modify_font(Pango.FontDescription('Monospace 10'))
-        self.treeview.connect('button_press_event', self.right_click)
+        treeview.set_can_focus(False)
+        treeview.set_enable_tree_lines(True)
+        treeview.set_headers_visible(True)
+        treeview.set_enable_search(True)
+        treeview.set_hover_selection(False)
+        treeview.set_grid_lines(Gtk.TreeViewGridLines.HORIZONTAL)
+        treeview.set_enable_tree_lines(True)
+        treeview.set_level_indentation(10)
+        # ~ treeview.modify_font(Pango.FontDescription('Monospace 10'))
+        treeview.connect('button_press_event', self.right_click)
 
         # DOC: In order to have a Gtk.Widged with sorting and filtering
         # capabilities, you have to filter the model first, and use this
         # new model to create the sorted model. Then, attach the sorted
         # model to the treeview...
 
-        # Treeview filtering:
-        self.visible_filter = self.model.filter_new()
-        self.visible_filter.set_visible_func(self.visible_function)
+        # Treeview filtering
+        visible_filter = self.srvgui.add_widget('visor_sapnotes_visible_filter', model.filter_new())
+        visible_filter.set_visible_func(self.__clb_visible_function)
         # https://stackoverflow.com/questions/23355866/user-search-collapsed-rows-in-a-gtk-treeview
 
         # TreeView sorting
-        self.sorted_model = Gtk.TreeModelSort(model=self.visible_filter)
-        self.sorted_model.set_sort_func(0, self.sort_function, None)
+        sorted_model = Gtk.TreeModelSort(model=visible_filter)
+        self.srvgui.add_widget('visor_sapnotes_sorted_model', sorted_model)
+        sorted_model.set_sort_func(0, self.sort_function, None)
 
         # Selection
-        self.selection = self.treeview.get_selection()
-        self.selection.set_mode(Gtk.SelectionMode.SINGLE)
-        self.selection.connect('changed', self.row_changed)
+        selection = treeview.get_selection()
+        selection.set_mode(Gtk.SelectionMode.SINGLE)
+        selection.connect('changed', self.row_changed)
 
         # Set model (filtered and sorted)
-        self.treeview.set_model(self.sorted_model)
+        treeview.set_model(sorted_model)
 
         self.show_all()
+        return visor
 
 
     def sort_function(self, model, row1, row2, user_data):
@@ -302,52 +438,53 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         return False
 
 
-    def visible_function(self, model, itr, data):
+    def __clb_visible_function(self, model, itr, data):
         entry = self.srvgui.get_widget('gtk_entry_filter_visor')
         text = self.srvutl.clean_html(entry.get_text())
-        title = model.get(itr, 4)[0]
-        match = text.upper() in title.upper()
+        title = model.get(itr, COLUMN.TITLE)[0]
+        component = model.get(itr, COLUMN.COMPONENT)[0]
+        fields = title + ' ' + component
+        match = text.upper() in fields.upper()
 
         return match
 
 
     def update_total_sapnotes_count(self):
+        visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
         statusbar = self.srvgui.get_widget('widget_statusbar')
         lblnotescount = self.srvgui.get_widget('gtk_label_total_notes')
         total = self.srvdtb.get_total()
-        count = len(self.visible_filter)
-        lblnotescount.set_markup("<b>%d/<big>%d SAP Notes</big></b>" % (count, total))
+        count = len(visible_filter)
+        lblnotescount.set_markup("<b>%d/<big>%d</big></b>" % (count, total))
         msg = 'View populated with %d SAP Notes' % count
         self.srvuif.statusbar_msg(msg)
 
 
-    def get_visible_filter(self):
-        return self.visible_filter
-
-
     def row_changed(self, selection):
-        try:
-            model, treeiter = selection.get_selected()
-            if treeiter is not None:
-                component = model[treeiter][5]
-                if component == 'Annotation':
-                    aid = model[treeiter][10]
-                    is_valid = self.srvant.is_valid(aid)
-                    if is_valid:
-                        self.srvclb.action_annotation_edit(aid)
-                else:
-                    aid = None
-                    self.srvuif.set_widget_visibility('gtk_vbox_container_annotations', False)
-        except Exception as error:
-            self.log.debug(error)
+        pass
+        # ~ try:
+            # ~ model, treeiter = selection.get_selected()
+            # ~ if treeiter is not None:
+                # ~ component = model[treeiter][5]
+                # ~ if component == 'Annotation':
+                    # ~ aid = model[treeiter][10]
+                    # ~ is_valid = self.srvant.is_valid(aid)
+                    # ~ if is_valid:
+                        # ~ self.srvclb.action_annotation_edit(aid)
+                # ~ else:
+                    # ~ aid = None
+        # ~ except Exception as error:
+            # ~ self.log.debug(error)
 
 
-    def toggle_checkbox(self, cell, path):
-        path = self.sorted_model.convert_path_to_child_path(Gtk.TreePath(path))
-        self.model[path][2] = not self.model[path][2]
+    def __clb_row_toggled(self, cell, path):
+        sorted_model = self.srvgui.get_widget('visor_sapnotes_sorted_model')
+        model = sorted_model.get_model()
+        rpath = sorted_model.convert_path_to_child_path(Gtk.TreePath(path))
+        model[rpath][COLUMN.CHECKBOX] = not model[rpath][COLUMN.CHECKBOX]
 
 
-    def get_node(self, key, icon, checkbox, sid, title, component, category='', sntype='', priority='', updated='', aid='', timestamp=''):
+    def get_node(self, key, icon, checkbox, sid, title, component, category='', sntype='', priority='', updated='', timestamp=''):
         # Add completion entries
         completion = self.srvgui.get_widget('gtk_entrycompletion_visor')
         completion_model = completion.get_model()
@@ -365,17 +502,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         node.append(sntype)
         node.append(priority)
         node.append(updated)
-        node.append(aid) # Extra key for annotations id (aid)
         node.append(timestamp)
         return node
-
-
-    def get_model(self):
-        return self.model
-
-
-    def get_sorted_model(self):
-        return self.sorted_model
 
 
     def get_bag(self):
@@ -383,28 +511,24 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
 
     def reload(self):
-        self.populate_sapnotes(self.bag)
+        self.populate(self.bag)
 
 
-    def populate_sapnotes(self, bag=None, cid=None):
+    def populate(self, bag=None, cid=None):
+        model = self.srvgui.get_widget('gtk_model_sapnotes')
+        sorted_model = self.srvgui.get_widget('visor_sapnotes_sorted_model')
         icon_sapnote = self.srvicm.get_pixbuf_icon('basico-sapnote', 32, 32)
         icon_bookmark = self.srvicm.get_pixbuf_icon('basico-bookmarks', 32, 32)
         for atype in ATYPES:
             self.icons['type'][atype.lower()] = self.srvicm.get_pixbuf_icon('basico-annotation-type-%s' % atype.lower())
-        self.column_sid.set_visible(True)
-        self.column_checkbox.set_visible(False)
-        self.column_category.set_visible(False)
-        self.column_component.set_visible(True)
         completion = self.srvgui.get_widget('gtk_entrycompletion_visor')
         completion_model = completion.get_model()
         completion_model.clear()
-        self.model.clear()
-
+        model.clear()
         if bag is None:
             bag = self.bag
         else:
             self.bag = bag
-
 
         for sid in self.bag:
             metadata = self.srvdtb.get_sapnote_metadata(sid)
@@ -412,18 +536,30 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                 bookmark = metadata['bookmark']
                 title = escape(metadata['title'])
                 sid = str(int(metadata['id']))
+
+                has_annotations = self.srvant.get_by_sid(sid)
+                has_attachments = self.srvatc.get_by_sid(sid)
                 if bookmark:
                     icon = icon_bookmark
                     title = "<b>%s</b>" % title
                     sid = "<b>%s</b>" % sid
                 else:
-                    icon = icon_sapnote
+                    if len(has_annotations) > 0 and len(has_attachments) > 0:
+                        icon = self.srvicm.get_pixbuf_icon('basico-annotation-attachment', 32, 32)
+                    elif len(has_annotations) > 0 and len(has_attachments) == 0:
+                        icon = self.srvicm.get_pixbuf_icon('basico-annotation', 32, 32)
+                    elif len(has_annotations) == 0 and len(has_attachments) > 0:
+                        icon = self.srvicm.get_pixbuf_icon('basico-attachment', 32, 32)
+                    else:
+                        icon = icon_sapnote
 
                 timestamp = metadata['releasedon']
                 timestamp = timestamp.replace('-', '')
                 timestamp = timestamp.replace(':', '')
                 timestamp = timestamp.replace('T', '_')
-
+                stype = escape(metadata['type'].lower())
+                icon_name = 'basico-%s' % stype.replace(' ', '-')
+                icon = self.srvicm.get_pixbuf_icon(icon_name, 36, 36)
                 node = self.get_node(   int(metadata['id']),
                                         icon,
                                         False,
@@ -434,10 +570,9 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                                         escape(metadata['type']),
                                         escape(metadata['priority']),
                                         self.srvutl.fuzzy_date_from_timestamp(timestamp),
-                                        '',
                                         timestamp
                                     )
-                pid = self.model.append(None, node)
+                pid = model.append(None, node)
 
                 # Load annotations
                 files = self.srvant.get_by_sid(metadata['id'])
@@ -459,15 +594,36 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                                                 annotation['Type'],
                                                 '',
                                                 self.srvutl.fuzzy_date_from_timestamp(annotation['Timestamp']),
-                                                annotation['AID'],
+                                                # ~ annotation['AID'],
                                                 annotation['Timestamp']
                                             )
-                        self.model.append(pid, node)
-        self.treeview.set_model(self.sorted_model)
+                        model.append(pid, node)
+
+                # Load attachments
+                # ~ files = self.srvatc.get_by_sid(metadata['id'])
+                # ~ for fname in files:
+                    # ~ with open(fname, 'r') as ft:
+                        # ~ attachment = json.load(ft)
+                        # ~ icon = self.srvicm.get_pixbuf_icon('basico-attachment')
+                        # ~ node = self.get_node(   0,
+                                                # ~ icon,
+                                                # ~ False,
+                                                # ~ '',
+                                                # ~ attachment['Title'],
+                                                # ~ 'Attachment',
+                                                # ~ '',
+                                                # ~ attachment['Description'],
+                                                # ~ '',
+                                                # ~ self.srvutl.fuzzy_date_from_timestamp(attachment['Created']),
+                                                # ~ attachment['TID'],
+                                                # ~ attachment['Created']
+                                            # ~ )
+                        # ~ model.append(pid, node)
+        treeview = self.srvgui.get_widget('visor_sapnotes_treeview')
+        treeview.set_model(sorted_model)
         self.update_total_sapnotes_count()
         self.show_widgets()
-        stack = self.srvgui.get_widget('gtk_stack_main')
-        stack.set_visible_child_name('visor')
+        self.srvclb.gui_show_dashboard()
 
 
     def show_widgets(self):
@@ -475,25 +631,32 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
 
     def right_click(self, treeview, event, data=None):
+        treeview = self.srvgui.get_widget('visor_sapnotes_treeview')
         if event.button == 3:
             rect = Gdk.Rectangle()
             rect.x = x = int(event.x)
             rect.y = y = int(event.y)
-            pthinfo = self.treeview.get_path_at_pos(x,y)
+            pthinfo = treeview.get_path_at_pos(x,y)
             if pthinfo is not None:
                 path,col,cellx,celly = pthinfo
                 model = treeview.get_model()
                 treeiter = model.get_iter(path)
-                component = model[treeiter][5]
-                sid = model[treeiter][0]
+                component = model[treeiter][COLUMN.COMPONENT]
+                sid = model[treeiter][COLUMN.KEY]
+                if sid == 0:
+                    return
                 sid = "0"*(10 - len(str(sid))) + str(sid)
-                toolbar = self.srvgui.get_widget('visortoolbar')
+                # ~ toolbar = self.srvgui.get_widget('visortoolbar')
                 popover = self.srvgui.add_widget('gtk_popover_visor_row', Gtk.Popover.new(treeview))
                 popover.set_position(Gtk.PositionType.TOP)
                 popover.set_pointing_to(rect)
                 box = self.build_popover(sid, popover, component)
                 popover.add(box)
                 self.srvclb.gui_show_popover(None, popover)
+
+
+    def clb_create_annotation(self, button, sid):
+        self.srvclb.action_annotation_create_for_sapnote(sid)
 
 
     def build_popover(self, sid, popover, component):
@@ -530,11 +693,34 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             # Popover button "Add an annotation"
             button = get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
             button.show_all()
-            button.connect('clicked', self.srvclb.gui_annotation_widget_show, sid, 'create')
+            button.connect('clicked', self.clb_create_annotation, sid)
             box.pack_start(button, False, False, 0)
 
+            fbox = Gtk.VBox()
+            frame = Gtk.Frame()
+            frame.set_border_width(3)
+            label = Gtk.Label()
+            label.set_markup(' <b>Attachments</b> ')
+            frame.set_label_widget(label)
+            # Popover button "Add attachments"
+            button = get_popover_button("<b>Add</b> new to SAP Note %d" % isid, 'basico-attachment')
+            button.set_property('margin', 3)
+            button.show_all()
+            button.connect('clicked', self.srvclb.gui_attachment_add_to_sapnote, sid)
+            fbox.pack_start(button, False, False, 0)
+
+            # Popover button "Show attachments"
+            if len(self.srvatc.get_by_sid(sid)) > 0:
+                button = get_popover_button("<b>Show</b> linked to SAP Note %d" % isid, 'basico-attachment')
+                button.set_property('margin', 3)
+                button.show_all()
+                # ~ button.connect('clicked', self.srvclb.gui_attachment_show_, sid)
+                fbox.pack_start(button, False, False, 0)
+            frame.add(fbox)
+            box.pack_start(frame, False, False, 0)
+
             # Popover button "Open SAP Note"
-            button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-browse')
+            button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
             button.connect('clicked', self.srvclb.sapnote_browse, sid)
             box.pack_start(button, False, False, 0)
 
@@ -589,15 +775,15 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
 
     def get_filtered_bag(self):
-        visor = self.srvgui.get_widget('visor_sapnotes')
-        model = visor.get_sorted_model()
+        clean_html = self.srvutl.clean_html
+        sorted_model = self.srvgui.get_widget('visor_sapnotes_sorted_model')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         selected = []
 
         def get_selected_sapnotes(model, path, itr):
-            sid = model.get(itr, 0)[0]
-            aid = model.get(itr, 10)[0]
-            if len(aid) == 0:
+            sid = clean_html(model.get(itr, COLUMN.SID)[0])
+            if len(escape(sid)) > 0:
                 selected.append(str(sid))
 
-        model.foreach(get_selected_sapnotes)
+        sorted_model.foreach(get_selected_sapnotes)
         return selected

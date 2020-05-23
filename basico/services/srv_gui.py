@@ -8,7 +8,9 @@
 """
 
 import gi
+gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
+from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
@@ -16,6 +18,8 @@ from gi.repository import Gio
 from basico.core.mod_srv import Service
 from basico.core.mod_win import GtkAppWindow
 from basico.core.mod_log import get_logger
+from basico.core.mod_env import FILE
+# ~ from basico.widgets.wdg_splash import Splash
 
 
 class UIApp(Gtk.Application):
@@ -45,10 +49,18 @@ class UIApp(Gtk.Application):
             self.my_app_settings = "Primary application instance."
             self.window = self.srvgui.add_widget('gtk_app_window_main', GtkAppWindow(self))
             self.window.connect("delete-event", self.srvgui.quit)
+            self.window.connect("key-press-event",self.on_key_press_event)
             self.log.debug("New Basico instance created")
             self.srvuif.statusbar_msg("Welcome to Basico", True)
         else:
             self.log.debug("Basico is already running!")
+        splash = self.app.get_splash()
+        splash.hide()
+
+
+    def on_key_press_event(self, widget, event):
+        if Gdk.keyval_name(event.keyval) == 'Escape':
+            self.srvclb.action_annotation_cancel()
 
 
     def get_services(self):
@@ -82,12 +94,14 @@ class GUI(Service):
     srvsap = None
     widgets = {} # Widget name : Object
     keys = {} # Key : Value; keys: doctype, property, values
+    signals = {} # Signals dictionary for all widgets (widget::signal)
 
     def initialize(self):
         """
         Setup GUI Service
         """
-        self.srvsap = self.get_service('SAP')
+        pass
+        # ~ self.srvsap = self.get_service('SAP')
 
 
     def run(self):
@@ -97,6 +111,8 @@ class GUI(Service):
         GObject.threads_init()
         self.uiapp = UIApp(self.app)
         self.log.debug("Setting up GUI")
+        # ~ splash = self.app.get_splash()
+        # ~ splash.show()
         self.uiapp.run()
 
 
@@ -136,6 +152,15 @@ class GUI(Service):
         return self.keys
 
 
+    def get_keys_starting_with(self, name):
+        matches = []
+        for key in self.keys:
+            if key.startswith(name):
+                matches.append(key)
+
+        return matches
+
+
     def get_key_value(self, key):
         """
         Return current value from var cache
@@ -148,6 +173,25 @@ class GUI(Service):
         Set current value for var cache
         """
         self.keys[key] = value
+
+
+    def add_signal(self, widget, signal, value):
+        """
+        Add signal to signals cache
+        """
+        signal_name = "%s::%s" % (widget, signal)
+        self.signals[signal_name] = value
+
+
+    def get_signal(self, widget, signal):
+        """
+        Return signal from cache
+        """
+        signal_name = "%s::%s" % (widget, signal)
+        try:
+            return self.signals[signal_name]
+        except KeyError:
+            return None
 
 
     def add_widget(self, name, obj=None):
@@ -166,7 +210,10 @@ class GUI(Service):
         """
         try:
             return self.widgets[name]
-        except KeyError:
+        except KeyError as warning:
+            self.log.warning(warning)
+            # ~ self.log.error(self.get_traceback())
+            raise
             return None
 
 

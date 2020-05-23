@@ -9,40 +9,74 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit', '3.0')
+
+try:
+    gi.require_version('WebKit2', '4.0')
+    from gi.repository import WebKit2 as WebKit
+    WEBKIT_RELEASE = 4
+
+except:
+    gi.require_version('WebKit', '3.0')
+    from gi.repository import WebKit
+    WEBKIT_RELEASE = 3
 
 from gi.repository import Gtk
-from gi.repository import WebKit
 
 
-class BasicoBrowser(Gtk.VBox):
-    def __init__(self, *args, **kwargs):
-        super(BasicoBrowser, self).__init__(*args, **kwargs)
+from basico.core.mod_wdg import BasicoWidget
 
+class BasicoBrowser(BasicoWidget, Gtk.VBox):
+    def __init__(self, app):
+        # ~ def __init__(self, *args, **kwargs):
+        super().__init__(app, __class__.__name__)
+        # ~ super(BasicoBrowser, self).__init__(*args, **kwargs)
+        Gtk.VBox.__init__(self)
+        self.app = app
+        if WEBKIT_RELEASE == 4:
+            self.log.debug("Using WebKit2 (4.0)")
+        else:
+            self.log.debug("Using WebKit (3.0)")
+
+        # ~ session = WebKit.get_default_session()
+        # ~ session.set_property("ssl-use-system-ca-file", True)
         self.webview = WebKit.WebView()
 
         settings = self.webview.get_settings()
-        settings.set_property('enable-developer-extras', True)
-        settings.set_property('enable-default-context-menu', True)
+        if WEBKIT_RELEASE == 3:
 
-        settings.set_property('default-encoding', 'utf-8')
-        settings.set_property('enable-private-browsing', True)
-        settings.set_property('enable-html5-local-storage', True)
+            settings.set_property('enable-developer-extras', False)
+            settings.set_property('enable-default-context-menu', True)
+            settings.set_property('default-encoding', 'utf-8')
+            settings.set_property('enable-private-browsing', False)
+            settings.set_property('enable-html5-local-storage', True)
 
-        # disable plugins, like Adobe Flash and Java
-        settings.set_property('enable-plugins', True)
+            # disable plugins, like Adobe Flash and Java
+            settings.set_property('enable-plugins', False)
 
-        # scale other content besides from text as well
-        self.webview.set_full_content_zoom(True)
+            # scale other content besides from text as well
+            self.webview.set_full_content_zoom(True)
+        else:
+            settings.set_property('enable-smooth-scrolling', True)
+            settings.set_property('enable-plugins', False)
+            settings.set_property('enable-fullscreen', False)
+            settings.set_property('enable-html5-database', False)
+            settings.set_property('enable-html5-local-storage', False)
+            settings.set_property('enable-media-stream', False)
+            settings.set_property('enable-mediasource', False)
+            settings.set_property('enable-offline-web-application-cache', True)
+            settings.set_property('enable-page-cache', True)
+            settings.set_property('enable-webaudio', False)
+            settings.set_property('enable-webgl', False)
 
-        self.show()
+        # ~ self.show()
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.add(self.webview)
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scrolled_window.set_shadow_type(Gtk.ShadowType.IN)
         scrolled_window.set_hexpand(True)
         scrolled_window.set_vexpand(True)
         self.pack_start(scrolled_window, True, True, 0)
-        scrolled_window.show_all()
+        # ~ scrolled_window.show_all()
 
 
     def load_url(self, url):
