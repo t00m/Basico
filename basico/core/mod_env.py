@@ -51,6 +51,7 @@ LPATH['BACKUP'] = LPATH['EXPORT'] + 'backup' + SEP
 LPATH['PDF'] = LPATH['EXPORT'] + 'pdf' + SEP
 LPATH['OPT'] = LPATH['ROOT'] + 'opt' + SEP
 LPATH['DRIVERS'] = LPATH['OPT'] + 'webdrivers' + SEP
+LPATH['FIREFOX_PROFILE'] = os.path.join(LPATH['DRIVERS'], 'basico.default')
 
 
 # Global paths
@@ -85,5 +86,6 @@ FILE['HELP_INDEX'] = GPATH['HELP_HTML'] + 'index.html'
 FILE['SPLASH'] = GPATH['SPLASH'] + 'basico-splash-400x250.png'
 FILE['G_SAP_PRODUCTS'] = GPATH['SAP'] + 'products.txt'
 FILE['L_SAP_PRODUCTS'] = LPATH['RESOURCES'] + 'products.txt'
+FILE['FIREFOX_DRIVER'] = os.path.join(LPATH['DRIVERS'], 'geckodriver')
 # Annotations
 ATYPES = ['Bookmark', 'Email', 'Fixme', 'Incident', 'Meeting', 'Note', 'Procedure', 'Snippet', 'Template', 'Todo']

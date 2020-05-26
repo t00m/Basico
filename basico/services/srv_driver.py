@@ -11,20 +11,13 @@ import os
 import sys
 import selenium
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver import Firefox, FirefoxProfile
 
-from basico.core.mod_env import LPATH
+from basico.core.mod_env import LPATH, FILE
 from basico.core.mod_srv import Service
 
-GECKODRIVER_URL = "https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz"
+# GECKODRIVER_URL = "https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz"
 
 
 class SeleniumDriver(Service):
@@ -92,22 +85,32 @@ class SeleniumDriver(Service):
            Launchpad must load target page successfully.
         '''
         driver = None
-        capabilities = {'marionette': False}
-        utils = self.get_service('Utils')
+
+        # Enable custom Firefox profile
         options = Options()
-        options.add_argument('--headless')
-        FIREFOX_PROFILE_DIR = utils.get_firefox_profile_dir()
-        self.log.debug(FIREFOX_PROFILE_DIR)
-        # ~ FIREFOX_PROFILE = FirefoxProfile(FIREFOX_PROFILE_DIR)
+        options.profile = LPATH['FIREFOX_PROFILE']
+
+        # Enable headless
+        options.headless = True
+
+        # Enable custom geckodriver
+        # Disabled as the driver directory with the binary is defined
+        # above in the envvar PATH
+        # service = Service(FILE['FIREFOX_DRIVER'])
+
         try:
-            driver = webdriver.Firefox(firefox_profile=FIREFOX_PROFILE_DIR, options=options, capabilities=capabilities) #, executable_path=gecko_path)
-            # ~ driver = webdriver.Firefox(capabilities=capabilities, firefox_profile=FIREFOX_PROFILE, firefox_options=options)
+            # With Service
+            # ~ driver = webdriver.Firefox(options=options, service=service)
+
+            # Without Service:
+            driver = webdriver.Firefox(options=options)
+            self.log.debug("Webdriver initialited: %s", driver)
         except Exception as error:
             self.log.error(error)
             # Geckodriver not found
             # Download it from:
             # https://github.com/mozilla/geckodriver/releases/latest
-        self.log.debug("Webdriver initialited")
+
         return driver
 
         # ~ driver = Firefox(

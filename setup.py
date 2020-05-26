@@ -11,6 +11,7 @@
 
 import os
 from os.path import sep as SEP
+import glob
 import sys
 import subprocess
 from setuptools import setup
@@ -34,6 +35,10 @@ def add_data_basico():
         data_files_basico = [
             ('share/applications', ['basico/data/desktop/basico.desktop']),
             ('share/icons', ['basico/data/icons/basico-component.svg']),
+            ('basico/data/res/firefox',
+                [
+                    'basico/data/res/firefox/basico.default.zip'
+                ]),
             ('basico/data/res/selenium/drivers',
                 [
                     'basico/data/res/selenium/drivers/geckodriver',
@@ -173,7 +178,7 @@ def main():
         # able to automatically install dependencies
         install_requires=[
               'python-dateutil',
-              'selenium==3.141.0',
+              'selenium',
               'feedparser',
               'requests',
               'openpyxl',

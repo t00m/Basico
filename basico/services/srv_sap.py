@@ -176,7 +176,8 @@ class SAP(Service):
             content = self.srvdtb.get_sapnote_content(sid)
 
         self.fetched()
-
+        # ~ self.log.debug(content)
+        # ~ self.log.debug(sid)
         sapnote = self.analyze_sapnote(sid, content)
         if len(sapnote) > 0:
             self.srvdtb.add(sapnote)
@@ -205,9 +206,12 @@ class SAP(Service):
             ODATA_NOTE_URL = self.srvstg.get('SAP', 'ODATA_NOTE_URL')
             timeout = self.srvstg.get('SAP', 'TIMEOUT')
             self.log.debug("Downloading SAP Note %s" % sapnote)
-            browser = webdriver.load(driver, ODATA_NOTE_URL % sapnote)
-            time.sleep(timeout)
+            URL = ODATA_NOTE_URL % sapnote
+            self.log.debug("Downloading: %s", URL)
+            browser = webdriver.load(driver, URL)
+            time.sleep(20)
             content = browser.page_source
+            print(content)
             fsn = LPATH['CACHE_XML'] + sapnote + '.xml'
             with open(fsn, 'w') as fxml:
                 fxml.write(content)

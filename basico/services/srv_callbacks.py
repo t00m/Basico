@@ -470,23 +470,26 @@ class Callback(Service):
         self.srvsap.start_fetching(len(bag))
         dlbag = []
 
+        for sapnote in lbag:
+            self.srvsap.fetch(driver, sapnote)
+
         # FIXME: max_workers = 1 = Threads disabled
         # Indeed, I think this is the best option right now.
-        with Executor(max_workers=1) as exe:
-            jobs = []
-            for sapnote in lbag:
-                job = exe.submit(self.srvsap.fetch, driver, sapnote)
-                jobs.append(job)
+        # ~ with Executor(max_workers=1) as exe:
+            # ~ jobs = []
+            # ~ for sapnote in lbag:
+                # ~ job = exe.submit(self.srvsap.fetch, driver, sapnote)
+                # ~ jobs.append(job)
 
-            for job in jobs:
-                rc, sapnote = job.result()
-                msg = "\tRC SAP Note %s: %s" % (sapnote, rc)
-                self.log.info(msg)
-                result[sapnote] = rc
-                if rc:
-                    sid = "0"*(10 - len(sapnote)) + sapnote
-                    dlbag.append(sid)
-                time.sleep(0.2)
+            # ~ for job in jobs:
+                # ~ rc, sapnote = job.result()
+                # ~ msg = "\tRC SAP Note %s: %s" % (sapnote, rc)
+                # ~ self.log.info(msg)
+                # ~ result[sapnote] = rc
+                # ~ if rc:
+                    # ~ sid = "0"*(10 - len(sapnote)) + sapnote
+                    # ~ dlbag.append(sid)
+                # ~ time.sleep(0.2)
 
         dlbuffer.set_text('')
         # ~ popover = self.srvgui.get_widget('gtk_popover_toolbutton_import')
