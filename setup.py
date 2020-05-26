@@ -173,7 +173,7 @@ def main():
         # able to automatically install dependencies
         install_requires=[
               'python-dateutil',
-              'selenium',
+              'selenium==3.141.0',
               'feedparser',
               'requests',
               'openpyxl',

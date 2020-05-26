@@ -19,11 +19,12 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver import Firefox, FirefoxProfile
 
 from basico.core.mod_env import LPATH
 from basico.core.mod_srv import Service
 
-GECKODRIVER_URL = "https://github.com/mozilla/geckodriver/releases/download/v0.15.0/geckodriver-v0.15.0-linux64.tar.gz"
+GECKODRIVER_URL = "https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz"
 
 
 class SeleniumDriver(Service):
@@ -72,8 +73,8 @@ class SeleniumDriver(Service):
         else:
             self.log.debug("Gecko Webdriver found in: %s" % GECKODRIVER)
             return True
-    
-        
+
+
     def open(self):
         '''
         In order to have selenium working with Firefox and be able to
@@ -91,13 +92,16 @@ class SeleniumDriver(Service):
            Launchpad must load target page successfully.
         '''
         driver = None
+        capabilities = {'marionette': False}
         utils = self.get_service('Utils')
         options = Options()
         options.add_argument('--headless')
         FIREFOX_PROFILE_DIR = utils.get_firefox_profile_dir()
-        FIREFOX_PROFILE = webdriver.FirefoxProfile(FIREFOX_PROFILE_DIR)
+        self.log.debug(FIREFOX_PROFILE_DIR)
+        # ~ FIREFOX_PROFILE = FirefoxProfile(FIREFOX_PROFILE_DIR)
         try:
-            driver = webdriver.Firefox(firefox_profile=FIREFOX_PROFILE, firefox_options=options)
+            driver = webdriver.Firefox(firefox_profile=FIREFOX_PROFILE_DIR, options=options, capabilities=capabilities) #, executable_path=gecko_path)
+            # ~ driver = webdriver.Firefox(capabilities=capabilities, firefox_profile=FIREFOX_PROFILE, firefox_options=options)
         except Exception as error:
             self.log.error(error)
             # Geckodriver not found
@@ -105,6 +109,17 @@ class SeleniumDriver(Service):
             # https://github.com/mozilla/geckodriver/releases/latest
         self.log.debug("Webdriver initialited")
         return driver
+
+        # ~ driver = Firefox(
+                # ~ capabilities=capabilities,
+                # ~ firefox_profile=profile2)
+
+        # ~ from selenium import webdriver
+
+        # ~ url = "https://mail.google.com"
+        # ~ fp = webdriver.FirefoxProfile('/Users/<username>/Library/Application Support/Firefox/Profiles/71v1uczn.default')
+
+        # ~ driver = webdriver.Firefox(fp)
 
 
     def close(self, driver):
