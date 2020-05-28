@@ -23,6 +23,7 @@ from basico.core.mod_env import FILE, LPATH, ATYPES, APP
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.widgets.wdg_settingsview import SettingsView
 
+MAX_WORKERS = 1 # Number of simultaneous connections
 
 class Callback(Service):
     def initialize(self):
@@ -430,20 +431,18 @@ class Callback(Service):
 
     def sapnote_import_from_launchpad(self, *args):
         db = self.get_service('DB')
-        webdriver = self.get_service('Driver')
-        textview = self.srvgui.get_widget('gtk_textview_download_launchpad')
+        winroot = self.srvgui.get_widget('gtk_app_window_main')
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        textview = self.srvgui.get_widget('gtk_textview_download_launchpad')
+        dlbuffer = textview.get_buffer()
+        istart, iend = dlbuffer.get_bounds()
+        text = dlbuffer.get_text(istart, iend, False)
 
         bag = []
         all_notes = []
         sapnotes = []
-        dlbuffer = textview.get_buffer()
-        istart, iend = dlbuffer.get_bounds()
-        text = dlbuffer.get_text(istart, iend, False)
-        self.log.debug(text)
         lines = text.replace(' ', ',')
         lines = lines.replace('\n', ',')
-        self.log.debug(lines)
         for sid in lines.split(','):
             sid = sid.strip()
             if len(sid) > 0:
@@ -458,45 +457,28 @@ class Callback(Service):
         lbag = list(bag)
         lbag.sort()
 
-        if len(bag)> 0:
-            driver = webdriver.open()
+        if len(bag) == 0:
+            return
 
-        winroot = self.srvgui.get_widget('gtk_app_window_main')
-        msg = "%d SAP Notes to be downloaded: %s" % (len(bag), ', '.join(list(bag)))
-        self.log.info(msg)
+        self.log.debug("Number of SAP Notes to be downloaded: %d", len(bag))
+        self.srvsap.start_fetching(len(bag))
 
         result = {}
-
-        self.srvsap.start_fetching(len(bag))
         dlbag = []
+        with Executor(max_workers=MAX_WORKERS) as exe:
+            jobs = []
+            for sid in lbag:
+                job = exe.submit(self.srvsap.fetch, sid)
+                jobs.append(job)
 
-        for sapnote in lbag:
-            self.srvsap.fetch(driver, sapnote)
-
-        # FIXME: max_workers = 1 = Threads disabled
-        # Indeed, I think this is the best option right now.
-        # ~ with Executor(max_workers=1) as exe:
-            # ~ jobs = []
-            # ~ for sapnote in lbag:
-                # ~ job = exe.submit(self.srvsap.fetch, driver, sapnote)
-                # ~ jobs.append(job)
-
-            # ~ for job in jobs:
-                # ~ rc, sapnote = job.result()
-                # ~ msg = "\tRC SAP Note %s: %s" % (sapnote, rc)
-                # ~ self.log.info(msg)
-                # ~ result[sapnote] = rc
-                # ~ if rc:
-                    # ~ sid = "0"*(10 - len(sapnote)) + sapnote
-                    # ~ dlbag.append(sid)
-                # ~ time.sleep(0.2)
+            for job in jobs:
+                rc, sid = job.result()
+                result[sid] = rc
+                if rc:
+                    dlbag.append(self.srvutl.format_sid(sid))
+                time.sleep(0.2)
 
         dlbuffer.set_text('')
-        # ~ popover = self.srvgui.get_widget('gtk_popover_toolbutton_import')
-        # ~ self.gui_hide_popover(popover)
-        if len(bag) > 0:
-            webdriver.close(driver)
-
         self.srvsap.stop_fetching()
         db.save_notes()
         db.build_stats()

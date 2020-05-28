@@ -7,6 +7,7 @@
 # Description: SAP service
 """
 
+import os
 import time
 import traceback
 from shutil import which
@@ -53,6 +54,7 @@ class SAP(Service):
         self.srvutl = self.get_service('Utils')
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')
+        self.srvweb = self.get_service('Driver')
 
 
     def __init_config_section(self):
@@ -161,27 +163,24 @@ class SAP(Service):
         return sapnote
 
 
-    def fetch(self, driver, sid):
+    def fetch(self, sid):
         valid = False
 
         if not self.srvdtb.is_stored(sid):
-            self.log.debug("%3d/%3d - SAP Note %s must be downloaded" % (self.notes_fetched+1, self.notes_total, sid))
-            content = self.download(driver, sid)
+            content = self.download(sid)
             if len(content) > 0:
-                self.log.debug("%3d/%3d - SAP Note %s fetched" % (self.notes_fetched+1, self.notes_total, sid))
+                self.log.info("SAP Note %s downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
             else:
-                self.log.debug("%3d/%3d - SAP Note %s not feched" % (self.notes_fetched+1, self.notes_total, sid))
+                self.log.info("SAP Note %s not downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
         else:
-            self.log.debug("%3d/%3d - SAP Note %s will be analyzed again" % (self.notes_fetched+1, self.notes_total, sid))
+            self.log.info("SAP Note %s was already stored in database (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
             content = self.srvdtb.get_sapnote_content(sid)
 
         self.fetched()
-        # ~ self.log.debug(content)
-        # ~ self.log.debug(sid)
         sapnote = self.analyze_sapnote(sid, content)
         if len(sapnote) > 0:
+            self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add(sapnote)
-            self.srvdtb.store(sid, content)
             valid = True
         return valid, sid
 
@@ -200,19 +199,14 @@ class SAP(Service):
         self.notes_total = 0
 
 
-    def download(self, driver, sapnote=None):
+    def download(self, sid=None):
         try:
-            webdriver = self.get_service('Driver')
             ODATA_NOTE_URL = self.srvstg.get('SAP', 'ODATA_NOTE_URL')
             timeout = self.srvstg.get('SAP', 'TIMEOUT')
-            self.log.debug("Downloading SAP Note %s" % sapnote)
-            URL = ODATA_NOTE_URL % sapnote
-            self.log.debug("Downloading: %s", URL)
-            browser = webdriver.load(driver, URL)
-            time.sleep(20)
-            content = browser.page_source
-            print(content)
-            fsn = LPATH['CACHE_XML'] + sapnote + '.xml'
+            URL = ODATA_NOTE_URL % sid
+            content = self.srvweb.request(URL)
+            fname = self.srvutl.format_sid(sid) + '.xml'
+            fsn = os.path.join(LPATH['CACHE_XML'], fname)
             with open(fsn, 'w') as fxml:
                 fxml.write(content)
         except Exception as error:

@@ -51,20 +51,22 @@ class Database(Service):
     def get_services(self):
         self.srvclt = self.get_service('Collections')
 
-    def store(self, sapnote, html):
-        FSAPNOTE = LPATH['CACHE_XML'] + sapnote + '.xml'
+    def store(self, sid, html):
+        fname = sid + '.xml'
+        FSAPNOTE = os.path.join(LPATH['CACHE_XML'], fname)
 
         try:
             f = open(FSAPNOTE, 'w')
             f.write(html)
             f.close()
-            self.log.debug("SAP Note %s in XML format stored in %s" % (sapnote, FSAPNOTE))
+            self.log.debug("SAP Note %s stored in %s" % (sid, FSAPNOTE))
         except Exception as error:
             self.log.error(error)
 
 
     def get_sapnote_content(self, sid):
-        FSAPNOTE = LPATH['CACHE_XML'] + sid + '.xml'
+        fname = sid + '.xml'
+        FSAPNOTE = os.path.join(LPATH['CACHE_XML'], fname)
         content = open(FSAPNOTE, 'r').read()
         return content
 
@@ -86,7 +88,8 @@ class Database(Service):
 
 
     def is_stored(self, sid):
-        fsapnote = LPATH['CACHE_XML'] + sid + '.xml'
+        fname = sid + '.xml'
+        fsapnote = os.path.join(LPATH['CACHE_XML'], fname)
         stored = os.path.exists(fsapnote)
 
         return stored

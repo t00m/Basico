@@ -46,13 +46,14 @@ class Database(Service):
         except:
             settings[self.section]['DBSAP'] = FILE['DBSAP']
         self.srvstg.save(settings)
-        
+
 
     def get_services(self):
         self.srvclt = self.get_service('Collections')
 
     def store(self, sapnote, html):
-        FSAPNOTE = LPATH['CACHE_XML'] + sapnote + '.xml'
+        fname = sapnote + '.xml'
+        FSAPNOTE = os.path.join(LPATH['CACHE_XML'], fname)
 
         try:
             f = open(FSAPNOTE, 'w')
@@ -64,7 +65,8 @@ class Database(Service):
 
 
     def get_sapnote_content(self, sid):
-        FSAPNOTE = LPATH['CACHE_XML'] + sid + '.xml'
+        fname = sid + '.xml'
+        FSAPNOTE = os.path.join(LPATH['CACHE_XML'], fname)
         content = open(FSAPNOTE, 'r').read()
         return content
 
@@ -86,7 +88,8 @@ class Database(Service):
 
 
     def is_stored(self, sid):
-        fsapnote = LPATH['CACHE_XML'] + sid + '.xml'
+        fname = sid + '.xml'
+        fsapnote = os.path.join(LPATH['CACHE_XML'], fname)
         stored = os.path.exists(fsapnote)
 
         return stored
@@ -192,7 +195,7 @@ class Database(Service):
                     n += 1
         self.save_notes()
         return n
-        
+
 
     def get_notes(self):
         '''
@@ -380,7 +383,7 @@ class Database(Service):
                             continue
                         if cid not in new_cols:
                             new_cols.append(cid)
-                            self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid)) 
+                            self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid))
                 else:
                     current_collections = self.sapnotes[sid]['collections']
                     current_collections.extend(collections)
@@ -390,12 +393,12 @@ class Database(Service):
                             continue
                         if cid not in bag:
                             bag.append(cid)
-                            self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid)) 
+                            self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid))
                     self.sapnotes[sid]['collections'] = bag
                 self.save_notes()
             except:
                 self.log.error(error)
- 
+
 
     def delete(self, sid):
         sid = self.normalize_sid(sid)

@@ -423,6 +423,8 @@ class Utils(Service):
         return run
 
 
+    def format_sid(self, sid):
+        return "0"*(10 - len(sid)) + sid
 
 
     def clean_html(self, raw_html):
