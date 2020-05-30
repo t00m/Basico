@@ -55,6 +55,8 @@ class SAP(Service):
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')
         self.srvweb = self.get_service('Driver')
+        self.srvweb.connect('download-complete', self.download_complete)
+        self.log.debug("Listening to Firefox Webdriver Service")
 
 
     def __init_config_section(self):
@@ -131,14 +133,14 @@ class SAP(Service):
 
 
 
-    def analyze_sapnote(self, sid, content):
+    def analyze_sapnote(self, content):
         '''
         Get metadata details from SAP Note
         '''
+        sapnote = {}
         try:
             f = self.srvutl.feedparser_parse(content)
             sid = f.entries[0].d_sapnotesnumber
-            sapnote = {}
             sapnote['id'] = sid
             sapnote['componentkey'] = f.entries[0].d_componentkey
             comptxt = f.entries[0].d_componenttext
@@ -157,32 +159,31 @@ class SAP(Service):
             sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
             self.log.debug ("SAP Note %s analyzed successfully" % sid)
         except Exception as error:
-            sapnote = {}
-            self.log.error("Error while analyzing data for SAP Note %s" % sid)
+            pass
+            # ~ self.log.warning("Error while analyzing. SAP metadata not found.")
 
         return sapnote
 
 
-    def fetch(self, sid):
-        valid = False
+    # ~ def fetch(self, sid):
+        # ~ valid = False
+        # ~ if not self.srvdtb.is_stored(sid):
+            # ~ content = self.download(sid)
+            # ~ if len(content) > 0:
+                # ~ self.log.info("SAP Note %s downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
+            # ~ else:
+                # ~ self.log.info("SAP Note %s not downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
+        # ~ else:
+            # ~ self.log.info("SAP Note %s was already stored in database (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
+            # ~ content = self.srvdtb.get_sapnote_content(sid)
 
-        if not self.srvdtb.is_stored(sid):
-            content = self.download(sid)
-            if len(content) > 0:
-                self.log.info("SAP Note %s downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
-            else:
-                self.log.info("SAP Note %s not downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
-        else:
-            self.log.info("SAP Note %s was already stored in database (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
-            content = self.srvdtb.get_sapnote_content(sid)
-
-        self.fetched()
-        sapnote = self.analyze_sapnote(sid, content)
-        if len(sapnote) > 0:
-            self.srvdtb.store(self.srvutl.format_sid(sid), content)
-            self.srvdtb.add(sapnote)
-            valid = True
-        return valid, sid
+        # ~ self.fetched()
+        # ~ sapnote = self.analyze_sapnote(content)
+        # ~ if len(sapnote) > 0:
+            # ~ self.srvdtb.store(self.srvutl.format_sid(sid), content)
+            # ~ self.srvdtb.add(sapnote)
+            # ~ valid = True
+        # ~ return valid, sid
 
 
     def start_fetching(self, total):
@@ -198,22 +199,32 @@ class SAP(Service):
         self.notes_fetched = 0
         self.notes_total = 0
 
+    def download_complete(self, webdrvsrv):
+        self.log.debug("Download complete for url:")
+        driver = webdrvsrv.get_driver()
+        url = driver.current_url
+        self.log.debug(url)
+        content = driver.page_source
+        sapnote = self.analyze_sapnote(content)
+        if len(sapnote) > 0:
+            sid = sapnote['id']
+            self.srvdtb.store(self.srvutl.format_sid(sid), content)
+            self.srvdtb.add(sapnote)
+            self.log.info("SAP Note %s added successfully to database", sid)
+        else:
+            self.log.warning("Warning. SAP metadata analysis failed. Check manually.")
 
-    def download(self, sid=None):
-        try:
-            ODATA_NOTE_URL = self.srvstg.get('SAP', 'ODATA_NOTE_URL')
-            timeout = self.srvstg.get('SAP', 'TIMEOUT')
-            URL = ODATA_NOTE_URL % sid
-            content = self.srvweb.request(URL)
-            fname = self.srvutl.format_sid(sid) + '.xml'
-            fsn = os.path.join(LPATH['CACHE_XML'], fname)
-            with open(fsn, 'w') as fxml:
-                fxml.write(content)
-        except Exception as error:
-            self.log.error(error)
-            content = ''
 
-        return content
+    def download(self, bag):
+        for sid in bag:
+            try:
+                ODATA_NOTE_URL = self.srvstg.get('SAP', 'ODATA_NOTE_URL')
+                timeout = self.srvstg.get('SAP', 'TIMEOUT')
+                URL = ODATA_NOTE_URL % sid
+                self.srvweb.request(URL)
+            except Exception as error:
+                self.log.error(error)
+                self.print_traceback()
 
 
     def set_bookmark(self, bag):

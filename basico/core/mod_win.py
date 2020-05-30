@@ -40,7 +40,7 @@ from basico.widgets.wdg_browser import BasicoBrowser
 from basico.core.mod_log import get_logger
 
 
-class GtkAppWindow(Service, Gtk.ApplicationWindow):
+class GtkAppWindow(Gtk.ApplicationWindow):
     def __init__(self, uiapp):
         self.setup_controller(uiapp)
         # ~ self.get_logger(__class__.__name__)

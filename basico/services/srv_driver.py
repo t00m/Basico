@@ -18,6 +18,8 @@ import logging
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 logging.getLogger('selenium').setLevel(logging.WARNING)
 
+from gi.repository import GObject
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as SeleniumService
@@ -43,12 +45,13 @@ class DriverStatus(IntEnum):
 
 
 class SeleniumDriver(Service):
+    url = None
     retry = 0
     driver = None
     driver_status = DriverStatus.STOPPED
 
     def initialize(self):
-        pass
+        GObject.signal_new('download-complete', SeleniumDriver, GObject.SignalFlags.RUN_LAST, None, () )
 
     def __set_driver(self, driver):
         self.driver = driver
@@ -62,7 +65,11 @@ class SeleniumDriver(Service):
     def get_driver_status(self):
         return self.driver_status
 
+    def get_url(self):
+        return url
+
     def request(self, url):
+        self.url = url
         self.log.debug("Requested URL: %s", url)
 
         self.log.debug("Nº of retries: %d", self.retry)
@@ -115,7 +122,7 @@ class SeleniumDriver(Service):
                 self.log.debug("SAP Note downloaded")
                 self.retry = 0
                 self.__set_driver_status(DriverStatus.WAITING)
-                return driver.page_source
+                self.emit('download-complete')
 
     def end(self):
         driver = self.get_driver()

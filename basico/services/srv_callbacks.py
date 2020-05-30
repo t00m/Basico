@@ -10,6 +10,7 @@
 import os
 import json
 import time
+# ~ from threading import Thread
 from concurrent.futures import ThreadPoolExecutor as Executor
 
 import gi
@@ -457,36 +458,35 @@ class Callback(Service):
         lbag = list(bag)
         lbag.sort()
 
-        if len(bag) == 0:
+        if len(lbag) == 0:
             return
 
-        self.log.debug("Number of SAP Notes to be downloaded: %d", len(bag))
-        self.srvsap.start_fetching(len(bag))
+        self.log.debug("Number of SAP Notes to be downloaded: %d", len(lbag))
+        self.srvsap.download(lbag)
 
-        result = {}
-        dlbag = []
-        with Executor(max_workers=MAX_WORKERS) as exe:
-            jobs = []
-            for sid in lbag:
-                job = exe.submit(self.srvsap.fetch, sid)
-                jobs.append(job)
+        # ~ self.srvsap.start_fetching(len(bag))
 
-            for job in jobs:
-                rc, sid = job.result()
-                result[sid] = rc
-                if rc:
-                    dlbag.append(self.srvutl.format_sid(sid))
-                time.sleep(0.2)
+        # ~ result = {}
+        # ~ dlbag = []
+        # ~ with Executor(max_workers=MAX_WORKERS) as exe:
+            # ~ jobs = []
+            # ~ for sid in lbag:
+                # ~ job = exe.submit(self.srvsap.download, sid)
+                # ~ jobs.append(job)
+
+            # ~ for job in jobs:
+                # ~ rc, sid = job.result()
+                # ~ result[sid] = rc
+                # ~ if rc:
+                    # ~ dlbag.append(self.srvutl.format_sid(sid))
+                # ~ time.sleep(0.2)
 
         dlbuffer.set_text('')
-        self.srvsap.stop_fetching()
-        db.save_notes()
+        # ~ self.srvsap.stop_fetching()
         db.build_stats()
-        self.log.info("Download completed.")
-        self.srvuif.statusbar_msg("Download completed", True)
         visor_sapnotes.populate(all_notes)
         self.gui_show_visor_sapnotes()
-        return result
+        # ~ return result
 
 
     def expand_menuview(self):

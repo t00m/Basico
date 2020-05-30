@@ -306,7 +306,7 @@ class Database(Service):
         try:
             with open(FILE['DBSAP'], 'w') as fdb:
                 json.dump(bag, fdb)
-                self.log.debug ("Saved %d notes to %s" % (len(bag), FILE['DBSAP']))
+                self.log.debug ("SAP Notes database saved")
         except Exception as error:
             self.log.error(error)
 

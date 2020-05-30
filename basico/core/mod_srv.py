@@ -9,12 +9,12 @@
 
 import sys
 import traceback as tb
-
+from gi.repository import GObject
 from basico.core.mod_env import FILE
 from basico.core.mod_log import get_logger
 
 
-class Service(object):
+class Service(GObject.GObject):
     """
     Service class is the base class for those modules acting as services.
     Different modules (GUI, Database, Ask, etc...) share same methods
@@ -27,6 +27,8 @@ class Service(object):
         @type app: Basico instance
         @param app: current Basico instance reference
         """
+        GObject.GObject.__init__(self)
+
         if app is not None:
             self.app = app
 
