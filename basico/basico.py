@@ -24,7 +24,7 @@ from basico.services.srv_uif import UIFuncs
 from basico.services.srv_callbacks import Callback
 from basico.services.srv_notify import Notification
 from basico.services.srv_database import Database
-from basico.services.srv_driver import SeleniumDriver
+from basico.services.srv_download import DownloadManager
 from basico.services.srv_collections import Collections
 from basico.services.srv_annotations import Annotation
 from basico.services.srv_attachment import Attachment
@@ -109,7 +109,7 @@ class Basico(object):
                 'IM'            :   IconManager(),
                 'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
-                'Driver'        :   SeleniumDriver(),
+                'Driver'        :   DownloadManager(),
                 'Collections'   :   Collections(),
                 'Annotation'    :   Annotation(),
                 'Attachment'    :   Attachment(),

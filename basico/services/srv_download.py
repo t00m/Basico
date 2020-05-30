@@ -47,15 +47,16 @@ class DriverStatus(IntEnum):
     DISABLE = 3 # Webdriver broken!
 
 
-class SeleniumDriver(Service):
+class DownloadManager(Service):
     queue = queue.Queue()
     retry = 0
     driver = None
     driver_status = DriverStatus.STOPPED
 
     def initialize(self):
-        GObject.signal_new('download-complete', SeleniumDriver, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         threading.Thread(target=self.download, daemon=True).start()
+        self.log.debug("Basico Download Manager started")
 
     def __set_driver(self, driver):
         self.driver = driver
@@ -137,4 +138,4 @@ class SeleniumDriver(Service):
         if driver is not None:
             driver.quit()
             self.__set_driver(None)
-            self.log.debug("Webdriver closed")
+        self.log.debug("Basico Download Manager stopped")
