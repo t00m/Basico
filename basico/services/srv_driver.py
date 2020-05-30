@@ -11,6 +11,9 @@ import os
 import sys
 import time
 from enum import IntEnum
+import threading
+import queue
+import time
 
 # Disable logging for imported modules
 # Comment to see what is going on behind the scenes
@@ -45,13 +48,14 @@ class DriverStatus(IntEnum):
 
 
 class SeleniumDriver(Service):
-    url = None
+    queue = queue.Queue()
     retry = 0
     driver = None
     driver_status = DriverStatus.STOPPED
 
     def initialize(self):
         GObject.signal_new('download-complete', SeleniumDriver, GObject.SignalFlags.RUN_LAST, None, () )
+        threading.Thread(target=self.download, daemon=True).start()
 
     def __set_driver(self, driver):
         self.driver = driver
@@ -66,65 +70,69 @@ class SeleniumDriver(Service):
         return self.driver_status
 
     def get_url(self):
-        return url
+        return self.url
 
     def request(self, url):
-        self.url = url
-        self.log.debug("Requested URL: %s", url)
+        self.queue.put(url)
 
-        self.log.debug("Nº of retries: %d", self.retry)
-        if self.retry > 2:
-            self.__set_driver_status(DriverStatus.DISABLE)
+    def download(self):
+        while True:
+            url = self.queue.get()
+            self.log.debug("Downloading %s", url)
+            if self.retry > 2:
+                self.__set_driver_status(DriverStatus.DISABLE)
 
-        status = self.get_driver_status()
-        self.log.debug("WebDriver status: %s", status)
-
-        if status == DriverStatus.DISABLE:
-            self.log.error("Webdriver not working anymore")
-            return None
-
-        while status == DriverStatus.RUNNING:
-            time.sleep(1)
             status = self.get_driver_status()
+            self.log.debug("WebDriver status: %s", status)
 
-        if status == DriverStatus.STOPPED:
-            try:
-                options = Options()
-                options.profile = LPATH['FIREFOX_PROFILE']
-                options.headless = True
-                service = SeleniumService(FILE['FIREFOX_DRIVER'])
-                driver = webdriver.Firefox(options=options, service=service)
-                self.__set_driver_status(DriverStatus.WAITING)
-                self.__set_driver(driver)
-                self.log.debug("New webdriver instance created and ready")
-            except Exception as error:
-                self.__set_driver_status(DriverStatus.STOPPED)
-                self.log.error(error)
-                self.retry += 1
-                self.request(url)
+            if status == DriverStatus.DISABLE:
+                self.log.error("Webdriver not working anymore")
+                return None
 
-        status = self.get_driver_status()
-        if status == DriverStatus.WAITING:
-            self.__set_driver_status(DriverStatus.RUNNING)
-            try:
-                driver = self.get_driver()
-                driver.get(url)
-                element_present = EC.presence_of_element_located((By.ID, 'content'))
-                WebDriverWait(driver, TIMEOUT).until(element_present)
-            except TimeoutException:
-                self.__set_driver_status(DriverStatus.WAITING)
-            except Exception as error:
-                self.log.error(error)
-                self.retry += 1
-                self.__set_driver_status(DriverStatus.STOPPED)
-                self.request(url)
-            finally:
-                self.log.debug("SAP Note downloaded")
-                self.retry = 0
-                self.__set_driver_status(DriverStatus.WAITING)
-                self.emit('download-complete')
+            while status == DriverStatus.RUNNING:
+                time.sleep(1)
+                status = self.get_driver_status()
+
+            if status == DriverStatus.STOPPED:
+                try:
+                    options = Options()
+                    options.profile = LPATH['FIREFOX_PROFILE']
+                    options.headless = True
+                    service = SeleniumService(FILE['FIREFOX_DRIVER'])
+                    driver = webdriver.Firefox(options=options, service=service)
+                    self.__set_driver_status(DriverStatus.WAITING)
+                    self.__set_driver(driver)
+                    self.log.debug("New webdriver instance created and ready")
+                except Exception as error:
+                    self.__set_driver_status(DriverStatus.STOPPED)
+                    self.log.error(error)
+                    self.retry += 1
+                    self.request(self.url)
+
+            status = self.get_driver_status()
+            if status == DriverStatus.WAITING:
+                self.__set_driver_status(DriverStatus.RUNNING)
+                try:
+                    driver = self.get_driver()
+                    driver.get(url)
+                    element_present = EC.presence_of_element_located((By.ID, 'content'))
+                    WebDriverWait(driver, TIMEOUT).until(element_present)
+                except TimeoutException:
+                    self.__set_driver_status(DriverStatus.WAITING)
+                except Exception as error:
+                    self.log.error(error)
+                    self.retry += 1
+                    self.__set_driver_status(DriverStatus.STOPPED)
+                    self.request(url)
+                finally:
+                    self.log.debug("SAP Note downloaded")
+                    self.retry = 0
+                    self.__set_driver_status(DriverStatus.WAITING)
+                    self.emit('download-complete')
+            self.queue.task_done()
 
     def end(self):
+        self.queue.join()
         driver = self.get_driver()
         if driver is not None:
             driver.quit()
