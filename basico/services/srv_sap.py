@@ -9,6 +9,7 @@
 
 import os
 import time
+import glob
 import traceback
 from shutil import which
 from basico.core.mod_srv import Service
@@ -57,6 +58,7 @@ class SAP(Service):
         self.srvweb = self.get_service('Driver')
         self.srvweb.connect('download-complete', self.download_complete)
         self.log.debug("Listening to Firefox Webdriver Service")
+        self.srvuif = self.get_service("UIF")
 
 
     def __init_config_section(self):
@@ -199,29 +201,42 @@ class SAP(Service):
         self.notes_fetched = 0
         self.notes_total = 0
 
-    def download_complete(self, webdrvsrv):
-        self.log.debug("Download complete for url:")
-        driver = webdrvsrv.get_driver()
-        url = driver.current_url
-        self.log.debug(url)
-        content = driver.page_source
+    def dispatch_sapnote(self, sid, content):
         sapnote = self.analyze_sapnote(content)
         if len(sapnote) > 0:
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add(sapnote)
-            self.log.info("SAP Note %s added successfully to database", sid)
+            # ~ self.srvuif.statusbar_msg("SAP Note %s added to database" % sid, False)
+            # ~ self.log.info(, sid)
         else:
+            # ~ self.srvuif.statusbar_msg("SAP Note %s failed. Check manually!" % sid, False)
             self.log.warning("Warning. SAP metadata analysis failed. Check manually.")
 
+    # ~ def dispatch_pdf(self, sid, content):
+        # ~ self.log.debug(glob.glob(os.path.join(LPATH['CACHE_PDF'], '*')))
+        # ~ filename = "%s.pdf" % self.srvutl.format_sid(sid)
+        # ~ target = os.path.join(LPATH['CACHE_PDF'], filename)
+        # ~ with open(target, 'w') as fpdf:
+            # ~ fpdf.write(content)
+        # ~ if os.path.exists(target):
+            # ~ self.log.debug("PDF for SAP Note %s saved to: %s", sid, target)
+
+    def download_complete(self, webdrvsrv, data):
+        url_sid, url_type = data
+        self.log.debug("Download complete for url:")
+        driver = webdrvsrv.get_driver()
+        self.log.debug("\tDriver URL: %s",  driver.current_url)
+        self.log.debug("\tType: %s", url_type)
+        content = driver.page_source
+        eval("self.dispatch_%s(url_sid, content)" % url_type)
 
     def download(self, bag):
         for sid in bag:
             try:
-                ODATA_NOTE_URL = self.srvstg.get('SAP', 'ODATA_NOTE_URL')
-                timeout = self.srvstg.get('SAP', 'TIMEOUT')
-                URL = ODATA_NOTE_URL % sid
-                self.srvweb.request(URL)
+                self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
+                # ~ FIXME: self.srvweb.request(sid, SAP_NOTE_URL_PDF % sid, 'pdf')
+
             except Exception as error:
                 self.log.error(error)
                 self.print_traceback()

@@ -165,29 +165,29 @@ class Database(Service):
             #FIXME self.stats[''].add(version)
 
 
-    def add(self, sapnote, overwrite=False, batch=False):
+    def add(self, sapnote, overwrite=True, batch=False):
         sid = sapnote['id']
 
         if self.exists(sid):
             if overwrite:
                 self.sapnotes[sid] = sapnote
-                self.log.info("SAP Note %s added to database (Overwrite is %s)", sid, overwrite)
+                self.log.info("SAP Note %s updated", sid, overwrite)
                 if batch is False:
                     self.save_notes()
                 return True
             else:
-                self.log.info("SAP Note %s already exists in database (Overwrite is %s)", sid, overwrite)
+                self.log.info("SAP Note %s locked", sid, overwrite)
                 return False
         else:
             self.sapnotes[sid] = sapnote
-            self.log.info("SAP Note %s added to database (Overwrite is %s)", sid, overwrite)
+            self.log.info("SAP Note %s added", sid)
             if batch is False:
                 self.save_notes()
             return True
 
 
     def add_list(self, sapnotes, overwrite=False):
-        self.log.info("Add %d SAP Notes to database (Overwrite is %s)", len(sapnotes), overwrite)
+        self.log.info("Add %d SAP Notes to database (overwrite mode is %s)", len(sapnotes), overwrite)
         n = 0
         for sid in sapnotes:
             if overwrite:
@@ -306,7 +306,7 @@ class Database(Service):
         try:
             with open(FILE['DBSAP'], 'w') as fdb:
                 json.dump(bag, fdb)
-                self.log.debug ("SAP Notes database saved")
+                self.log.debug ("SAP Notes database updated")
         except Exception as error:
             self.log.error(error)
 

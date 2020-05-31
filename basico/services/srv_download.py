@@ -20,10 +20,15 @@ import time
 import logging
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 logging.getLogger('selenium').setLevel(logging.WARNING)
+logging.getLogger('WDM').setLevel(logging.WARNING)
+logging.getLogger('webdriver_manager').setLevel(logging.WARNING)
+logging.getLogger('GeckoDriverManager').setLevel(logging.WARNING)
+
+
 
 from gi.repository import GObject
 
-import selenium
+from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as SeleniumService
 from selenium.webdriver.firefox.options import Options
@@ -52,9 +57,12 @@ class DownloadManager(Service):
     retry = 0
     driver = None
     driver_status = DriverStatus.STOPPED
+    url_sid = None
+    url_uri = None
+    url_type = None
 
     def initialize(self):
-        GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         threading.Thread(target=self.download, daemon=True).start()
         self.log.debug("Basico Download Manager started")
 
@@ -70,11 +78,17 @@ class DownloadManager(Service):
     def get_driver_status(self):
         return self.driver_status
 
-    def get_url(self):
-        return self.url
+    def get_url_uri(self):
+        return self.url_uri
 
-    def request(self, url):
-        self.queue.put(url)
+    def get_url_type(self):
+        return self.url_type
+
+    def request(self, url_sid, url_uri, url_type):
+        self.url_sid = url_sid
+        self.url_uri = url_uri
+        self.url_type = url_type
+        self.queue.put(url_uri)
 
     def download(self):
         while True:
@@ -99,7 +113,7 @@ class DownloadManager(Service):
                     options = Options()
                     options.profile = LPATH['FIREFOX_PROFILE']
                     options.headless = True
-                    service = SeleniumService(FILE['FIREFOX_DRIVER'])
+                    service = SeleniumService(executable_path=GeckoDriverManager().install())
                     driver = webdriver.Firefox(options=options, service=service)
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.__set_driver(driver)
@@ -129,7 +143,7 @@ class DownloadManager(Service):
                     self.log.debug("SAP Note downloaded")
                     self.retry = 0
                     self.__set_driver_status(DriverStatus.WAITING)
-                    self.emit('download-complete')
+                    self.emit('download-complete', (self.url_sid, self.url_type))
             self.queue.task_done()
 
     def end(self):

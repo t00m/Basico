@@ -183,6 +183,7 @@ def main():
               'requests',
               'openpyxl',
               'rdflib',
+              'webdriver_manager',
         ],
         include_package_data=True,
         data_files=data_files,
