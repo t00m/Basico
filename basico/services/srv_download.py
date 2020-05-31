@@ -15,6 +15,7 @@ from enum import IntEnum
 import threading
 import queue
 import time
+import uuid
 
 from gi.repository import GObject
 from webdriver_manager.firefox import GeckoDriverManager
@@ -51,6 +52,7 @@ class DriverStatus(IntEnum):
 
 class DownloadManager(Service):
     queue = queue.Queue()
+    requests = {}
     retry = 0
     driver = None
     driver_status = DriverStatus.STOPPED
@@ -82,23 +84,30 @@ class DownloadManager(Service):
         return self.url_type
 
     def request(self, url_sid, url_uri, url_type):
-        self.url_sid = url_sid
-        self.url_uri = url_uri
-        self.url_type = url_type
-        self.queue.put(url_uri)
+        uuid4 = str(uuid.uuid4())
+        rid = uuid4[:uuid4.find('-')]
+        self.log.info("[%s] Request created", rid)
+        self.requests[rid] = {}
+        self.requests[rid]['url_rid'] = rid
+        self.requests[rid]['url_sid'] = url_sid
+        self.requests[rid]['url_uri'] = url_uri
+        self.requests[rid]['url_typ'] = url_type
+        self.queue.put(rid)
 
     def download(self):
         while True:
-            url = self.queue.get()
-            self.log.debug("Downloading %s", url)
+            rid = self.queue.get()
+            url = self.requests[rid]['url_uri']
+            self.log.debug("[%s] Request download: %s", rid, url)
+            # ~ self.log.debug("[%s] %s", rid, url)
             if self.retry > 2:
                 self.__set_driver_status(DriverStatus.DISABLE)
 
             status = self.get_driver_status()
-            self.log.debug("WebDriver status: %s", status)
+            self.log.debug("[%s] WebDriver status: %s", rid, status)
 
             if status == DriverStatus.DISABLE:
-                self.log.error("Webdriver not working anymore")
+                self.log.error("[%s] Webdriver not working anymore", rid)
                 return None
 
             while status == DriverStatus.RUNNING:
@@ -115,10 +124,10 @@ class DownloadManager(Service):
                     driver = webdriver.Firefox(options=options, service=service)
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.__set_driver(driver)
-                    self.log.debug("New webdriver instance created and ready")
+                    self.log.debug("[%s] Webdriver instance created and ready", rid)
                 except Exception as error:
                     self.__set_driver_status(DriverStatus.STOPPED)
-                    self.log.error(error)
+                    self.log.error("[%s] Webdriver Error: %s", rid, error)
                     self.retry += 1
                     self.request(self.url)
 
@@ -138,10 +147,10 @@ class DownloadManager(Service):
                     self.__set_driver_status(DriverStatus.STOPPED)
                     self.request(url)
                 finally:
-                    self.log.debug("SAP Note downloaded")
+                    self.log.debug("[%s] SAP Note %s downloaded", rid, self.requests[rid]['url_sid'])
                     self.retry = 0
                     self.__set_driver_status(DriverStatus.WAITING)
-                    self.emit('download-complete', (self.url_sid, self.url_type))
+                    self.emit('download-complete', (self.requests[rid]))
             self.queue.task_done()
 
     def end(self):

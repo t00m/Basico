@@ -166,16 +166,19 @@ class SAP(Service):
 
         return sapnote
 
-    def dispatch_sapnote(self, sid, content):
+    def dispatch_sapnote(self, data, content):
+        rid = data['url_rid']
+        sid = data['url_sid']
         sapnote = self.analyze_sapnote(content)
         if len(sapnote) > 0:
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add(sapnote)
         else:
-            self.log.warning("Warning. SAP metadata analysis failed. Check manually.")
-            self.log.warning("Hint: make sure you have imported your SAP Passport profile in custom Fireforx profile:")
-            self.log.warning(LPATH['FIREFOX_PROFILE'])
+            self.log.warning("[%s] Metadata analysis for SAP Note %s failed. Check manually:", rid, sid)
+            self.log.warning("[%s] \t1. Make sure you have imported your SAP Passport profile in custom Fireforx profile:", rid)
+            self.log.warning("[%s] \t   Edit profile: firefox --profile %s", rid, LPATH['FIREFOX_PROFILE'])
+            self.log.warning("[%s] \t2. SAP Note %s is not available or doesn't exist", rid, sid)
 
     # ~ def dispatch_pdf(self, sid, content):
         # ~ self.log.debug(glob.glob(os.path.join(LPATH['CACHE_PDF'], '*')))
@@ -187,13 +190,11 @@ class SAP(Service):
             # ~ self.log.debug("PDF for SAP Note %s saved to: %s", sid, target)
 
     def download_complete(self, webdrvsrv, data):
-        self.log.info("Received content from Download Manager. Analyzing content.")
-        url_sid, url_type = data
+        self.log.info("[%s] Request received", data['url_rid'])
         driver = webdrvsrv.get_driver()
-        self.log.info("\tDriver URL: %s",  driver.current_url)
-        self.log.info("\tType: %s", url_type)
+        self.log.debug("\t[%s][%s] URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
         content = driver.page_source
-        eval("self.dispatch_%s(url_sid, content)" % url_type)
+        eval("self.dispatch_%s(data, content)" % data['url_typ'])
 
     def download(self, bag):
         for sid in bag:

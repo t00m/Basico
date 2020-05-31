@@ -42,7 +42,7 @@ class Service(GObject.GObject):
 
 
     def print_traceback(self):
-        self.log.debug(tb.format_exc())
+        self.log.error(tb.format_exc())
 
 
     def get_logger(self, logname):
