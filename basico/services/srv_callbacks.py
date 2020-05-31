@@ -42,6 +42,7 @@ class Callback(Service):
         self.srvbnr = self.get_service('BNR')
         self.srvclt = self.get_service('Collections')
         self.srvatc = self.get_service('Attachment')
+        self.srvweb = self.get_service('Driver')
 
 
     def stack_visor_changed(self, stack, gparam):
@@ -117,7 +118,7 @@ class Callback(Service):
         SAP_NOTE_URL = self.srvstg.get('SAP', 'SAP_NOTE_URL')
         url = SAP_NOTE_URL % sid
         self.srvuif.grab_focus()
-        self.srvutl.browse(url)
+        self.srvweb.browse(url)
 
 
     def sapnote_download_pdf(self, button, sid):

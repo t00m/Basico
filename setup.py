@@ -35,9 +35,9 @@ def add_data_basico():
         data_files_basico = [
             ('share/applications', ['basico/data/desktop/basico.desktop']),
             ('share/icons', ['basico/data/icons/basico-component.svg']),
-            ('basico/data/res/firefox',
+            ('basico/data/res/selenium',
                 [
-                    'basico/data/res/firefox/basico.default.zip'
+                    'basico/data/res/selenium/webdriver_prefs.json'
                 ]),
             ('basico/data/res/selenium/drivers',
                 [

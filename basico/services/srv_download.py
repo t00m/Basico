@@ -35,11 +35,6 @@ from basico.core.mod_srv import Service
 # Comment to see what is going on behind the scenes
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 logging.getLogger('selenium').setLevel(logging.WARNING)
-# ~ logging.getLogger("WDM").setLevel(logging.ERROR)
-# ~ logging.getLogger('webdriver_manager').setLevel(logging.ERROR)
-# ~ logging.getLogger('GeckoDriverManager').setLevel(logging.ERROR)
-
-# GECKODRIVER_URL = "https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz"
 
 TIMEOUT = 3
 
@@ -56,9 +51,6 @@ class DownloadManager(Service):
     retry = 0
     driver = None
     driver_status = DriverStatus.STOPPED
-    url_sid = None
-    url_uri = None
-    url_type = None
 
     def initialize(self):
         GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
@@ -120,8 +112,8 @@ class DownloadManager(Service):
                     options.profile = LPATH['FIREFOX_PROFILE']
                     options.headless = True
                     GDM = GeckoDriverManager(log_level=logging.ERROR)
-                    service = SeleniumService(executable_path=GDM.install())
-                    driver = webdriver.Firefox(options=options, service=service)
+                    gecko = SeleniumService(executable_path=GDM.install())
+                    driver = webdriver.Firefox(options=options, service=gecko)
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.__set_driver(driver)
                     self.log.debug("[%s] Webdriver instance created and ready", rid)
@@ -129,7 +121,10 @@ class DownloadManager(Service):
                     self.__set_driver_status(DriverStatus.STOPPED)
                     self.log.error("[%s] Webdriver Error: %s", rid, error)
                     self.retry += 1
-                    self.request(self.url)
+                    url_sid = self.requests[rid]['url_sid']
+                    url_uri = self.requests[rid]['url_uri']
+                    url_type = self.requests[rid]['url_typ']
+                    self.request(url_sid, url_uri, url_type)
 
             status = self.get_driver_status()
             if status == DriverStatus.WAITING:
@@ -152,6 +147,18 @@ class DownloadManager(Service):
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.emit('download-complete', (self.requests[rid]))
             self.queue.task_done()
+
+    def browse(self, url):
+        try:
+            self.browser.get(url)
+        except:
+            options = Options()
+            options.profile = LPATH['FIREFOX_PROFILE']
+            options.headless = False
+            gecko = SeleniumService(executable_path=self.gdm.install())
+            self.browser = webdriver.Firefox(options=options, service=gecko)
+            self.browser.get(url)
+        self.log.debug("Browsing %s", url)
 
     def end(self):
         self.queue.join()

@@ -87,6 +87,7 @@ FILE['SPLASH'] = os.path.join(GPATH['SPLASH'], 'basico-splash-400x250.png')
 FILE['G_SAP_PRODUCTS'] = os.path.join(GPATH['SAP'], 'products.txt')
 FILE['L_SAP_PRODUCTS'] = os.path.join(LPATH['RESOURCES'], 'products.txt')
 FILE['FIREFOX_DRIVER'] = os.path.join(LPATH['DRIVERS'], 'geckodriver')
+FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'] = os.path.join(GPATH['SELENIUM'], 'webdriver_prefs.json')
 
 # Annotations
 ATYPES = ['Bookmark', 'Email', 'Fixme', 'Incident', 'Meeting', 'Note', 'Procedure', 'Snippet', 'Template', 'Todo']

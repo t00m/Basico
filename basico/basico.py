@@ -11,6 +11,9 @@ import os
 import sys
 import signal
 import shutil
+
+import selenium
+
 from gi.repository import GObject
 from basico.core.mod_env import APP, LPATH, GPATH, FILE
 from basico.core.mod_log import get_logger
@@ -64,9 +67,6 @@ class Basico(object):
         """
         Setup Basico environment
         """
-        # Add webdriver path to System PATH
-        os.environ["PATH"] += os.pathsep + LPATH['DRIVERS']
-
         # Create local paths if they do not exist
         for entry in LPATH:
             if not os.path.exists(LPATH[entry]):
@@ -126,6 +126,18 @@ class Basico(object):
 
 
     def setup_post(self):
+        # Patch Selenium 4
+        FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'] = os.path.join(os.path.dirname(selenium.__file__), 'webdriver/firefox/webdriver_prefs.json')
+        if not os.path.exists(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET']):
+            try:
+                shutil.copy(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'], FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
+                self.log.debug("Webdriver preferences config file not found. Python Selenium libs patched locally")
+            except:
+                self.log.warning("Firefox Webdriver preferences not found in: ")
+                self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
+                self.log.warning("Copied missing file from: ")
+                self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'])
+
         if not os.path.exists(FILE['L_SAP_PRODUCTS']):
             shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
             self.log.debug("SAP Products file copied to local database resources directory")

@@ -192,7 +192,7 @@ class SAP(Service):
     def download_complete(self, webdrvsrv, data):
         self.log.info("[%s] Request received", data['url_rid'])
         driver = webdrvsrv.get_driver()
-        self.log.debug("\t[%s][%s] URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
+        self.log.debug("[%s] %s - URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
         content = driver.page_source
         eval("self.dispatch_%s(data, content)" % data['url_typ'])
 
