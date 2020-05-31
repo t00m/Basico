@@ -166,52 +166,16 @@ class SAP(Service):
 
         return sapnote
 
-
-    # ~ def fetch(self, sid):
-        # ~ valid = False
-        # ~ if not self.srvdtb.is_stored(sid):
-            # ~ content = self.download(sid)
-            # ~ if len(content) > 0:
-                # ~ self.log.info("SAP Note %s downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
-            # ~ else:
-                # ~ self.log.info("SAP Note %s not downloaded (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
-        # ~ else:
-            # ~ self.log.info("SAP Note %s was already stored in database (%d/%d)", self.srvutl.format_sid(sid), self.notes_fetched + 1, self.notes_total)
-            # ~ content = self.srvdtb.get_sapnote_content(sid)
-
-        # ~ self.fetched()
-        # ~ sapnote = self.analyze_sapnote(content)
-        # ~ if len(sapnote) > 0:
-            # ~ self.srvdtb.store(self.srvutl.format_sid(sid), content)
-            # ~ self.srvdtb.add(sapnote)
-            # ~ valid = True
-        # ~ return valid, sid
-
-
-    def start_fetching(self, total):
-        self.notes_fetched = 0
-        self.notes_total = total
-
-
-    def fetched(self):
-        self.notes_fetched += 1
-
-
-    def stop_fetching(self):
-        self.notes_fetched = 0
-        self.notes_total = 0
-
     def dispatch_sapnote(self, sid, content):
         sapnote = self.analyze_sapnote(content)
         if len(sapnote) > 0:
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add(sapnote)
-            # ~ self.srvuif.statusbar_msg("SAP Note %s added to database" % sid, False)
-            # ~ self.log.info(, sid)
         else:
-            # ~ self.srvuif.statusbar_msg("SAP Note %s failed. Check manually!" % sid, False)
             self.log.warning("Warning. SAP metadata analysis failed. Check manually.")
+            self.log.warning("Hint: make sure you have imported your SAP Passport profile in custom Fireforx profile:")
+            self.log.warning(LPATH['FIREFOX_PROFILE'])
 
     # ~ def dispatch_pdf(self, sid, content):
         # ~ self.log.debug(glob.glob(os.path.join(LPATH['CACHE_PDF'], '*')))
@@ -223,17 +187,18 @@ class SAP(Service):
             # ~ self.log.debug("PDF for SAP Note %s saved to: %s", sid, target)
 
     def download_complete(self, webdrvsrv, data):
+        self.log.info("Received content from Download Manager. Analyzing content.")
         url_sid, url_type = data
-        self.log.debug("Download complete for url:")
         driver = webdrvsrv.get_driver()
-        self.log.debug("\tDriver URL: %s",  driver.current_url)
-        self.log.debug("\tType: %s", url_type)
+        self.log.info("\tDriver URL: %s",  driver.current_url)
+        self.log.info("\tType: %s", url_type)
         content = driver.page_source
         eval("self.dispatch_%s(url_sid, content)" % url_type)
 
     def download(self, bag):
         for sid in bag:
             try:
+                self.log.info("Requested SAP Note %s" % sid)
                 self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
                 # ~ FIXME: self.srvweb.request(sid, SAP_NOTE_URL_PDF % sid, 'pdf')
 

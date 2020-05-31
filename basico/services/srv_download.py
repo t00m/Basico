@@ -10,24 +10,13 @@
 import os
 import sys
 import time
+import logging
 from enum import IntEnum
 import threading
 import queue
 import time
 
-# Disable logging for imported modules
-# Comment to see what is going on behind the scenes
-import logging
-logging.getLogger('urllib3').setLevel(logging.WARNING)
-logging.getLogger('selenium').setLevel(logging.WARNING)
-logging.getLogger('WDM').setLevel(logging.WARNING)
-logging.getLogger('webdriver_manager').setLevel(logging.WARNING)
-logging.getLogger('GeckoDriverManager').setLevel(logging.WARNING)
-
-
-
 from gi.repository import GObject
-
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as SeleniumService
@@ -40,6 +29,14 @@ from selenium.webdriver.common.by import By
 
 from basico.core.mod_env import LPATH, FILE
 from basico.core.mod_srv import Service
+
+# Disable logging for imported modules
+# Comment to see what is going on behind the scenes
+logging.getLogger('urllib3').setLevel(logging.WARNING)
+logging.getLogger('selenium').setLevel(logging.WARNING)
+# ~ logging.getLogger("WDM").setLevel(logging.ERROR)
+# ~ logging.getLogger('webdriver_manager').setLevel(logging.ERROR)
+# ~ logging.getLogger('GeckoDriverManager').setLevel(logging.ERROR)
 
 # GECKODRIVER_URL = "https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz"
 
@@ -113,7 +110,8 @@ class DownloadManager(Service):
                     options = Options()
                     options.profile = LPATH['FIREFOX_PROFILE']
                     options.headless = True
-                    service = SeleniumService(executable_path=GeckoDriverManager().install())
+                    GDM = GeckoDriverManager(log_level=logging.ERROR)
+                    service = SeleniumService(executable_path=GDM.install())
                     driver = webdriver.Firefox(options=options, service=service)
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.__set_driver(driver)

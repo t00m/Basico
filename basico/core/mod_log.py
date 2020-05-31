@@ -19,18 +19,18 @@ def get_logger(name):
     """
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
     log = logging.getLogger(name)
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
 
     formatter = logging.Formatter("%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
-    fh = logging.FileHandler(FILE['LOG']) 
+    fh = logging.FileHandler(FILE['LOG'])
     fh.setFormatter(formatter)
-    fh.setLevel(logging.DEBUG)
+    fh.setLevel(logging.INFO)
     log.addHandler(fh)
 
     formatter = logging.Formatter("%(asctime)s | %(message)s")
-    fe = logging.FileHandler(FILE['EVENTS']) 
+    fe = logging.FileHandler(FILE['EVENTS'])
     fe.setFormatter(formatter)
     fe.setLevel(logging.INFO)
     log.addHandler(fe)
-    
+
     return log
