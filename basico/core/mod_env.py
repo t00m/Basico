@@ -50,7 +50,7 @@ LPATH['EXPORT'] = os.path.join(LPATH['VAR'], 'export')
 LPATH['BACKUP'] = os.path.join(LPATH['EXPORT'], 'backup')
 LPATH['PDF'] = os.path.join(LPATH['EXPORT'], 'pdf')
 LPATH['OPT'] = os.path.join(LPATH['ROOT'], 'opt')
-LPATH['DRIVERS'] = os.path.join(LPATH['OPT'], 'webdrivers')
+LPATH['DRIVERS'] = os.path.join(LPATH['OPT'], 'webdrivers') # Deprecated
 LPATH['FIREFOX_PROFILE'] = os.path.join(LPATH['DRIVERS'], 'basico.default')
 
 

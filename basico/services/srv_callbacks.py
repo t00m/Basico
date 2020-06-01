@@ -48,6 +48,8 @@ class Callback(Service):
 
     def webdriver_profile_missing(self, *args):
         self.log.warning("Webdriver prfile missing")
+        cmd = "firefox --profile %s" % LPATH['FIREFOX_PROFILE']
+        os.system(cmd)
 
     def stack_visor_changed(self, stack, gparam):
         visible_stack_name = stack.get_visible_child_name()

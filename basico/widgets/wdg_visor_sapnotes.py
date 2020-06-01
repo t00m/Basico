@@ -710,14 +710,14 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             fbox.pack_start(button, False, False, 0)
 
             # Popover button "Show attachments"
-            if len(self.srvatc.get_by_sid(sid)) > 0:
-                button = get_popover_button("<b>Show</b> linked to SAP Note %d" % isid, 'basico-attachment')
-                button.set_property('margin', 3)
-                button.show_all()
-                # ~ button.connect('clicked', self.srvclb.gui_attachment_show_, sid)
-                fbox.pack_start(button, False, False, 0)
-            frame.add(fbox)
-            box.pack_start(frame, False, False, 0)
+            # ~ if len(self.srvatc.get_by_sid(sid)) > 0:
+                # ~ button = get_popover_button("<b>Show</b> linked to SAP Note %d" % isid, 'basico-attachment')
+                # ~ button.set_property('margin', 3)
+                # ~ button.show_all()
+                # ~ # button.connect('clicked', self.srvclb.gui_attachment_show_, sid)
+                # ~ fbox.pack_start(button, False, False, 0)
+            # ~ frame.add(fbox)
+            # ~ box.pack_start(frame, False, False, 0)
 
             # Popover button "Open SAP Note"
             button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')

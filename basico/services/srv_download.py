@@ -61,10 +61,11 @@ class DownloadManager(Service):
 
     def check_profile(self):
         files = glob.glob(os.path.join(LPATH['FIREFOX_PROFILE'], '*'))
-        has_profile = len(files) == 0
-        if not profile_exists:
+        has_profile = len(files) > 0
+        self.log.debug("Webdriver profile available? %s", has_profile)
+        if not has_profile:
             self.emit('download-profile-missing')
-        return profile_exists
+        return has_profile
 
     def __set_driver(self, driver):
         self.driver = driver
@@ -124,6 +125,8 @@ class DownloadManager(Service):
                     options = Options()
                     options.profile = LPATH['FIREFOX_PROFILE']
                     options.headless = True
+                    # ~ 'security.default_personal_cert'
+                    self.log.debug(options.preferences)
                     GDM = GeckoDriverManager(log_level=logging.ERROR)
                     gecko = SeleniumService(executable_path=GDM.install())
                     driver = webdriver.Firefox(options=options, service=gecko)
