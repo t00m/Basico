@@ -28,8 +28,8 @@ from gi.repository.GdkPixbuf import Pixbuf
 from basico.core.mod_srv import Service
 from basico.core.mod_env import APP, FILE, ATYPES
 from basico.widgets.wdg_visor_sapnotes import SAPNotesVisor
-from basico.widgets.wdg_visor_annotations import AnnotationsVisor
-from basico.widgets.wdg_visor_attachments import AttachmentsVisor
+# ~ from basico.widgets.wdg_visor_annotations import AnnotationsVisor
+# ~ from basico.widgets.wdg_visor_attachments import AttachmentsVisor
 from basico.widgets.wdg_visor_toolbar import VisorToolbar
 from basico.widgets.wdg_about import About
 from basico.widgets.wdg_settingsview import SettingsView
@@ -278,9 +278,9 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         mainbox.pack_start(statusbar, False, False, 0)
 
         # Connect signals for visor annotations
-        visor_annotations = self.srvgui.get_widget('visor_annotations')
-        visor_annotations.set_menuview_signals()
-        visor_annotations.set_active_categories()
+        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
+        # ~ visor_annotations.set_menuview_signals()
+        # ~ visor_annotations.set_active_categories()
         self.add(mainbox)
         self.show_all()
 
@@ -305,14 +305,14 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_main.child_set_property (stack_child, "icon-name", "basico-dashboard")
 
         ### Settings stack child
-        stack_child = self.setup_main_stack_settings()
-        stack_main.add_titled(stack_child, "settings", "Basico Settings")
-        stack_main.child_set_property (stack_child, "icon-name", "basico-settings")
+        # ~ stack_child = self.setup_main_stack_settings()
+        # ~ stack_main.add_titled(stack_child, "settings", "Basico Settings")
+        # ~ stack_main.child_set_property (stack_child, "icon-name", "basico-settings")
 
         ### Help stack child
-        stack_child = self.setup_main_stack_settings()
-        stack_main.add_titled(stack_child, "help", "Basico Help")
-        stack_main.child_set_property (stack_child, "icon-name", "basico-help")
+        # ~ stack_child = self.setup_main_stack_settings()
+        # ~ stack_main.add_titled(stack_child, "help", "Basico Help")
+        # ~ stack_main.child_set_property (stack_child, "icon-name", "basico-help")
 
         ### About stack child
         # ~ stack_child = self.setup_stack_about()
@@ -354,14 +354,14 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_visors.child_set_property (stack_child, "icon-name", "basico-sapnote")
 
         #### Stack for Visor Annotations
-        stack_child = self.setup_stack_visor_annotations()
-        stack_visors.add_titled(stack_child, "visor-annotations", "Annotations")
-        stack_visors.child_set_property (stack_child, "icon-name", "basico-filter")
+        # ~ stack_child = self.setup_stack_visor_annotations()
+        # ~ stack_visors.add_titled(stack_child, "visor-annotations", "Annotations")
+        # ~ stack_visors.child_set_property (stack_child, "icon-name", "basico-filter")
 
         #### Stack for Visor Annotations
-        stack_child = self.setup_stack_visor_attachments()
-        stack_visors.add_titled(stack_child, "visor-attachments", "Attachments")
-        stack_visors.child_set_property (stack_child, "icon-name", "basico-attachment")
+        # ~ stack_child = self.setup_stack_visor_attachments()
+        # ~ stack_visors.add_titled(stack_child, "visor-attachments", "Attachments")
+        # ~ stack_visors.child_set_property (stack_child, "icon-name", "basico-attachment")
 
         return box
 
@@ -419,19 +419,19 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         scr.set_shadow_type(Gtk.ShadowType.NONE)
         vwp = Gtk.Viewport()
         vwp.set_hexpand(True)
-        visor_annotations = self.srvgui.add_widget('visor_annotations', AnnotationsVisor(self.controller))
-        visor_annotations.set_hexpand(True)
-        visor_annotations.set_vexpand(True)
-        vwp.add(visor_annotations)
+        # ~ visor_annotations = self.srvgui.add_widget('visor_annotations', AnnotationsVisor(self.controller))
+        # ~ visor_annotations.set_hexpand(True)
+        # ~ visor_annotations.set_vexpand(True)
+        # ~ vwp.add(visor_annotations)
         scr.add(vwp)
 
         tab_widget = self.srvuif.create_notebook_tab_label('basico-annotation-visor', '<b>Annotations Visor</b>')
         notebook.append_page(scr, tab_widget)
 
         # Annotation Widget tab
-        annotation_widget = self.srvgui.add_widget('widget_annotation', AnnotationWidget(self.controller))
-        tab_widget = self.srvuif.create_notebook_tab_label('basico-annotation-widget', '<b>Annotation Widget</b>')
-        notebook.append_page(annotation_widget, tab_widget)
+        # ~ annotation_widget = self.srvgui.add_widget('widget_annotation', AnnotationWidget(self.controller))
+        # ~ tab_widget = self.srvuif.create_notebook_tab_label('basico-annotation-widget', '<b>Annotation Widget</b>')
+        # ~ notebook.append_page(annotation_widget, tab_widget)
 
         box.pack_start(notebook, True, True, 0)
         visor_annotations.show_all()

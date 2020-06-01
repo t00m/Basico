@@ -9,7 +9,7 @@
 
 import html
 import gi
-gi.require_version('Gtk', '3.0') 
+gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('Pango', '1.0')
 gi.require_version('GdkPixbuf', '2.0')
@@ -43,7 +43,7 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
         self.srvuif = self.get_service("UIF")
         self.srvclt = self.get_service('Collections')
         self.srvclb = self.get_service('Callbacks')
-        self.srvant = self.get_service('Annotation')
+        # ~ self.srvant = self.get_service('Annotation')
         self.srvutl = self.get_service('Utils')
 
 
@@ -125,7 +125,7 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
         scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.set_hexpand(True)
-        scroller.set_vexpand(True)        
+        scroller.set_vexpand(True)
         a_text = self.srvgui.add_widget('gtk_textview_annotation_text', GtkSource.View.new_with_buffer(GtkSource.Buffer()))
         a_text.set_wrap_mode(Gtk.WrapMode.WORD)
         a_text.modify_font(Pango.FontDescription('Monospace 10'))
@@ -251,9 +251,9 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
                 a_wdg_aid.set_text(annotation['AID'])
                 a_wdg_timestamp.set_text(annotation['Timestamp'])
                 a_wdg_title.set_text(html.escape(annotation['Title']))
-                
+
                 a_wdg_type.set_active_iter(self.srvgui.get_widget('annotation_type_%s' % annotation['Type']))
-                
+
                 try:
                     a_wdg_category.set_active_iter(self.srvgui.get_widget('annotation_category_%s' % annotation['Category']))
                 except:
@@ -263,7 +263,7 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
                     a_wdg_priority.set_active_iter(self.srvgui.get_widget('annotation_priority_%s' % annotation['Priority']))
                 except:
                     a_wdg_priority.set_active_iter(self.srvgui.get_widget('annotation_priority_Normal'))
-                    
+
                 self.srvuif.set_textview_text(a_wdg_text, open(ANNOTATION_FILE_CONTENT).read())
                 a_wdg_link.set_text(annotation['Link'])
                 a_wdg_link_button.set_uri(annotation['Link'])
@@ -275,7 +275,7 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
 
     def get_metadata_from_widget(self):
         """
-        C:237, 4: Missing method docstring (missing-docstring) 
+        C:237, 4: Missing method docstring (missing-docstring)
         """
         annotation = {}
         a_wdg_aid = self.srvgui.get_widget('gtk_label_aid')

@@ -75,8 +75,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         self.srvdtb = self.get_service('DB')
         self.srvuif = self.get_service("UIF")
         self.srvutl = self.get_service("Utils")
-        self.srvant = self.get_service('Annotation')
-        self.srvatc = self.get_service('Attachment')
+        # ~ self.srvant = self.get_service('Annotation')
+        # ~ self.srvatc = self.get_service('Attachment')
 
 
     def sort_by_timestamp(self):
@@ -537,8 +537,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                 title = escape(metadata['title'])
                 sid = str(int(metadata['id']))
 
-                has_annotations = self.srvant.get_by_sid(sid)
-                has_attachments = self.srvatc.get_by_sid(sid)
+                has_annotations = [] #self.srvant.get_by_sid(sid)
+                has_attachments = [] #self.srvatc.get_by_sid(sid)
                 if bookmark:
                     icon = icon_bookmark
                     title = "<b>%s</b>" % title
@@ -575,7 +575,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                 pid = model.append(None, node)
 
                 # Load annotations
-                files = self.srvant.get_by_sid(metadata['id'])
+                files = [] #self.srvant.get_by_sid(metadata['id'])
                 for fname in files:
                     with open(fname, 'r') as fa:
                         annotation = json.load(fa)

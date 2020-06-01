@@ -224,8 +224,8 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         boxan.pack_start(button, False, False, 3)
 
         ### New annotation from template
-        combobox = self.combobox_templates()
-        boxan.pack_start(combobox, False, False, 3)
+        # ~ combobox = self.combobox_templates()
+        # ~ boxan.pack_start(combobox, False, False, 3)
 
         # ~ widget_import = self.srvgui.add_widget('widget_import', ImportWidget(self.app))
         # ~ boxan.pack_start(widget_import, False, False, 3)
@@ -266,7 +266,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
         self.srvuif = self.get_service("UIF")
-        self.srvant = self.get_service('Annotation')
+        # ~ self.srvant = self.get_service('Annotation')
 
 
     def completion_match_func(self, completion, key, iter):

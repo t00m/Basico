@@ -105,17 +105,17 @@ class Basico(object):
                 'UIF'           :   UIFuncs(),
                 'SAP'           :   SAP(),
                 'Settings'      :   Settings(),
-                'Notify'        :   Notification(),
+                # ~ 'Notify'        :   Notification(),
                 'IM'            :   IconManager(),
                 'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
                 'Driver'        :   DownloadManager(),
                 'Collections'   :   Collections(),
-                'Annotation'    :   Annotation(),
-                'Attachment'    :   Attachment(),
-                'BNR'           :   BackupRestoreMan(),
-                'Notify'        :   Notification(),
-                'Asciidoctor'   :   Asciidoctor(),
+                # ~ 'Annotation'    :   Annotation(),
+                # ~ 'Attachment'    :   Attachment(),
+                # ~ 'BNR'           :   BackupRestoreMan(),
+                # ~ 'Notify'        :   Notification(),
+                # ~ 'Asciidoctor'   :   Asciidoctor(),
             }
 
             for name in services:

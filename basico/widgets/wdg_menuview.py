@@ -123,7 +123,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvant = self.get_service('Annotation')
+        # ~ self.srvant = self.get_service('Annotation')
         self.srvuif = self.get_service('UIF')
         self.srvclt = self.get_service('Collections')
         self.srvutl = self.get_service('Utils')

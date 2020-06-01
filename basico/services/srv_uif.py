@@ -26,9 +26,9 @@ class UIFuncs(Service):
         self.srvclb = self.get_service('Callbacks')
         self.srvicm = self.get_service('IM')
         # ~ self.srvdtb = self.get_service('DB')
-        self.srvant = self.get_service('Annotation')
+        # ~ self.srvant = self.get_service('Annotation')
         self.srvutl = self.get_service('Utils')
-        self.srvntf = self.get_service('Notify')
+        # ~ self.srvntf = self.get_service('Notify')
 
 
     def get_gtk_version(self):
@@ -76,8 +76,8 @@ class UIFuncs(Service):
         if statusbar is not None:
             # Maybe the widget hasn't been created yet
             statusbar.message(msg)
-        if important:
-            self.srvntf.show(htimestamp, message)
+        # ~ if important:
+            # ~ self.srvntf.show(htimestamp, message)
 
 
     def create_menuview_button(self, view):
