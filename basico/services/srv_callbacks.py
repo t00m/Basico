@@ -43,7 +43,11 @@ class Callback(Service):
         self.srvclt = self.get_service('Collections')
         # ~ self.srvatc = self.get_service('Attachment')
         self.srvweb = self.get_service('Driver')
+        self.srvweb.connect('download-profile-missing', self.webdriver_profile_missing)
 
+
+    def webdriver_profile_missing(self, *args):
+        self.log.warning("Webdriver prfile missing")
 
     def stack_visor_changed(self, stack, gparam):
         visible_stack_name = stack.get_visible_child_name()

@@ -10,6 +10,7 @@
 import os
 import sys
 import time
+import glob
 import logging
 from enum import IntEnum
 import threading
@@ -53,9 +54,17 @@ class DownloadManager(Service):
     driver_status = DriverStatus.STOPPED
 
     def initialize(self):
+        GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         threading.Thread(target=self.download, daemon=True).start()
         self.log.debug("Basico Download Manager started")
+
+    def check_profile(self):
+        files = glob.glob(os.path.join(LPATH['FIREFOX_PROFILE'], '*'))
+        has_profile = len(files) == 0
+        if not profile_exists:
+            self.emit('download-profile-missing')
+        return profile_exists
 
     def __set_driver(self, driver):
         self.driver = driver
@@ -76,6 +85,10 @@ class DownloadManager(Service):
         return self.url_type
 
     def request(self, url_sid, url_uri, url_type):
+        has_profile = self.check_profile()
+        if not has_profile:
+            return
+
         uuid4 = str(uuid.uuid4())
         rid = uuid4[:uuid4.find('-')]
         self.log.info("[%s] Request created", rid)
