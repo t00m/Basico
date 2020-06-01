@@ -174,7 +174,9 @@ class SAP(Service):
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add(sapnote)
+            self.srvuif.statusbar_msg("SAP Note %s added" % sid)
         else:
+            self.srvuif.statusbar_msg("Error. Metadata for SAP Note %s not valid" % sid)
             self.log.warning("[%s] Metadata analysis for SAP Note %s failed. Check manually:", rid, sid)
             self.log.warning("[%s] \t1. Make sure you have imported your SAP Passport profile in custom Fireforx profile:", rid)
             self.log.warning("[%s] \t   Edit profile: firefox --profile %s", rid, LPATH['FIREFOX_PROFILE'])

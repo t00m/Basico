@@ -9,6 +9,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+from gi.repository import GLib
 from gi.repository import Gtk
 from gi.repository import Pango
 
@@ -47,4 +48,6 @@ class Statusbar(BasicoWidget, Gtk.HBox):
 
 
     def message(self, message):
-        self.statusbar.set_markup("<b>%s</b>" % message)
+        def show(message):
+            self.statusbar.set_markup("<b>%s</b>" % message)
+        GLib.idle_add(show, message)

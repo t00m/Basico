@@ -13,6 +13,8 @@ import json
 import glob
 from html import escape
 
+from gi.repository import GObject
+
 from basico.core.mod_env import LPATH, FILE
 from basico.core.mod_srv import Service
 from basico.services.srv_collections import COL_DOWNLOADED
@@ -33,10 +35,13 @@ class Database(Service):
         self.stats['priority'] = set()
         self.stats['type'] = set()
         self.stats['version'] = set()
+        self.setup_signals()
         self.__init_config_section()
         self.get_services()
         self.load_notes()
 
+    def setup_signals(self):
+        GObject.signal_new('database-add', Database, GObject.SignalFlags.RUN_LAST, None, () )
 
     def __init_config_section(self):
         settings = self.srvstg.load()
@@ -165,15 +170,13 @@ class Database(Service):
             #FIXME self.stats[''].add(version)
 
 
-    def add(self, sapnote, overwrite=True, batch=False):
+    def add(self, sapnote, overwrite=True):
         sid = sapnote['id']
 
         if self.exists(sid):
             if overwrite:
                 self.sapnotes[sid] = sapnote
                 self.log.info("SAP Note %s updated", sid, overwrite)
-                if batch is False:
-                    self.save_notes()
                 return True
             else:
                 self.log.info("SAP Note %s locked", sid, overwrite)
@@ -181,8 +184,6 @@ class Database(Service):
         else:
             self.sapnotes[sid] = sapnote
             self.log.info("SAP Note %s added", sid)
-            if batch is False:
-                self.save_notes()
             return True
 
 
@@ -194,6 +195,7 @@ class Database(Service):
                 if self.add(sapnotes[sid], overwrite, batch=True):
                     n += 1
         self.save_notes()
+        self.emit('database-add', (self.requests[rid]))
         return n
 
 
