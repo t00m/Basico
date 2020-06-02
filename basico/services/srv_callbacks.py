@@ -52,7 +52,10 @@ class Callback(Service):
         # Database updated
         if type(obj) == type(self.srvdtb):
             self.log.debug("Database was updated. Refreshing SAP Notes Visor")
-            # ~ self.gui_refresh_view()
+            viewmenu = self.srvgui.get_widget('viewmenu')
+            viewmenu.set_view('collection')
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+            visor_sapnotes.populate()
 
 
     def webdriver_profile_missing(self, *args):
