@@ -343,7 +343,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_visors = self.srvgui.add_widget('gtk_stack_visors', Gtk.Stack())
         stack_switcher.set_stack(stack_visors)
         stack_switcher.set_property('icon-size', 3)
-        stack_visors.connect('notify::visible-child', self.srvclb.gui_change_stack_visor)
+        stack_visors.connect('notify::visible-child', self.srvclb.gui_stack_visor_change)
         stack_visors.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         stack_visors.set_transition_duration(250)
         box.pack_start(stack_visors, True, True, 0)
@@ -506,5 +506,5 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
         stack_visors.set_visible_child_name('visor-sapnotes')
         viewmenu.set_view('collection')
-        self.srvclb.gui_viewmenu_select_first_entry()
+        # ~ self.srvclb.gui_viewmenu_select_first_entry()
 

@@ -623,7 +623,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         treeview.set_model(sorted_model)
         self.update_total_sapnotes_count()
         self.show_widgets()
-        self.srvclb.gui_stack_dashboard_show()
+        # ~ self.srvclb.gui_stack_dashboard_show()
 
 
     def show_widgets(self):

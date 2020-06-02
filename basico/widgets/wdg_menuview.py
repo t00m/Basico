@@ -500,7 +500,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
         completion.set_model(completion_model)
         viewfilter.set_completion(completion)
-        self.srvclb.gui_stack_dashboard_show()
+        # ~ self.srvclb.gui_stack_dashboard_show()
         self.current_status = None
 
 

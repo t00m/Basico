@@ -35,7 +35,7 @@ class Callback(Service):
     def get_services(self):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvdtb.connect('database-add', self.gui_update_visor_sapnotes)
+        self.srvdtb.connect('database-add', self.gui_visor_sapnotes_update)
         self.srvgui = self.get_service('GUI')
         self.srvuif = self.get_service("UIF")
         self.srvsap = self.get_service('SAP')
@@ -316,8 +316,7 @@ class Callback(Service):
         # ~ self.srvuif.grab_focus()
 
 
-    def gui_show_settings(self, button):
-        return
+    # ~ def gui_show_settings(self, button):
         # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
         # ~ stack = self.srvgui.get_widget('gtk_stack_main')
         # ~ view_settings = self.srvgui.get_widget('widget_settings')
