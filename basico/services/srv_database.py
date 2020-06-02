@@ -39,6 +39,7 @@ class Database(Service):
         self.__init_config_section()
         self.get_services()
         self.load_notes()
+        self.log.debug(type(self))
 
     def setup_signals(self):
         GObject.signal_new('database-add', Database, GObject.SignalFlags.RUN_LAST, None, () )
@@ -170,33 +171,43 @@ class Database(Service):
             #FIXME self.stats[''].add(version)
 
 
-    def add(self, sapnote, overwrite=True):
-        sid = sapnote['id']
+    # ~ def add(self, sapnote, overwrite=True):
+        # ~ sid = sapnote['id']
 
-        if self.exists(sid):
-            if overwrite:
-                self.sapnotes[sid] = sapnote
-                self.log.info("SAP Note %s updated", sid, overwrite)
-                return True
-            else:
-                self.log.info("SAP Note %s locked", sid, overwrite)
-                return False
-        else:
-            self.sapnotes[sid] = sapnote
-            self.log.info("SAP Note %s added", sid)
-            return True
+        # ~ if self.exists(sid):
+            # ~ if overwrite:
+                # ~ self.sapnotes[sid] = sapnote
+                # ~ self.log.info("SAP Note %s updated", sid, overwrite)
+                # ~ return True
+            # ~ else:
+                # ~ self.log.info("SAP Note %s locked", sid, overwrite)
+                # ~ return False
+        # ~ else:
+            # ~ self.sapnotes[sid] = sapnote
+            # ~ self.log.info("SAP Note %s added", sid)
+            # ~ return True
 
 
-    def add_list(self, sapnotes, overwrite=False):
+    def add(self, sapnotes, overwrite=False):
         self.log.info("Add %d SAP Notes to database (overwrite mode is %s)", len(sapnotes), overwrite)
-        n = 0
-        for sid in sapnotes:
-            if overwrite:
-                if self.add(sapnotes[sid], overwrite, batch=True):
-                    n += 1
+        for sapnote in sapnotes:
+            sid = sapnote['id']
+            saved = False
+            if self.exists(sid):
+                if overwrite:
+                    self.sapnotes[sid] = sapnote
+                    self.log.info("SAP Note %s updated", sid, overwrite)
+                    saved = True
+                else:
+                    self.log.info("SAP Note %s locked", sid, overwrite)
+                    saved = False
+            else:
+                self.sapnotes[sid] = sapnote
+                self.log.info("SAP Note %s added", sid)
+                saved = True
         self.save_notes()
-        self.emit('database-add', (self.requests[rid]))
-        return n
+        self.emit('database-add')
+        return saved
 
 
     def get_notes(self):

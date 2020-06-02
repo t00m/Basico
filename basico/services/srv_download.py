@@ -126,7 +126,7 @@ class DownloadManager(Service):
                     options.profile = LPATH['FIREFOX_PROFILE']
                     options.headless = True
                     # ~ 'security.default_personal_cert'
-                    self.log.debug(options.preferences)
+                    # ~ self.log.debug(options.preferences)
                     GDM = GeckoDriverManager(log_level=logging.ERROR)
                     gecko = SeleniumService(executable_path=GDM.install())
                     driver = webdriver.Firefox(options=options, service=gecko)

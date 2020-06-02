@@ -173,7 +173,7 @@ class SAP(Service):
         if len(sapnote) > 0:
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
-            self.srvdtb.add(sapnote)
+            self.srvdtb.add([sapnote])
             self.srvuif.statusbar_msg("SAP Note %s added" % sid)
         else:
             self.srvuif.statusbar_msg("Error. Metadata for SAP Note %s not valid" % sid)
@@ -218,7 +218,7 @@ class SAP(Service):
             sapnotes[sid]['bookmark'] = True
             mylist.append(sapnotes[sid])
             self.log.info("SAP Note %s bookmarked" % sid)
-        self.srvdtb.add_list(mylist)
+        self.srvdtb.add(mylist)
 
 
     def set_no_bookmark(self, bag):
@@ -229,7 +229,7 @@ class SAP(Service):
             sapnotes[sid]['bookmark'] = False
             mylist.append(sapnotes[sid])
             self.log.info("SAP Note %s unbookmarked" % sid)
-        self.srvdtb.add_list(mylist)
+        self.srvdtb.add(mylist)
 
 
     def is_bookmark(self, sapnote):

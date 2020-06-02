@@ -33,6 +33,7 @@ class Callback(Service):
     def get_services(self):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
+        self.srvdtb.connect('database-add', self.react_to_signal)
         self.srvgui = self.get_service('GUI')
         self.srvuif = self.get_service("UIF")
         self.srvsap = self.get_service('SAP')
@@ -45,9 +46,17 @@ class Callback(Service):
         self.srvweb = self.get_service('Driver')
         self.srvweb.connect('download-profile-missing', self.webdriver_profile_missing)
 
+    def react_to_signal(self, obj):
+        self.log.debug("[SIGNAL]: %s" % obj)
+
+        # Database updated
+        if type(obj) == type(self.srvdtb):
+            self.log.debug("Database was updated. Refreshing SAP Notes Visor")
+            # ~ self.gui_refresh_view()
+
 
     def webdriver_profile_missing(self, *args):
-        self.log.warning("Webdriver prfile missing")
+        self.log.warning("Webdriver profile missing")
         cmd = "firefox --profile %s" % LPATH['FIREFOX_PROFILE']
         os.system(cmd)
 
