@@ -33,7 +33,7 @@ class Callback(Service):
     def get_services(self):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvdtb.connect('database-add', self.react_to_signal)
+        self.srvdtb.connect('database-add', self.gui_visor_sapnotes_update)
         self.srvgui = self.get_service('GUI')
         self.srvuif = self.get_service("UIF")
         self.srvsap = self.get_service('SAP')
@@ -46,7 +46,7 @@ class Callback(Service):
         self.srvweb = self.get_service('Driver')
         self.srvweb.connect('download-profile-missing', self.webdriver_profile_missing)
 
-    def react_to_signal(self, obj):
+    def gui_visor_sapnotes_update(self, obj):
         self.log.debug("[SIGNAL]: %s" % obj)
 
         # Database updated
