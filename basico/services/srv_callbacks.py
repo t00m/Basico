@@ -26,6 +26,8 @@ from basico.widgets.wdg_settingsview import SettingsView
 
 MAX_WORKERS = 1 # Number of simultaneous connections
 
+# def naming rule: <service>_<widget>_<action>
+
 class Callback(Service):
     def initialize(self):
         self.get_services()
@@ -33,7 +35,7 @@ class Callback(Service):
     def get_services(self):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvdtb.connect('database-add', self.gui_visor_sapnotes_update)
+        self.srvdtb.connect('database-add', self.gui_update_visor_sapnotes)
         self.srvgui = self.get_service('GUI')
         self.srvuif = self.get_service("UIF")
         self.srvsap = self.get_service('SAP')
@@ -44,7 +46,7 @@ class Callback(Service):
         self.srvclt = self.get_service('Collections')
         # ~ self.srvatc = self.get_service('Attachment')
         self.srvweb = self.get_service('Driver')
-        self.srvweb.connect('download-profile-missing', self.webdriver_profile_missing)
+        self.srvweb.connect('download-profile-missing', self.download_webdriver_setup)
 
     def gui_visor_sapnotes_update(self, obj):
         self.log.debug("[SIGNAL]: %s" % obj)
@@ -57,13 +59,12 @@ class Callback(Service):
             visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
             visor_sapnotes.populate()
 
-
-    def webdriver_profile_missing(self, *args):
+    def download_webdriver_setup(self, *args):
         self.log.warning("Webdriver profile missing")
         cmd = "firefox --profile %s" % LPATH['FIREFOX_PROFILE']
         os.system(cmd)
 
-    def stack_visor_changed(self, stack, gparam):
+    def gui_stack_visor_change(self, stack, gparam):
         visible_stack_name = stack.get_visible_child_name()
         if visible_stack_name is None:
             return
@@ -82,28 +83,28 @@ class Callback(Service):
             visor_attachments.populate()
 
 
-    def gui_show_visor_sapnotes(self):
+    def gui_visor_sapnotes_show(self):
         stack_main = self.srvgui.get_widget('gtk_stack_main')
         stack_main.set_visible_child_name('dashboard')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-sapnotes')
 
 
-    def gui_show_visor_annotations(self):
+    def gui_visor_annotations_show(self):
         stack_main = self.srvgui.get_widget('gtk_stack_main')
         stack_main.set_visible_child_name('dashboard')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-annotations')
 
 
-    def gui_show_visor_attachments(self):
+    def gui_visor_attachments_show(self):
         stack_main = self.srvgui.get_widget('gtk_stack_main')
         stack_main.set_visible_child_name('dashboard')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-attachments')
 
 
-    def action_search(self, entry):
+    def gui_entry_search(self, entry):
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_annotations = self.srvgui.get_widget('visor_annotations')
@@ -131,7 +132,7 @@ class Callback(Service):
 
 
 
-    def sapnote_browse(self, button, sid):
+    def driver_sapnote_browse(self, button, sid):
         self.log.info("Browsing SAP Note %d" % int(sid))
         SAP_NOTE_URL = self.srvstg.get('SAP', 'SAP_NOTE_URL')
         url = SAP_NOTE_URL % sid
@@ -139,14 +140,14 @@ class Callback(Service):
         self.srvweb.browse(url)
 
 
-    def sapnote_download_pdf(self, button, sid):
+    def driver_sapnote_download_pdf(self, button, sid):
         self.log.info("Browsing PDF for SAP Note %d" % int(sid))
         SAP_NOTE_URL_PDF = self.srvstg.get('SAP', 'SAP_NOTE_URL_PDF')
         url = SAP_NOTE_URL_PDF % sid
         self.srvutl.browse(url)
 
 
-    def sapnote_delete(self, button, sid):
+    def database_sapnote_delete(self, button, sid):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         viewmenu = self.srvgui.get_widget('viewmenu')
 
@@ -156,10 +157,10 @@ class Callback(Service):
             self.srvuif.statusbar_msg("SAP Note %s deleted" % sid, True)
             visor_sapnotes.reload()
         else:
-            self.log.info("SAP Note %s not deletd", sid)
+            self.log.info("SAP Note %s not deleted", sid)
 
 
-    def sapnote_delete_view(self, button):
+    def database_sapnote_delete_view(self, button):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         viewmenu = self.srvgui.get_widget('viewmenu')
 
@@ -180,7 +181,7 @@ class Callback(Service):
         viewmenu.populate()
 
 
-    def gui_hide_popover(self, popover):
+    def gui_popover_hide(self, popover):
         popover.hide()
 
 
@@ -278,7 +279,7 @@ class Callback(Service):
                     # ~ self.srvclt.load_collections()
                     # ~ visor_annotations.populate()
                     # ~ self.gui_refresh_view()
-                    # ~ self.gui_show_visor_sapnotes()
+                    # ~ self.gui_visor_sapnotes_show()
                     # ~ self.srvuif.statusbar_msg("Backup restored successfully", True)
                     # ~ self.log.info("Backup restored successfully")
                 # ~ elif response == Gtk.ResponseType.NO:
@@ -297,7 +298,7 @@ class Callback(Service):
         # ~ about = self.srvgui.get_widget('widget_about')
         # ~ stack = self.srvgui.get_widget('gtk_stack_main')
         # ~ stack.set_visible_child_name('about')
-        # ~ self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        # ~ self.gui_popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
         # ~ # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
         # ~ self.srvuif.grab_focus()
@@ -308,7 +309,7 @@ class Callback(Service):
         # ~ logviewer = self.srvgui.get_widget('widget_logviewer')
         # ~ stack = self.srvgui.get_widget('gtk_stack_main')
         # ~ logviewer.update()
-        # ~ self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        # ~ self.gui_popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         # ~ stack.set_visible_child_name('log')
         # ~ #self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
         # ~ self.srvuif.statusbar_msg("Displaying application log")
@@ -322,7 +323,7 @@ class Callback(Service):
         # ~ view_settings = self.srvgui.get_widget('widget_settings')
         # ~ stack.set_visible_child_name('settings')
         # ~ view_settings.update()
-        # ~ self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        # ~ self.gui_popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
         # ~ # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
         # ~ notebook_menuview.hide()
@@ -330,7 +331,7 @@ class Callback(Service):
         # ~ self.srvuif.statusbar_msg("Displaying application settings")
 
 
-    def gui_show_dashboard(self, *args):
+    def gui_stack_dashboard_show(self, *args):
         stack = self.srvgui.get_widget('gtk_stack_main')
         # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
         viewmenu = self.srvgui.get_widget('viewmenu')
@@ -338,7 +339,7 @@ class Callback(Service):
 
         # ~ notebook_menuview.show_all()
         stack.set_visible_child_name('dashboard')
-        self.gui_hide_popover(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        self.gui_popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
 
         if current_view == 'annotation':
@@ -509,7 +510,7 @@ class Callback(Service):
         # ~ self.srvsap.stop_fetching()
         db.build_stats()
         visor_sapnotes.populate(all_notes)
-        self.gui_show_visor_sapnotes()
+        self.gui_visor_sapnotes_show()
         # ~ return result
 
 
@@ -582,7 +583,7 @@ class Callback(Service):
         viewmenu.set_view(view)
         popover = self.srvgui.get_widget('gtk_popover_button_menu_views')
         popover.hide()
-        self.gui_show_visor_sapnotes()
+        self.gui_visor_sapnotes_show()
 
 
     def gui_toggle_menu_view(self, obj):
@@ -682,7 +683,7 @@ class Callback(Service):
         self.srvuif.grab_focus()
 
 
-    def action_annotation_save(self):
+    def annotation_save(self):
         widget_annotation = self.srvgui.get_widget('widget_annotation')
         aid = widget_annotation.get_aid_from_widget()
         annotation = widget_annotation.get_metadata_from_widget()
@@ -706,7 +707,7 @@ class Callback(Service):
         # ~ notebook.set_current_page(page)
         # ~ self.log.debug('Annotation canceled')
         self.srvuif.statusbar_msg("Annotation canceled")
-        self.gui_show_dashboard()
+        self.gui_stack_dashboard_show()
         self.srvuif.grab_focus()
 
 
@@ -856,7 +857,7 @@ class Callback(Service):
     def gui_jump_to_sapnote(self, widget, sid):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.populate([sid])
-        self.gui_show_visor_sapnotes()
+        self.gui_visor_sapnotes_show()
         self.srvuif.grab_focus()
         msg = "Jumping to SAP Note %s" % sid
         self.log.info(msg)
@@ -872,7 +873,7 @@ class Callback(Service):
         GObject.signal_handler_block(notebook, signal)
         visor_annotations = self.srvgui.get_widget('visor_annotations')
         visor_annotations.populate([aid])
-        self.gui_show_visor_annotations()
+        self.gui_visor_annotations_show()
         self.srvuif.grab_focus()
         msg = "Jumping to annotation %s" % aid
         self.log.info(msg)

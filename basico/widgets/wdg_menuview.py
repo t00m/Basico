@@ -248,7 +248,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
     def row_changed(self, selection):
         if self.current_status is None:
             visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            # ~ self.log.warning("gui_show_visor_sapnotes!!!")
+            # ~ self.log.warning("gui_visor_sapnotes_show!!!")
 
             try:
                 model, treeiter = selection.get_selected()
@@ -400,7 +400,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
         # Popover button "Delete all SAP Notes in this view"
         button = get_popover_button("<b>Delete</b> %d SAP Notes in this view" % count, 'basico-delete')
-        button.connect('clicked', self.srvclb.sapnote_delete_view)
+        button.connect('clicked', self.srvclb.database_sapnote_delete_view)
         box.pack_start(button, False, False, 0)
 
         return box
@@ -500,7 +500,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
         completion.set_model(completion_model)
         viewfilter.set_completion(completion)
-        self.srvclb.gui_show_dashboard()
+        self.srvclb.gui_stack_dashboard_show()
         self.current_status = None
 
 

@@ -623,7 +623,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         treeview.set_model(sorted_model)
         self.update_total_sapnotes_count()
         self.show_widgets()
-        self.srvclb.gui_show_dashboard()
+        self.srvclb.gui_stack_dashboard_show()
 
 
     def show_widgets(self):
@@ -721,12 +721,12 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
             # Popover button "Open SAP Note"
             button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
-            button.connect('clicked', self.srvclb.sapnote_browse, sid)
+            button.connect('clicked', self.srvclb.driver_sapnote_browse, sid)
             box.pack_start(button, False, False, 0)
 
             # Popover button "Download SAP Note in PDF"
             button = get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse')
-            button.connect('clicked', self.srvclb.sapnote_download_pdf, sid)
+            button.connect('clicked', self.srvclb.driver_sapnote_download_pdf, sid)
             box.pack_start(button, False, False, 0)
 
             # Popover button "Bookmark"
@@ -767,7 +767,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
             # Popover button "Delete SAP Note"
             button = get_popover_button("<b>Delete</b> SAP Note %d" % isid, 'basico-delete')
-            button.connect('clicked', self.srvclb.sapnote_delete, sid)
+            button.connect('clicked', self.srvclb.database_sapnote_delete, sid)
             button.set_tooltip_text("Checkbox must be activated in order to trigger the deletion")
             box.pack_start(button, False, False, 0)
 

@@ -90,7 +90,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
 
         def on_icon_pressed(entry, icon_pos, event):
             if icon_pos == Gtk.EntryIconPosition.PRIMARY:
-                self.srvclb.action_search(entry)
+                self.srvclb.gui_entry_search(entry)
             elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
                 self.srvclb.gui_filter_visor(entry)
 
