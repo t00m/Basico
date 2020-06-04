@@ -15,6 +15,7 @@ from concurrent.futures import ThreadPoolExecutor as Executor
 
 import gi
 gi.require_version('Gtk', '3.0')
+from gi.repository import GLib
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
@@ -49,15 +50,15 @@ class Callback(Service):
         self.srvweb.connect('download-profile-missing', self.download_webdriver_setup)
 
     def gui_visor_sapnotes_update(self, obj):
-        self.log.debug("[SIGNAL]: %s" % obj)
-
         # Database updated
         if type(obj) == type(self.srvdtb):
-            self.log.debug("Database was updated. Refreshing SAP Notes Visor")
-            viewmenu = self.srvgui.get_widget('viewmenu')
-            viewmenu.set_view('collection')
-            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            visor_sapnotes.populate()
+            def reload():
+                self.log.debug("Database was updated. Refreshing SAP Notes Visor")
+                viewmenu = self.srvgui.get_widget('viewmenu')
+                viewmenu.set_view('collection')
+                visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+                visor_sapnotes.populate()
+            GLib.idle_add(reload)
 
     def download_webdriver_setup(self, *args):
         self.log.warning("Webdriver profile missing")
@@ -169,7 +170,7 @@ class Callback(Service):
         if answer is True:
             for sid in bag:
                 self.srvdtb.delete(sid)
-            visor_sapnotes.reload()
+            visor_sapnotes.populate()
             msg = "Deleted %d SAP Notes" % len(bag)
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg, True)
@@ -177,8 +178,8 @@ class Callback(Service):
             msg = "None of the %d SAP Notes has been deleted" % len(bag)
             self.log.info(msg)
             self.srvuif.statusbar_msg(msg, True)
-        visor_sapnotes.reload()
-        viewmenu.populate()
+        # ~ visor_sapnotes.reload()
+        # ~ viewmenu.populate()
 
 
     def gui_popover_hide(self, popover):
@@ -465,19 +466,19 @@ class Callback(Service):
 
         bag = []
         all_notes = []
-        sapnotes = []
+        sapnotes = set()
         lines = text.replace(' ', ',')
         lines = lines.replace('\n', ',')
         for sid in lines.split(','):
             sid = sid.strip()
             if len(sid) > 0:
-                sapnotes.append(sid)
+                sapnotes.add(sid)
         for sid in sapnotes:
             is_valid = self.srvdtb.is_valid(sid)
-            is_saved = self.srvdtb.get_sapnote_metadata(sid)
-            if is_valid and not is_saved:
+            # ~ is_saved = self.srvdtb.get_sapnote_metadata(sid)
+            if is_valid: # and not is_saved:
                 bag.append(sid)
-            if is_valid:
+            # ~ if is_valid:
                 all_notes.append(sid)
         lbag = list(bag)
         lbag.sort()

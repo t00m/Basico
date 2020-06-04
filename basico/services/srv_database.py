@@ -188,26 +188,27 @@ class Database(Service):
             # ~ return True
 
 
-    def add(self, sapnotes, overwrite=False):
-        self.log.info("Add %d SAP Notes to database (overwrite mode is %s)", len(sapnotes), overwrite)
+    def add(self, sapnotes, overwrite=True):
+        self.log.info("Adding %d SAP Notes to database (overwrite mode is %s)", len(sapnotes), overwrite)
+        n = 1
         for sapnote in sapnotes:
             sid = sapnote['id']
-            saved = False
+            updated = False
             if self.exists(sid):
                 if overwrite:
+                    updated = True
                     self.sapnotes[sid] = sapnote
-                    self.log.info("SAP Note %s updated", sid, overwrite)
-                    saved = True
                 else:
-                    self.log.info("SAP Note %s locked", sid, overwrite)
-                    saved = False
+                    updated = False
             else:
+                updated = True
                 self.sapnotes[sid] = sapnote
-                self.log.info("SAP Note %s added", sid)
-                saved = True
+            self.log.info("[%d/%d] SAP Note %s added? %s", n, len(sapnotes), sid, updated)
+            n += 1
+
         self.save_notes()
         self.emit('database-add')
-        return saved
+        return updated
 
 
     def get_notes(self):

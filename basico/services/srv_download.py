@@ -47,6 +47,7 @@ class DriverStatus(IntEnum):
 
 
 class DownloadManager(Service):
+    th = None
     queue = queue.Queue()
     requests = {}
     retry = 0
@@ -56,13 +57,15 @@ class DownloadManager(Service):
     def initialize(self):
         GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
-        threading.Thread(target=self.download, daemon=True).start()
+        self.th = threading.Thread(name='download', target=self.download)
+        self.th.setDaemon(True)
+        self.th.start()
         self.log.debug("Basico Download Manager started")
 
-    def check_profile(self):
+    def check_profile(self, rid):
         files = glob.glob(os.path.join(LPATH['FIREFOX_PROFILE'], '*'))
         has_profile = len(files) > 0
-        self.log.debug("Webdriver profile available? %s", has_profile)
+        self.log.debug("[%s] Webdriver profile available? %s", rid, has_profile)
         if not has_profile:
             self.emit('download-profile-missing')
         return has_profile
@@ -86,13 +89,25 @@ class DownloadManager(Service):
         return self.url_type
 
     def request(self, url_sid, url_uri, url_type):
-        has_profile = self.check_profile()
+        uuid4 = str(uuid.uuid4())
+        rid = uuid4[:uuid4.find('-')]
+        alive = self.th.is_alive()
+        self.log.debug("[%s] Download thread alive? %s" , rid, alive)
+        if not alive:
+            self.log.debug("[%s] Restarting download process", rid)
+            try:
+                self.th.join()
+            except Exception as error:
+                # FIXME: is this ok?
+                self.log.error("[%s] %s", rid, error)
+            self.th.start()
+
+        has_profile = self.check_profile(rid)
         if not has_profile:
             return
 
-        uuid4 = str(uuid.uuid4())
-        rid = uuid4[:uuid4.find('-')]
-        self.log.info("[%s] Request created", rid)
+
+        self.log.info("[%s] Request enqueued", rid)
         self.requests[rid] = {}
         self.requests[rid]['url_rid'] = rid
         self.requests[rid]['url_sid'] = url_sid

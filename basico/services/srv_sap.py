@@ -135,7 +135,7 @@ class SAP(Service):
 
 
 
-    def analyze_sapnote(self, content):
+    def analyze_sapnote(self, rid, content):
         '''
         Get metadata details from SAP Note
         '''
@@ -159,24 +159,23 @@ class SAP(Service):
             sapnote['feedupdate'] = f.entries[0].updated
             sapnote['bookmark'] = False
             sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
-            self.log.debug ("SAP Note %s analyzed successfully" % sid)
+            self.log.debug ("[%s] SAP Note %s analyzed successfully", rid, sid)
         except Exception as error:
-            pass
-            # ~ self.log.warning("Error while analyzing. SAP metadata not found.")
+            self.log.warning("[%s] Content has no valid metadata. Skip.", rid)
 
         return sapnote
 
     def dispatch_sapnote(self, data, content):
         rid = data['url_rid']
         sid = data['url_sid']
-        sapnote = self.analyze_sapnote(content)
+        sapnote = self.analyze_sapnote(rid, content)
         if len(sapnote) > 0:
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add([sapnote])
-            self.srvuif.statusbar_msg("SAP Note %s added" % sid)
+            self.srvuif.statusbar_msg("[%s] SAP Note %s added" % (rid, sid))
         else:
-            self.srvuif.statusbar_msg("Error. Metadata for SAP Note %s not valid" % sid)
+            self.srvuif.statusbar_msg("[%s] Error. Metadata for SAP Note %s not valid" % (rid, sid))
             self.log.warning("[%s] Metadata analysis for SAP Note %s failed. Check manually:", rid, sid)
             self.log.warning("[%s] \t1. Make sure you have imported your SAP Passport profile in custom Fireforx profile:", rid)
             self.log.warning("[%s] \t   Edit profile: firefox --profile %s", rid, LPATH['FIREFOX_PROFILE'])
@@ -201,7 +200,7 @@ class SAP(Service):
     def download(self, bag):
         for sid in bag:
             try:
-                self.log.info("Requested SAP Note %s" % sid)
+                self.log.info("[        ] Requested SAP Note %s" % sid)
                 self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
                 # ~ FIXME: self.srvweb.request(sid, SAP_NOTE_URL_PDF % sid, 'pdf')
 
