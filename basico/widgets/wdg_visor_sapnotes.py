@@ -29,7 +29,6 @@ from basico.core.mod_env import LPATH, ATYPES
 from basico.services.srv_collections import COL_DOWNLOADED
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.widgets.wdg_import import ImportWidget
-from basico.core.mod_log import get_logger
 from basico.widgets.wdg_menuview import MenuView
 
 

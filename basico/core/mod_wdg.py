@@ -8,10 +8,10 @@
 """
 
 import sys
+import logging
 import traceback as tb
 
 from basico.core.mod_env import FILE
-from basico.core.mod_log import get_logger
 
 
 class BasicoWidget(object):
@@ -27,7 +27,8 @@ class BasicoWidget(object):
         if app is not None:
             self.app = app
 
-        self.log = get_logger(logname)
+        self.log = logging.getLogger(logname)
+        self.log.addHandler(self.app.intercepter)
         self.init_section(logname)
         # ~ self.log.debug("Loading widget: %s", logname)
 

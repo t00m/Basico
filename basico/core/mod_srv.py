@@ -8,10 +8,11 @@
 """
 
 import sys
+import logging
 import traceback as tb
 from gi.repository import GObject
 from basico.core.mod_env import FILE
-from basico.core.mod_log import get_logger
+
 
 
 class Service(GObject.GObject):
@@ -34,23 +35,13 @@ class Service(GObject.GObject):
 
         self.started = False
 
-
     def is_started(self):
         """Return True or False if service is running / not running
         """
         return self.started
 
-
     def print_traceback(self):
         self.log.error(tb.format_exc())
-
-
-    def get_logger(self, logname):
-        """
-        Get a logger for those modules that aren't real services.
-        """
-        self.log = get_logger(logname)
-
 
     def start(self, app, logname, section_name):
         """Start service.
@@ -64,7 +55,8 @@ class Service(GObject.GObject):
         self.started = True
         self.app = app
         self.section = section_name
-        self.log = get_logger(logname)
+        self.log = logging.getLogger(logname)
+        self.log.addHandler(self.app.intercepter)
         self.init_section(section_name)
 
         try:

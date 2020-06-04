@@ -15,6 +15,7 @@ from gi.repository import Pango
 
 from basico.core.mod_env import ROOT, USER_DIR, APP, LPATH, GPATH, FILE
 from basico.core.mod_wdg import BasicoWidget
+from basico.core.mod_log import event_log
 
 class Statusbar(BasicoWidget, Gtk.HBox):
     def __init__(self, app):
@@ -22,6 +23,7 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         Gtk.HBox.__init__(self)
         self.get_services()
         self.setup()
+        # ~ GLib.timeout_add(500, self.pooling)
 
 
     def setup(self):
@@ -51,3 +53,8 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         def show(message):
             self.statusbar.set_markup("<b>%s</b>" % message)
         GLib.idle_add(show, message)
+
+
+    # ~ def pooling(self, *args):
+        # ~ self.log.debug(event_log[-1])
+        # ~ return False

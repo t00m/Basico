@@ -95,11 +95,8 @@ class DownloadManager(Service):
         self.log.debug("[%s] Download thread alive? %s" , rid, alive)
         if not alive:
             self.log.debug("[%s] Restarting download process", rid)
-            try:
-                self.th.join()
-            except Exception as error:
-                # FIXME: is this ok?
-                self.log.error("[%s] %s", rid, error)
+            self.th = threading.Thread(name='download', target=self.download)
+            self.th.setDaemon(True)
             self.th.start()
 
         has_profile = self.check_profile(rid)

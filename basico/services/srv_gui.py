@@ -7,6 +7,8 @@
 # Description: GUI service
 """
 
+import logging
+
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
@@ -15,9 +17,9 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gio
+
 from basico.core.mod_srv import Service
 from basico.core.mod_win import GtkAppWindow
-from basico.core.mod_log import get_logger
 from basico.core.mod_env import FILE
 # ~ from basico.widgets.wdg_splash import Splash
 
@@ -34,10 +36,11 @@ class UIApp(Gtk.Application):
         Missing method docstring (missing-docstring)
         """
         super().__init__(application_id="net.t00mlabs.basico", flags=Gio.ApplicationFlags.FLAGS_NONE)
+        self.app = args[0]
         GLib.set_application_name("Basico")
         GLib.set_prgname('basico')
-        self.log = get_logger(__class__.__name__)
-        self.app = args[0]
+        self.log = logging.getLogger('UIApp')
+        self.log.addHandler(self.app.intercepter)
         self.get_services()
 
 

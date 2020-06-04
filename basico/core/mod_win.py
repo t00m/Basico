@@ -11,6 +11,7 @@ import os
 import sys
 import stat
 import time
+import logging
 import platform
 
 import gi
@@ -37,16 +38,16 @@ from basico.widgets.wdg_logviewer import LogViewer
 from basico.widgets.wdg_annot import AnnotationWidget
 from basico.widgets.wdg_statusbar import Statusbar
 from basico.widgets.wdg_browser import BasicoBrowser
-from basico.core.mod_log import get_logger
 
 
 class GtkAppWindow(Gtk.ApplicationWindow):
     def __init__(self, uiapp):
         self.setup_controller(uiapp)
-        # ~ self.get_logger(__class__.__name__)
+        self.log = logging.getLogger('GtkAppWindow')
+        self.app = uiapp.get_controller()
+        self.log.addHandler(self.app.intercepter)
         self.get_services()
         self.srvgui.add_widget('uiapp', uiapp)
-        self.app = self.srvgui.get_app()
         self.setup_window(uiapp)
         self.setup_widgets()
         self.run()

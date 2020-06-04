@@ -11,12 +11,14 @@ import os
 import sys
 import signal
 import shutil
+import queue
+import logging
 
 import selenium
 
 from gi.repository import GObject
 from basico.core.mod_env import APP, LPATH, GPATH, FILE
-from basico.core.mod_log import get_logger
+from basico.core.mod_log import LogIntercepter, queue_log
 from basico.services.srv_utils import Utils
 from basico.services.srv_gui import GUI
 from basico.services.srv_iconmgt import IconManager
@@ -36,6 +38,8 @@ from basico.services.srv_asciidoctor import Asciidoctor
 from basico.widgets.wdg_splash import Splash
 
 
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
+
 #DOC: http://stackoverflow.com/questions/16410852/keyboard-interrupt-with-with-python-gtk
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -43,6 +47,8 @@ class Basico(object):
     """
     Basico Application class
     """
+    intercepter = LogIntercepter()
+
     def __init__(self):
         """
         Basico class
@@ -83,7 +89,8 @@ class Basico(object):
                 pass
 
         #Initialize logging
-        self.log = get_logger(__class__.__name__)
+        self.log = logging.getLogger(__class__.__name__)
+        self.log.addHandler(self.intercepter)
         self.log.info("Basico %s started", APP['version'])
         self.log.debug("Global path: %s", GPATH['ROOT'])
         self.log.debug("Local path: %s", LPATH['ROOT'])

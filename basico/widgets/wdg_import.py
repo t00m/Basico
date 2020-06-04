@@ -20,8 +20,6 @@ from gi.repository import Pango
 from basico.core.mod_wdg import BasicoWidget
 from basico.core.mod_env import ROOT, USER_DIR, APP, LPATH, GPATH, FILE
 
-logger = logging.getLogger(__name__)
-
 class ImportWidget(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)

@@ -12,17 +12,20 @@
 #
 """
 
+import os
+import logging
 # Make sure the right Gtk version is loaded
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
-from os.path import exists
-from basico.core.mod_log import get_logger
+
 
 
 class Splash():
     def __init__(self, title, width=400, height=250, font=36, font_weight='normal', font_color='000000', background_color='ffffff', background_image=None, app=None):
-        self.log = get_logger(__class__.__name__)
+        self.app = app
+        self.log = logging.getLogger(__class__.__name__)
+        self.log.addHandler(self.app.intercepter)
         self.title = title
         self.width = width
         self.height = height
@@ -30,7 +33,7 @@ class Splash():
         self.font_weight = font_weight
         self.font_color = self.prep_hex_color(font_color)
         self.background_image = '' if background_image is None else background_image
-        self.app = app
+
 
         # Window settings
         self.window = Gtk.Window(Gtk.WindowType.POPUP)
@@ -41,7 +44,7 @@ class Splash():
         # Create overlay with a background image
         overlay = Gtk.Overlay()
         self.window.add(overlay)
-        if exists(self.background_image):
+        if os.path.exists(self.background_image):
             # Window will adjust to image size automatically
             bg = Gtk.Image.new_from_file(self.background_image)
             overlay.add(bg)
