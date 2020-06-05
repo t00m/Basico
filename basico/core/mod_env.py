@@ -19,12 +19,12 @@ APP = {}
 APP['short'] = "basico"
 APP['name'] = "SAP Notes Manager for SAP Consultants"
 APP['license'] = "The code is licensed under the terms of the  GPL v3\nso you're free to grab, extend, improve and fork the code\nas you want"
-APP['copyright'] = "Copyright \xa9 2016-2019 Tomás Vírseda"
+APP['copyright'] = "Copyright \xa9 2016-2020 Tomás Vírseda"
 APP['desc'] = "SAP Notes Manager for SAP Consultants\n\nThe code is licensed under the terms of the  GPL v3 so you're free to grab, extend, improve and fork the code as you want"
 APP['version'] = "0.4"
 APP['authors'] = ["Tomás Vírseda <tomasvirseda@gmail.com>"]
 APP['documenters'] = ["Tomás Vírseda <tomasvirseda@gmail.com>"]
-APP['email'] = "t00m@t00mlabs.net"
+APP['email'] = "tomasvirseda@gmail.com"
 
 
 # Local paths

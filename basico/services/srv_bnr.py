@@ -388,3 +388,106 @@ class BackupRestoreMan(Service):
             self.log.error(error)
             self.log.error(self.get_traceback())
             return False
+
+    # ~ def gui_database_backup(self, *args):
+        # ~ window = self.srvgui.get_window()
+        # ~ question = "Backup database"
+        # ~ message = "\nShould this backup include all your annotations?"
+        # ~ wdialog = self.srvuif.message_dialog_question(question, message)
+        # ~ res_bck_annot = wdialog.run()
+        # ~ wdialog.destroy()
+
+        # ~ dialog = Gtk.FileChooserDialog("Please choose target folder and backup name (without extension)", window,
+            # ~ Gtk.FileChooserAction.SAVE,
+            # ~ ("Cancel", Gtk.ResponseType.CANCEL,
+            # ~ "Select", Gtk.ResponseType.OK))
+        # ~ TIMESTAMP = self.srvutl.timestamp()
+        # ~ TARGET_FILE = 'basico-%s' % TIMESTAMP
+        # ~ dialog.set_filename(LPATH['BACKUP'])
+        # ~ dialog.set_current_folder_uri(LPATH['BACKUP'])
+        # ~ dialog.set_current_name(TARGET_FILE)
+        # ~ dialog.set_default_size(800, 400)
+        # ~ res_bck_file = dialog.run()
+        # ~ self.log.debug("Backup file: %s", dialog.get_filename())
+
+        # ~ if res_bck_file == Gtk.ResponseType.OK:
+            # ~ backup_filename = dialog.get_filename()
+            # ~ if res_bck_annot == Gtk.ResponseType.YES:
+                # ~ bckname = self.srvbnr.backup(backup_filename, backup_annotations=True)
+                # ~ msg = "Database with annotations backed up successfully to: %s" % bckname
+                # ~ dialog.destroy()
+            # ~ else:
+                # ~ bckname = self.srvbnr.backup(backup_filename, backup_annotations=False)
+                # ~ msg = "Database without annotations backed up successfully to: %s" % bckname
+            # ~ self.log.info(msg)
+            # ~ self.srvuif.statusbar_msg(msg, True)
+            # ~ self.srvuif.copy_text_to_clipboard(bckname)
+
+        # ~ else:
+            # ~ self.srvuif.statusbar_msg("Backup aborted by user", True)
+            # ~ self.log.info("Backup aborted")
+        # ~ self.srvuif.grab_focus()
+
+    # ~ def gui_database_restore(self, *args):
+        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
+        # ~ window = self.srvgui.get_window()
+        # ~ dialog = Gtk.FileChooserDialog("Please choose a backup file", window,
+            # ~ Gtk.FileChooserAction.OPEN,
+            # ~ (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+            # ~ Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        # ~ dialog.set_current_folder(LPATH['BACKUP'])
+        # ~ filter_zip = Gtk.FileFilter()
+        # ~ filter_zip.set_name("Basico backup files")
+        # ~ filter_zip.add_pattern("*.bco")
+        # ~ dialog.add_filter(filter_zip)
+        # ~ response = dialog.run()
+        # ~ backup = dialog.get_filename()
+        # ~ self.log.info("You are about to restore this file: %s" % backup)
+        # ~ dialog.destroy()
+
+        # ~ if response == Gtk.ResponseType.OK:
+            # ~ res = self.srvbnr.test(backup)
+            # ~ if res is None:
+                # ~ dialog = self.srvuif.message_dialog_info("Backup file corrupted?", "It wasn't possible to read all data from this file")
+                # ~ dialog.run()
+                # ~ self.srvuif.statusbar_msg("Backup file corrupted. It wasn't possible to read all data from this file", True)
+                # ~ self.log.info("Backup file corrupted?")
+            # ~ else:
+                # ~ # Ask if the process should force an overwrite in target database
+                # ~ question = "Should the import process overwrite data?"
+                # ~ message = "All metadata for SAP Notes will be overwrited and annotations with the same identifier will be overwriten"
+                # ~ wdialog = self.srvuif.message_dialog_question(question, message)
+                # ~ response = wdialog.run()
+                # ~ wdialog.destroy()
+                # ~ if response == Gtk.ResponseType.YES:
+                    # ~ overwrite = True
+                # ~ else:
+                    # ~ overwrite = False
+
+
+                # ~ # Ask for final confirmation
+                # ~ sncount, ancount, clcount = res
+                # ~ question = "Restoring backup %s" % os.path.basename(backup)
+                # ~ message = "\n%s contains:\n\n<b>%6d SAP Notes</b>\n<b>%6d collections</b>\n<b>%6d annotations</b>\n\n" % (os.path.basename(backup), sncount, clcount, ancount)
+                # ~ message += "Do you still want to restore this backup?\n"
+                # ~ wdialog = self.srvuif.message_dialog_question(question, message)
+                # ~ response = wdialog.run()
+                # ~ wdialog.destroy()
+                # ~ if response == Gtk.ResponseType.YES:
+                    # ~ self.srvbnr.restore_from_backup(backup, overwrite)
+                    # ~ self.srvdtb.load_notes()
+                    # ~ self.srvclt.load_collections()
+                    # ~ visor_annotations.populate()
+                    # ~ self.gui_refresh_view()
+                    # ~ self.gui_visor_sapnotes_show()
+                    # ~ self.srvuif.statusbar_msg("Backup restored successfully", True)
+                    # ~ self.log.info("Backup restored successfully")
+                # ~ elif response == Gtk.ResponseType.NO:
+                    # ~ self.srvuif.statusbar_msg("Restore aborted by user", True)
+                    # ~ self.log.info("Restore aborted")
+        # ~ elif response == Gtk.ResponseType.CANCEL:
+            # ~ self.srvuif.statusbar_msg("Restore aborted by user", True)
+            # ~ self.log.info("Restore aborted")
+
+        # ~ dialog.destroy()
+        # ~ self.srvuif.grab_focus()

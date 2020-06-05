@@ -168,10 +168,10 @@ def main():
         version='0.4',
         author='Tomás Vírseda',
         author_email='tomasvirseda@gmail.com',
-        url='http://subversion.t00mlabs.net/basico',
+        url='https://github.com/t00m/Basico',
         description='SAP Notes Manager for SAP Consultants',
         long_description=long_description,
-        download_url = 'http://t00mlabs.net/downloads/basico-0.3.tar.gz',
+        download_url = 'https://github.com/t00m/Basico/archive/master.zip',
         license='GPLv3',
         packages=['basico', 'basico.core', 'basico.services', 'basico.widgets'],
         # distutils does not support install_requires, but pip needs it to be

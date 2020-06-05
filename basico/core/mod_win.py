@@ -169,7 +169,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.gui_show_about)
+        button.connect('clicked', self.srvclb.display_about)
         box.pack_end(button, False, False, 0)
 
         # ~ ### Help
@@ -236,10 +236,10 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
         hbox_backup = Gtk.VBox()
         button_backup = self.srvuif.create_button('basico-backup', 48, 48, '<b>Backup database</b> ')
-        button_backup.connect('clicked', self.srvclb.gui_database_backup)
+        # ~ button_backup.connect('clicked', self.srvclb.gui_database_backup)
         box_bnr.pack_start(button_backup, False, False, 0)
         button_restore = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from backup</b>')
-        button_restore.connect('clicked', self.srvclb.gui_database_restore)
+        # ~ button_restore.connect('clicked', self.srvclb.gui_database_restore)
         # ~ button_cache = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from cache</b>')
         # ~ button_cache.connect('clicked', self.srvbnr.restore_from_cache)
 
@@ -316,9 +316,10 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         # ~ stack_main.add_titled(stack_child, "help", "Basico Help")
         # ~ stack_main.child_set_property (stack_child, "icon-name", "basico-help")
 
-        ### About stack child
-        # ~ stack_child = self.setup_stack_about()
-        # ~ stack_main.add_titled(stack_child, "about", "About Basico")
+        # ~ ### About stack child
+        stack_child = self.setup_main_stack_about()
+        stack_main.add_titled(stack_child, "about", "About Basico")
+        stack_main.child_set_property (stack_child, "icon-name", "basico-about")
 
         ### Log stack child
         # ~ stack_child = self.setup_stack_log()

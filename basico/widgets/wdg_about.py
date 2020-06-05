@@ -61,7 +61,7 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
         widget.pack_start(label, False, False, 6)
 
         # Set Link button
-        linkbutton = Gtk.LinkButton(uri="http://t00mlabs.net", label="t00mlabs.net")
+        linkbutton = Gtk.LinkButton(uri="https://github.com/t00m/Basico", label="https://github.com/t00m/Basico")
         widget.pack_start(linkbutton, False, False, 6)
 
         # Set Copyright holders
@@ -83,3 +83,13 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
 
         self.add(viewport)
         self.show_all()
+
+    def display(self, *args):
+        srvuif = self.get_service('UIF')
+        about = self.srvgui.get_widget('widget_about')
+        stack = self.srvgui.get_widget('gtk_stack_main')
+        stack.set_visible_child_name('about')
+        self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
+        # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
+        srvuif.grab_focus()

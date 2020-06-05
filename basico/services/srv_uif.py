@@ -559,3 +559,6 @@ class UIFuncs(Service):
         box.show_all()
 
         return box
+
+    def popover_hide(self, popover):
+        popover.hide()
