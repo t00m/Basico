@@ -458,13 +458,20 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         self.log.debug("SAP Notes Visor updated")
 
     def update_total_sapnotes_count(self):
+        entry = self.srvgui.get_widget('gtk_entry_filter_visor')
+        term = entry.get_text()
+        viewmenu = self.srvgui.get_widget('viewmenu')
+        view = viewmenu.get_view()
         visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
         statusbar = self.srvgui.get_widget('widget_statusbar')
         lblnotescount = self.srvgui.get_widget('gtk_label_total_notes')
         total = self.srvdtb.get_total()
         count = len(visible_filter)
         lblnotescount.set_markup("<b>%d/<big>%d</big></b>" % (count, total))
-        msg = 'View populated with %d SAP Notes' % count
+        msg = "View <b>%s</b> populated with <b>%d notes</b>" % (view, count)
+        if len(term) > 0:
+            msg += " for term <b>%s</b>" % term
+        self.log.info(msg)
         # ~ self.srvuif.statusbar_msg(msg)
 
 
@@ -805,4 +812,4 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
     def filter(self, *args):
         visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
         visible_filter.refilter()
-        visor_sapnotes.update_total_sapnotes_count()
+        self.update_total_sapnotes_count()

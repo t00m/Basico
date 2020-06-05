@@ -74,8 +74,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         hbox = Gtk.HBox()
         entry = Gtk.Entry()
         entry.set_completion(self.completion)
-        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        # ~ entry.connect('activate', self.srvclb.gui_visor_filter)
+        entry.connect('changed', self.entry_filter)
         self.srvgui.add_widget('gtk_entry_filter_visor', entry)
 
         icon = self.srvicm.get_pixbuf_icon('basico-find')
@@ -96,7 +95,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
             elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
                 visor_sapnotes.filter()
 
-        entry.connect('changed', self.srvclb.gui_filter_visor)
+        # ~ entry.connect('changed', self.srvclb.gui_filter_visor)
         entry.connect("icon-press", on_icon_pressed)
         hbox.pack_start(entry, True, True, 0)
         tool.add(hbox)
@@ -309,7 +308,8 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         templates.show_all()
         return templates
 
-    def entry_search(self, entry):
+    def entry_search(self, *args):
+        entry = self.srvgui.get_widget('gtk_entry_filter_visor')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         term = entry.get_text()
@@ -325,3 +325,6 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         ebuffer.delete_text(0, -1)
         self.log.info("Found %d SAP Notes for term '%s'" % (len(bag), term))
 
+    def entry_filter(self, *args):
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes.filter()
