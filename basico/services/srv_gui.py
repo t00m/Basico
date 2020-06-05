@@ -8,6 +8,7 @@
 """
 
 import logging
+import threading
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -54,11 +55,14 @@ class UIApp(Gtk.Application):
             self.window.connect("delete-event", self.srvgui.quit)
             self.window.connect("key-press-event",self.on_key_press_event)
             self.log.debug("New Basico instance created")
-            self.srvuif.statusbar_msg("Welcome to Basico", True)
+            # ~ self.srvuif.statusbar_msg("Welcome to Basico", True)
         else:
             self.log.debug("Basico is already running!")
         splash = self.app.get_splash()
         splash.hide()
+        self.th = threading.Thread(name='statusbar', target=self.srvclb.update_statusbar)
+        self.th.setDaemon(True)
+        self.th.start()
 
 
     def on_key_press_event(self, widget, event):
@@ -214,9 +218,9 @@ class GUI(Service):
         try:
             return self.widgets[name]
         except KeyError as warning:
-            self.log.warning(warning)
-            # ~ self.log.error(self.get_traceback())
-            raise
+            # ~ self.log.warning(warning)
+            self.log.error(self.get_traceback())
+            # ~ raise
             return None
 
 

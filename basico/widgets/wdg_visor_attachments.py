@@ -320,7 +320,7 @@ class AttachmentsVisor(BasicoWidget, Gtk.VBox):
         count = len(self.visible_filter)
         lblnotescount.set_markup("<b>%d/<big>%d attachments</big></b>" % (count, total))
         msg = 'View populated with %d attachments' % count
-        self.srvuif.statusbar_msg(msg)
+        # ~ self.srvuif.statusbar_msg(msg)
 
 
     def get_visible_filter(self):
@@ -564,5 +564,5 @@ class AttachmentsVisor(BasicoWidget, Gtk.VBox):
             shutil.copy(source, target)
             msg = "Attachment downloaded to %s" % (target)
             self.log.debug(msg)
-            self.srvuif.statusbar_msg(msg)
+            # ~ self.srvuif.statusbar_msg(msg)
 

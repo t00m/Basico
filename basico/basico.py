@@ -16,6 +16,7 @@ import logging
 
 import selenium
 
+from gi.repository import GLib
 from gi.repository import GObject
 from basico.core.mod_env import APP, LPATH, GPATH, FILE
 from basico.core.mod_log import LogIntercepter, queue_log
@@ -208,6 +209,8 @@ class Basico(object):
         Start Basico
         """
         GUI = self.get_service('GUI')
+        # ~ self.srvclb = self.get_service('Callbacks')
+        # ~ GLib.timeout_add(500, self.srvclb.update_statusbar)
         GUI.run()
 
 

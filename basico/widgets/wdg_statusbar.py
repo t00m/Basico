@@ -10,6 +10,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
+from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import Pango
 
@@ -23,7 +24,6 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         Gtk.HBox.__init__(self)
         self.get_services()
         self.setup()
-        # ~ GLib.timeout_add(500, self.pooling)
 
 
     def setup(self):
@@ -44,17 +44,11 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         vbox.pack_start(viewport, True, False, 0)
         self.add(vbox)
 
-
     def get_services(self):
         self.srvgui = self.get_service("GUI")
 
-
-    def message(self, message):
-        def show(message):
-            self.statusbar.set_markup("<b>%s</b>" % message)
-        GLib.idle_add(show, message)
-
-
-    # ~ def pooling(self, *args):
-        # ~ self.log.debug(event_log[-1])
-        # ~ return False
+    def message(self, record):
+        # Display messages with priority INFO|WARNING|ERROR|CRITICAL
+        if record.levelno > 10:
+            message = record.getMessage()
+            self.statusbar.set_markup(message)

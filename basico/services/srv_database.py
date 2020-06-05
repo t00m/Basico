@@ -39,7 +39,6 @@ class Database(Service):
         self.__init_config_section()
         self.get_services()
         self.load_notes()
-        self.log.debug(type(self))
 
     def setup_signals(self):
         GObject.signal_new('database-add', Database, GObject.SignalFlags.RUN_LAST, None, () )

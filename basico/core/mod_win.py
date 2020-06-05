@@ -13,6 +13,7 @@ import stat
 import time
 import logging
 import platform
+import threading
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -250,7 +251,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
     def setup_widgets(self):
         # Statusbar
-        statusbar = self.srvgui.add_widget('widget_statusbar', Statusbar(self.controller))
+        self.statusbar = self.srvgui.add_widget('widget_statusbar', Statusbar(self.controller))
 
         # Mainbox
         mainbox = self.srvgui.add_widget('gtk_vbox_container_main', Gtk.VBox())
@@ -276,7 +277,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         mainbox.pack_start(paned, True, True, 0)
 
 
-        mainbox.pack_start(statusbar, False, False, 0)
+        mainbox.pack_start(self.statusbar, False, False, 0)
 
         # Connect signals for visor annotations
         # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
@@ -507,5 +508,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
         stack_visors.set_visible_child_name('visor-sapnotes')
         viewmenu.set_view('collection')
+
         # ~ self.srvclb.gui_viewmenu_select_first_entry()
+
+
 

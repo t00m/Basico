@@ -75,7 +75,9 @@ class UIFuncs(Service):
         msg = htimestamp + '\t-\t' + message
         if statusbar is not None:
             # Maybe the widget hasn't been created yet
+            # ~ Gdk.threads_enter()
             statusbar.message(msg)
+            # ~ Gdk.threads_leave()
         # ~ if important:
             # ~ self.srvntf.show(htimestamp, message)
 

@@ -627,9 +627,10 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
 
 
         if action == 'create':
-            self.srvuif.statusbar_msg("Creating new annotation")
+            # ~ self.srvuif.statusbar_msg("Creating new annotation")
+            pass
         elif action == 'edit' or action == 'preview':
-            self.srvuif.statusbar_msg("Creating/Editing new annotation for SAP Note %s" % str(int(sid)))
+            # ~ self.srvuif.statusbar_msg("Creating/Editing new annotation for SAP Note %s" % str(int(sid)))
             annotation = self.srvant.get_metadata_from_aid(aid)
             if annotation is not None:
                 ANNOTATION_FILE_CONTENT = LPATH['ANNOTATIONS'] + aid + '.adoc'

@@ -215,13 +215,13 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         try:
             int(self.sid)
             self.srvdtb.set_collections(self.sid, selected, self.overwrite)
-            self.srvuif.statusbar_msg("Selected collection linked to SAP Note %s" % str(int(self.sid)), True)
+            # ~ self.srvuif.statusbar_msg("Selected collection linked to SAP Note %s" % str(int(self.sid)), True)
         except:
             visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
             bag = visor_sapnotes.get_filtered_bag()
             for sid in bag:
                 self.srvdtb.set_collections(sid, selected, self.overwrite)
-            self.srvuif.statusbar_msg("Selected collections linked to all SAP Note in this view", True)
+            # ~ self.srvuif.statusbar_msg("Selected collections linked to all SAP Note in this view", True)
 
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.populate()
@@ -257,7 +257,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         if entry is not None and isinstance(entry, Gtk.Entry):
             name = entry.get_text()
             res, msg = self.srvclt.create(name)
-            self.srvuif.statusbar_msg(msg, True)
+            # ~ self.srvuif.statusbar_msg(msg, True)
 
         self.model.clear()
         collections = self.srvclt.get_all()
@@ -270,7 +270,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
                     self.model.append([cid, 0, name])
             self.current_cid = None
 
-        self.srvuif.statusbar_msg("Collections updated")
+        # ~ self.srvuif.statusbar_msg("Collections updated")
 
 
     def delete(self, button):
@@ -286,7 +286,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
             viewmenu.populate()
             msg = "Collection '%s' deleted" % name
             self.log.info(msg)
-            self.srvuif.statusbar_msg(msg, True)
+            # ~ self.srvuif.statusbar_msg(msg, True)
         else:
             if self.current_cid is not None:
                 title = "Collection '%s' not deleted" % name
@@ -338,7 +338,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         treeiter = model.get_iter(path)
         cid = model[treeiter][0]
         if cid == COL_DOWNLOADED:
-            self.srvuif.statusbar_msg("You can't rename this collection")
+            # ~ self.srvuif.statusbar_msg("You can't rename this collection")
             return
 
         name_old = self.srvclt.get_name_by_cid(cid)
@@ -350,4 +350,4 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
                 self.update()
                 msg = "Collection '%s' renamed to '%s'" % (name_old, target)
                 self.log.info(msg)
-                self.srvuif.statusbar_msg(msg)
+                # ~ self.srvuif.statusbar_msg(msg)

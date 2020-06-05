@@ -456,7 +456,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         count = len(visible_filter)
         lblnotescount.set_markup("<b>%d/<big>%d</big></b>" % (count, total))
         msg = 'View populated with %d SAP Notes' % count
-        self.srvuif.statusbar_msg(msg)
+        # ~ self.srvuif.statusbar_msg(msg)
 
 
     def row_changed(self, selection):

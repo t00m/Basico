@@ -224,10 +224,10 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
         title = self.srvgui.get_widget('gtk_label_annotation_sid')
         if sid == '0000000000':
             title.set_markup('<big><b>Annotation</b></big>')
-            self.srvuif.statusbar_msg("Creating new annotation")
+            # ~ self.srvuif.statusbar_msg("Creating new annotation")
         else:
             title.set_markup('<big><b>Annotation for SAP Note %s</b></big>' % str(int(sid)))
-            self.srvuif.statusbar_msg("Creating/Editing new annotation for SAP Note %s" % str(int(sid)))
+            # ~ self.srvuif.statusbar_msg("Creating/Editing new annotation for SAP Note %s" % str(int(sid)))
 
         if action == 'create':
             pass

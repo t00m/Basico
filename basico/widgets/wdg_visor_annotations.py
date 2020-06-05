@@ -619,7 +619,7 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
         selected = len(self.rows_toggled())
         lblnotescount.set_markup("<b><small>%d</small>/%d/<big>%d</big></b>" % (selected, count, total))
         msg = 'View populated with %d annotations' % count
-        self.srvuif.statusbar_msg(msg)
+        # ~ self.srvuif.statusbar_msg(msg)
 
 
     def get_visible_filter(self):

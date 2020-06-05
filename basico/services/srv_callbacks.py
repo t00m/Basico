@@ -12,6 +12,7 @@ import json
 import time
 # ~ from threading import Thread
 from concurrent.futures import ThreadPoolExecutor as Executor
+import threading
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -21,6 +22,7 @@ from gi.repository import Gdk
 from gi.repository import GObject
 
 from basico.core.mod_srv import Service
+from basico.core.mod_log import event_log, queue_log
 from basico.core.mod_env import FILE, LPATH, ATYPES, APP
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.widgets.wdg_settingsview import SettingsView
@@ -48,6 +50,8 @@ class Callback(Service):
         # ~ self.srvatc = self.get_service('Attachment')
         self.srvweb = self.get_service('Driver')
         self.srvweb.connect('download-profile-missing', self.download_webdriver_setup)
+
+
 
     def gui_visor_sapnotes_update(self, obj):
         # Database updated
@@ -123,13 +127,13 @@ class Callback(Service):
             ebuffer.delete_text(0, -1)
             msg = "Found %d SAP Notes for term '%s'" % (len(bag), term)
             self.log.info(msg)
-            self.srvuif.statusbar_msg(msg)
+            # ~ self.srvuif.statusbar_msg(msg)
         elif stack_visor == 'visor-annotations':
             annotations = self.srvant.search_term(term)
             visor_annotations.populate(annotations)
             msg = "Found %d annotations for term '%s'" % (len(annotations), term)
             self.log.info(msg)
-            self.srvuif.statusbar_msg(msg)
+            # ~ self.srvuif.statusbar_msg(msg)
 
 
 
@@ -155,7 +159,7 @@ class Callback(Service):
         answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', [sid])
         if answer is True:
             self.srvdtb.delete(sid)
-            self.srvuif.statusbar_msg("SAP Note %s deleted" % sid, True)
+            # ~ self.srvuif.statusbar_msg("SAP Note %s deleted" % sid, True)
             visor_sapnotes.reload()
         else:
             self.log.info("SAP Note %s not deleted", sid)
@@ -173,11 +177,11 @@ class Callback(Service):
             visor_sapnotes.populate()
             msg = "Deleted %d SAP Notes" % len(bag)
             self.log.info(msg)
-            self.srvuif.statusbar_msg(msg, True)
+            # ~ self.srvuif.statusbar_msg(msg, True)
         else:
             msg = "None of the %d SAP Notes has been deleted" % len(bag)
             self.log.info(msg)
-            self.srvuif.statusbar_msg(msg, True)
+            # ~ self.srvuif.statusbar_msg(msg, True)
         # ~ visor_sapnotes.reload()
         # ~ viewmenu.populate()
 
@@ -346,7 +350,7 @@ class Callback(Service):
             self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
         else:
             self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        self.srvuif.statusbar_msg("Displaying application dashboard")
+        # ~ self.srvuif.statusbar_msg("Displaying application dashboard")
 
 
     def gui_toggle_help_visor(self, *args):
@@ -359,7 +363,7 @@ class Callback(Service):
         else:
             self.srvuif.set_widget_visibility('gtk_notebook_help_page', False)
             notebook.set_current_page(0)
-        self.srvuif.statusbar_msg("Displaying application help")
+        # ~ self.srvuif.statusbar_msg("Displaying application help")
 
 
     def gui_lauch_help_visor(self, *args):
@@ -425,7 +429,7 @@ class Callback(Service):
         visor_sapnotes.populate(bag)
         msg = "%d SAP Notes (un)bookmarked" % len(bag)
         self.log.info(msg)
-        self.srvuif.statusbar_msg(msg, True)
+        # ~ self.srvuif.statusbar_msg(msg, True)
 
 
     def switch_bookmark(self, button, lsid, popover):
@@ -436,10 +440,10 @@ class Callback(Service):
                 bookmark = metadata['bookmark']
                 if bookmark:
                     self.sapnote_unbookmark([sid])
-                    self.srvuif.statusbar_msg("SAP Notes unbookmarked")
+                    # ~ self.srvuif.statusbar_msg("SAP Notes unbookmarked")
                 else:
                     self.sapnote_bookmark([sid])
-                    self.srvuif.statusbar_msg("SAP Notes bookmarked")
+                    # ~ self.srvuif.statusbar_msg("SAP Notes bookmarked")
             popover.hide()
         except:
             self.log.error("Could not bookmark SAP Note %s" % sid)
@@ -649,10 +653,10 @@ class Callback(Service):
             for aid in aids:
                 self.srvant.delete(aid)
             visor_annotations.populate()
-            self.srvuif.statusbar_msg("Annotations deleted", True)
+            # ~ self.srvuif.statusbar_msg("Annotations deleted", True)
         else:
             self.log.info("Annotations hasn't been deleted")
-            self.srvuif.statusbar_msg("Action canceled. Nothing deleted.", True)
+            # ~ self.srvuif.statusbar_msg("Action canceled. Nothing deleted.", True)
 
         self.srvuif.grab_focus()
 
@@ -671,11 +675,11 @@ class Callback(Service):
         if self.srvant.is_valid(aid):
             self.srvant.update(annotation)
             title = self.srvant.get_title(aid)
-            self.srvuif.statusbar_msg("Updated annotation: %s" % title, True)
+            # ~ self.srvuif.statusbar_msg("Updated annotation: %s" % title, True)
         else:
             self.srvant.create(annotation)
             title = self.srvant.get_title(aid)
-            self.srvuif.statusbar_msg('New annotation created: %s' % title, True)
+            # ~ self.srvuif.statusbar_msg('New annotation created: %s' % title, True)
         visor_annotations.populate()
         visor_sapnotes.populate()
         widget_annotation.clear()
@@ -691,7 +695,7 @@ class Callback(Service):
         if self.srvant.is_valid(aid):
             self.srvant.update(annotation)
             title = self.srvant.get_title(aid)
-            self.srvuif.statusbar_msg("Updated annotation: %s" % title, True)
+            # ~ self.srvuif.statusbar_msg("Updated annotation: %s" % title, True)
 
 
     def action_annotation_cancel(self, *args):
@@ -706,7 +710,7 @@ class Callback(Service):
         # ~ notebook = self.srvgui.get_widget('gtk_notebook_visor')
         # ~ notebook.set_current_page(page)
         # ~ self.log.debug('Annotation canceled')
-        self.srvuif.statusbar_msg("Annotation canceled")
+        # ~ self.srvuif.statusbar_msg("Annotation canceled")
         self.gui_stack_dashboard_show()
         self.srvuif.grab_focus()
 
@@ -748,11 +752,11 @@ class Callback(Service):
             export_path = dialog.get_filename()
             res = self.srvbnr.export_to_text_csv(bag, export_path)
             self.log.info("%d SAP Notes exported to CSV format: %s", len(bag), export_path)
-            self.srvuif.statusbar_msg("%d SAP Notes exported to CSV format: %s" % (len(bag), export_path), True)
+            # ~ self.srvuif.statusbar_msg("%d SAP Notes exported to CSV format: %s" % (len(bag), export_path), True)
             self.srvuif.copy_text_to_clipboard(export_path)
         else:
             self.log.info("Export canceled by user")
-            self.srvuif.statusbar_msg("Export canceled by user", True)
+            # ~ self.srvuif.statusbar_msg("Export canceled by user", True)
         dialog.destroy()
 
 
@@ -777,13 +781,13 @@ class Callback(Service):
             res = self.srvbnr.export_to_excel(bag, export_path)
             if res:
                 self.log.info("Selected SAP Notes exported to MS Excel format (xlsx): %s" % export_path)
-                self.srvuif.statusbar_msg("%d SAP Notes exported to MS Excel format: %s" % (len(bag), export_path), True)
+                # ~ self.srvuif.statusbar_msg("%d SAP Notes exported to MS Excel format: %s" % (len(bag), export_path), True)
                 self.srvuif.copy_text_to_clipboard(export_path)
             else:
                 self.log.error(self.get_traceback())
         else:
             self.log.info("Export canceled by user")
-            self.srvuif.statusbar_msg("Export canceled by user", True)
+            # ~ self.srvuif.statusbar_msg("Export canceled by user", True)
         dialog.destroy()
 
 
@@ -807,11 +811,11 @@ class Callback(Service):
             export_path = dialog.get_filename()
             target = self.srvbnr.export_to_basico(bag, export_path)
             self.log.info("%d SAP Notes exported to Basico %s format: %s", len(bag), APP['version'], target)
-            self.srvuif.statusbar_msg("%d SAP Notes exported to Basico %s format: %s" % (len(bag), APP['version'], target), True)
+            # ~ self.srvuif.statusbar_msg("%d SAP Notes exported to Basico %s format: %s" % (len(bag), APP['version'], target), True)
             self.srvuif.copy_text_to_clipboard(export_path)
         else:
             self.log.info("Export canceled by user")
-            self.srvuif.statusbar_msg("Export canceled by user", True)
+            # ~ self.srvuif.statusbar_msg("Export canceled by user", True)
         dialog.destroy()
 
 
@@ -829,7 +833,7 @@ class Callback(Service):
         msg = "%d SAP Notes copied to the clipboard: %s" % (len(bag), ', '.join(list(bag)))
         self.log.info(msg)
         msg = "%d SAP Notes copied to the clipboard" % len(bag)
-        self.srvuif.statusbar_msg(msg, True)
+        # ~ self.srvuif.statusbar_msg(msg, True)
 
 
     def gui_annotation_previous_row(self, *args):
@@ -861,7 +865,7 @@ class Callback(Service):
         self.srvuif.grab_focus()
         msg = "Jumping to SAP Note %s" % sid
         self.log.info(msg)
-        self.srvuif.statusbar_msg(msg)
+        # ~ self.srvuif.statusbar_msg(msg)
 
 
     def gui_jump_to_annotation(self, widget, aid):
@@ -877,7 +881,7 @@ class Callback(Service):
         self.srvuif.grab_focus()
         msg = "Jumping to annotation %s" % aid
         self.log.info(msg)
-        self.srvuif.statusbar_msg(msg)
+        # ~ self.srvuif.statusbar_msg(msg)
         GObject.signal_handler_unblock(notebook, signal)
         paned.set_position(400)
 
@@ -1056,3 +1060,13 @@ class Callback(Service):
     def copy_text_to_clipboard(self, widget, text):
         self.srvuif.copy_text_to_clipboard(text)
         self.srvuif.grab_focus()
+
+    def update_statusbar(self, *args):
+        statusbar = self.srvgui.get_widget('widget_statusbar')
+        alive = statusbar is not None
+        while alive:
+            record = queue_log.get()
+            time.sleep(0.2)
+            statusbar.message(record)
+            queue_log.task_done()
+        time.sleep(0.5)
