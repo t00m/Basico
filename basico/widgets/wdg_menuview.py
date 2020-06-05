@@ -302,12 +302,12 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
         popcollections.set_position(Gtk.PositionType.RIGHT)
         popcollections.add(CollectionsMgtView(self.app, '0000000000'))
-        self.srvclb.gui_show_popover(None, popcollections)
+        self.srvuif.popover_show(None, popcollections)
 
 
     def show_popover_export_collections(self, *args):
         popexport = self.srvgui.get_widget('gtk_popover_menuview_export')
-        self.srvclb.gui_show_popover(None, popexport)
+        self.srvuif.popover_show(None, popexport)
 
 
     def build_popover_export(self, colname):
@@ -400,7 +400,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         box.pack_start(button, False, False, 0)
         self.popviewtocat = self.srvgui.add_widget('gtk_popover_button_assign_view_to_category', Gtk.Popover.new(button))
         self.popviewtocat.set_position(Gtk.PositionType.RIGHT)
-        button.connect('clicked', self.srvclb.gui_show_popover, self.popviewtocat)
+        button.connect('clicked', self.srvuif.popover_show, self.popviewtocat)
         colmgt = CollectionsMgtView(self.app, 'view', overwrite=False)
         self.popviewtocat.add(colmgt)
 
@@ -442,7 +442,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 popover.set_position(Gtk.PositionType.RIGHT)
                 popover.set_pointing_to(rect)
                 popover.add(self.build_popover(colid, coltitle))
-                self.srvclb.gui_show_popover(None, popover)
+                self.srvuif.popover_show(None, popover)
 
 
     def set_view(self, view=None):

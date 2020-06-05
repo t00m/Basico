@@ -50,108 +50,17 @@ class Callback(Service):
         about = self.srvgui.get_widget('widget_about')
         about.display()
 
-    def gui_show_log(self, *args):
-        return
-        # ~ logviewer = self.srvgui.get_widget('widget_logviewer')
-        # ~ stack = self.srvgui.get_widget('gtk_stack_main')
+    def display_log(self, *args):
         # ~ logviewer.update()
-        # ~ self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        # ~ stack.set_visible_child_name('log')
-        # ~ #self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
-        # ~ self.srvuif.statusbar_msg("Displaying application log")
-        # ~ self.srvuif.grab_focus()
+        return
 
-
-    # ~ def gui_show_settings(self, button):
-        # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
-        # ~ stack = self.srvgui.get_widget('gtk_stack_main')
+    def display_settings(self, *args):
         # ~ view_settings = self.srvgui.get_widget('widget_settings')
-        # ~ stack.set_visible_child_name('settings')
         # ~ view_settings.update()
-        # ~ self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
-        # ~ # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
-        # ~ notebook_menuview.hide()
-        # ~ view_settings.grab_focus()
-        # ~ self.srvuif.statusbar_msg("Displaying application settings")
+        return
 
-
-    def gui_stack_dashboard_show(self, *args):
-        stack = self.srvgui.get_widget('gtk_stack_main')
-        # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        current_view = viewmenu.get_view()
-
-        # ~ notebook_menuview.show_all()
-        stack.set_visible_child_name('dashboard')
-        self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
-
-        if current_view == 'annotation':
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        else:
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        # ~ self.srvuif.statusbar_msg("Displaying application dashboard")
-
-
-    def gui_toggle_help_visor(self, *args):
-        button = self.srvgui.get_widget('gtk_togglebutton_help')
-        notebook = self.srvgui.get_widget('gtk_notebook_visor')
-
-        if button.get_active():
-            self.srvuif.set_widget_visibility('gtk_notebook_help_page', True)
-            notebook.set_current_page(2)
-        else:
-            self.srvuif.set_widget_visibility('gtk_notebook_help_page', False)
-            notebook.set_current_page(0)
-        # ~ self.srvuif.statusbar_msg("Displaying application help")
-
-
-    def gui_lauch_help_visor(self, *args):
-        self.srvutl.browse("file://%s" % FILE['HELP_INDEX'])
-
-
-    def gui_annotation_widget_show(self, aid, action='create'):
-        notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
-        widget_annotation = self.srvgui.get_widget('widget_annotation')
-        stack_main = self.srvgui.get_widget('gtk_stack_main')
-        widget = self.srvgui.get_widget('gtk_label_timestamp_created')
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-
-        stack_visors.set_visible_child_name("visor-annotations")
-        notebook.set_current_page(1)
-        self.srvuif.set_widget_visibility('visortoolbar', False)
-
-        if action == 'create':
-            widget_annotation.clear()
-            if aid == '':
-                aid = self.srvant.gen_aid()
-            else:
-                sid = aid
-                aid = self.srvant.gen_aid(sid)
-            widget_annotation.set_visible_stack('editor')
-        elif action == 'edit':
-            widget_annotation.set_visible_stack('editor')
-        elif action == 'preview':
-            widget_annotation.set_visible_stack('preview')
-
-        self.log.debug("Action: %s annotation with Id: %s", action, aid)
-
-        widget_annotation.set_metadata_to_widget(aid, action)
-        # ~ stack_main.set_visible_child_name('annotations')
-
-        self.srvuif.grab_focus()
-
-
-    def gui_show_popover(self, button, popover):
-        self.srvgui.set_key_value('LAST_POPOVER', popover)
-        if popover.get_visible():
-            popover.popdown()
-            popover.hide()
-        else:
-            popover.show_all()
-            popover.popup()
-
+    def display_help(self, *args):
+        return
 
     def switch_bookmark_current_view(self, *args):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')

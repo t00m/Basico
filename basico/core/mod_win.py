@@ -138,7 +138,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
             # ~ image.set_from_pixbuf(icon)
             # ~ button.set_image(image)
             # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-            # ~ button.connect('clicked', self.srvclb.gui_lauch_help_visor)
+            # ~ button.connect('clicked', self.srvclb.display_help)
 
         # ~ rhbox.pack_end(button, False, False, 0)
 
@@ -151,7 +151,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.set_relief(Gtk.ReliefStyle.NONE)
         popover = Gtk.Popover.new(button)
         self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
-        button.connect('clicked', self.srvclb.gui_show_popover, popover)
+        button.connect('clicked', self.srvuif.popover_show, popover)
         rhbox.pack_end(button, False, False, 0)
 
         # Popover body
@@ -173,18 +173,18 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         box.pack_end(button, False, False, 0)
 
         # ~ ### Help
-        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        # ~ icon = self.srvicm.get_pixbuf_icon('basico-help', 48, 48)
-        # ~ image = Gtk.Image()
-        # ~ image.set_from_pixbuf(icon)
-        # ~ label = Gtk.Label("Help")
-        # ~ hbox.pack_start(image, False, False, 3)
-        # ~ hbox.pack_start(label, False, False, 3)
-        # ~ button = Gtk.Button()
-        # ~ button.add(hbox)
-        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ button.connect('clicked', self.srvclb.gui_show_help)
-        # ~ box.pack_end(button, False, False, 0)
+        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        icon = self.srvicm.get_pixbuf_icon('basico-help', 48, 48)
+        image = Gtk.Image()
+        image.set_from_pixbuf(icon)
+        label = Gtk.Label("Help")
+        hbox.pack_start(image, False, False, 3)
+        hbox.pack_start(label, False, False, 3)
+        button = Gtk.Button()
+        button.add(hbox)
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        button.connect('clicked', self.srvclb.display_help)
+        box.pack_end(button, False, False, 0)
 
         ### Log viewer
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
@@ -197,22 +197,22 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.gui_show_log)
+        button.connect('clicked', self.srvclb.display_log)
         box.pack_end(button, False, False, 0)
 
         ### Settings
-        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        # ~ icon = self.srvicm.get_pixbuf_icon('basico-settings', 48, 48)
-        # ~ image = Gtk.Image()
-        # ~ image.set_from_pixbuf(icon)
-        # ~ label = Gtk.Label("Settings")
-        # ~ hbox.pack_start(image, False, False, 3)
-        # ~ hbox.pack_start(label, False, False, 3)
-        # ~ button = Gtk.Button()
-        # ~ button.add(hbox)
-        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ button.connect('clicked', self.srvclb.gui_show_settings)
-        # ~ box.pack_start(button, False, False, 0)
+        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        icon = self.srvicm.get_pixbuf_icon('basico-settings', 48, 48)
+        image = Gtk.Image()
+        image.set_from_pixbuf(icon)
+        label = Gtk.Label("Settings")
+        hbox.pack_start(image, False, False, 3)
+        hbox.pack_start(label, False, False, 3)
+        button = Gtk.Button()
+        button.add(hbox)
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        button.connect('clicked', self.srvclb.display_settings)
+        box.pack_start(button, False, False, 0)
 
         ### Backup
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
@@ -232,7 +232,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         popover_bnr.set_position(Gtk.PositionType.LEFT)
         popover_bnr.add(box_bnr)
         self.srvgui.add_widget('gtk_popover_button_menu_system', popover_bnr)
-        button.connect('clicked', self.srvclb.gui_show_popover, popover_bnr)
+        button.connect('clicked', self.srvuif.popover_show, popover_bnr)
 
         hbox_backup = Gtk.VBox()
         button_backup = self.srvuif.create_button('basico-backup', 48, 48, '<b>Backup database</b> ')
@@ -530,3 +530,31 @@ class GtkAppWindow(Gtk.ApplicationWindow):
             visor_attachments = self.srvgui.get_widget('visor_attachments')
             visor_attachments.populate()
 
+    def gui_stack_dashboard_show(self, *args):
+        stack = self.srvgui.get_widget('gtk_stack_main')
+        # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
+        viewmenu = self.srvgui.get_widget('viewmenu')
+        current_view = viewmenu.get_view()
+
+        # ~ notebook_menuview.show_all()
+        stack.set_visible_child_name('dashboard')
+        self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
+
+        if current_view == 'annotation':
+            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
+        else:
+            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
+        # ~ self.srvuif.statusbar_msg("Displaying application dashboard")
+
+    def gui_toggle_help_visor(self, *args):
+        button = self.srvgui.get_widget('gtk_togglebutton_help')
+        notebook = self.srvgui.get_widget('gtk_notebook_visor')
+
+        if button.get_active():
+            self.srvuif.set_widget_visibility('gtk_notebook_help_page', True)
+            notebook.set_current_page(2)
+        else:
+            self.srvuif.set_widget_visibility('gtk_notebook_help_page', False)
+            notebook.set_current_page(0)
+        # ~ self.srvuif.statusbar_msg("Displaying application help")

@@ -560,5 +560,14 @@ class UIFuncs(Service):
 
         return box
 
+    def popover_show(self, button, popover):
+        self.srvgui.set_key_value('LAST_POPOVER', popover)
+        if popover.get_visible():
+            popover.popdown()
+            popover.hide()
+        else:
+            popover.show_all()
+            popover.popup()
+
     def popover_hide(self, popover):
         popover.hide()

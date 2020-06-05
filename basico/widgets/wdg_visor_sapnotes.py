@@ -115,7 +115,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
         ### Popover menuviews
         popover = self.srvgui.add_widget('gtk_popover_button_menu_views', Gtk.Popover.new(menuviews))
-        menuviews.connect('clicked', self.srvclb.gui_show_popover, popover)
+        menuviews.connect('clicked', self.srvuif.popover_show, popover)
         box_views = Gtk.Box(spacing = 0, orientation="vertical")
         popover.add(box_views)
 
@@ -668,7 +668,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                 popover.set_pointing_to(rect)
                 box = self.build_popover(sid, popover, component)
                 popover.add(box)
-                self.srvclb.gui_show_popover(None, popover)
+                self.srvuif.popover_show(None, popover)
 
 
     # ~ def clb_create_annotation(self, button, sid):
@@ -772,7 +772,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             box.pack_start(button, False, False, 0)
             self.popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
             self.popcollections.set_position(Gtk.PositionType.RIGHT)
-            button.connect('clicked', self.srvclb.gui_show_popover, self.popcollections)
+            button.connect('clicked', self.srvuif.popover_show, self.popcollections)
             colmgt = CollectionsMgtView(self.app, sid, overwrite=True)
             self.popcollections.add(colmgt)
 

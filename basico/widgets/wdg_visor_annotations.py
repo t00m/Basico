@@ -904,7 +904,7 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
                     visor_annotations = self.srvgui.get_widget('visor_annotations')
                     width, height = visor_annotations.get_size_request()
                     popover.add(box)
-                    self.srvclb.gui_show_popover(None, popover)
+                    self.srvuif.popover_show(None, popover)
 
 
 
@@ -1115,3 +1115,34 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
             button = self.srvgui.get_widget('gtk_button_type_%s' % name.lower())
             button.set_state(switched)
             button.set_active(switched)
+
+    def gui_annotation_widget_show(self, aid, action='create'):
+        notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
+        widget_annotation = self.srvgui.get_widget('widget_annotation')
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        widget = self.srvgui.get_widget('gtk_label_timestamp_created')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+
+        stack_visors.set_visible_child_name("visor-annotations")
+        notebook.set_current_page(1)
+        self.srvuif.set_widget_visibility('visortoolbar', False)
+
+        if action == 'create':
+            widget_annotation.clear()
+            if aid == '':
+                aid = self.srvant.gen_aid()
+            else:
+                sid = aid
+                aid = self.srvant.gen_aid(sid)
+            widget_annotation.set_visible_stack('editor')
+        elif action == 'edit':
+            widget_annotation.set_visible_stack('editor')
+        elif action == 'preview':
+            widget_annotation.set_visible_stack('preview')
+
+        self.log.debug("Action: %s annotation with Id: %s", action, aid)
+
+        widget_annotation.set_metadata_to_widget(aid, action)
+        # ~ stack_main.set_visible_child_name('annotations')
+
+        self.srvuif.grab_focus()

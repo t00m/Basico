@@ -34,7 +34,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         # ~ tool.set_icon_name('basico-add')
         # ~ tool.set_tooltip_markup('<b>Download or find SAP Notes (if they were already downloaded)</b>')
         # ~ popover = self.srvgui.add_widget('gtk_popover_toolbutton_import', Gtk.Popover.new(tool))
-        # ~ tool.connect('clicked', self.srvclb.gui_show_popover, popover)
+        # ~ tool.connect('clicked', self.srvuif.popover_show, popover)
         # ~ self.toolbar.insert(tool, -1)
 
         # ~ ## Popover body
@@ -156,7 +156,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         tool.set_icon_name('basico-add')
         tool.set_tooltip_markup('<b>Add new SAP Notes, annotations or attachments</b>')
         popover = self.srvgui.add_widget('gtk_popover_toolbutton_add', Gtk.Popover.new(tool))
-        tool.connect('clicked', self.srvclb.gui_show_popover, popover)
+        tool.connect('clicked', self.srvuif.popover_show, popover)
         self.toolbar.insert(tool, -1)
 
         ## Popover body
@@ -179,7 +179,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         box.pack_start(button, False, False, 3)
         popoversn = self.srvgui.add_widget('gtk_popover_button_import_notes', Gtk.Popover.new(button))
         popoversn.set_position(Gtk.PositionType.LEFT)
-        button.connect('clicked', self.srvclb.gui_show_popover, popoversn)
+        button.connect('clicked', self.srvuif.popover_show, popoversn)
 
         boxsn = Gtk.VBox(spacing = 0, orientation="vertical")
         boxsn.set_property('margin', 3)
@@ -203,7 +203,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
 
         popoveran = self.srvgui.add_widget('gtk_popover_button_create_annotation', Gtk.Popover.new(button))
         popoveran.set_position(Gtk.PositionType.LEFT)
-        button.connect('clicked', self.srvclb.gui_show_popover, popoveran)
+        button.connect('clicked', self.srvuif.popover_show, popoveran)
 
         boxan = Gtk.VBox(spacing = 0, orientation="vertical")
         boxan.set_property('margin', 3)

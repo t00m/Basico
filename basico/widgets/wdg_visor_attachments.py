@@ -469,7 +469,7 @@ class AttachmentsVisor(BasicoWidget, Gtk.VBox):
                 box = self.build_popover(tid, popover)
                 if box is not None:
                     popover.add(box)
-                    self.srvclb.gui_show_popover(None, popover)
+                    self.srvuif.popover_show(None, popover)
 
 
     def build_popover(self, tid, popover):
