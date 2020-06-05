@@ -782,8 +782,9 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
 
             # Popover button "Delete SAP Note"
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
             button = get_popover_button("<b>Delete</b> SAP Note %d" % isid, 'basico-delete')
-            button.connect('clicked', self.srvclb.database_sapnote_delete, sid)
+            button.connect('clicked', visor_sapnotes.delete, [sid])
             button.set_tooltip_text("Checkbox must be activated in order to trigger the deletion")
             box.pack_start(button, False, False, 0)
 
@@ -814,3 +815,17 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
         visible_filter.refilter()
         self.update_total_sapnotes_count()
+
+    def delete(self, *args):
+        try:
+            bag = args[1]
+        except:
+            bag = self.get_filtered_bag()
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        # ~ viewmenu = self.srvgui.get_widget('viewmenu')
+        answer = self.srvuif.warning_message_delete_sapnotes(None, 'Deleting SAP Notes', 'Are you sure?', bag)
+        if answer is True:
+            self.srvdtb.delete(bag)
+            self.log.info("Deleted %d SAP Notes", len(bag))
+        else:
+            self.log.info("Action canceled by user. Nothing deleted!")

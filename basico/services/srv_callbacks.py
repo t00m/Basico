@@ -47,54 +47,6 @@ class Callback(Service):
         self.srvweb = self.get_service('Driver')
 
 
-    def driver_sapnote_browse(self, button, sid):
-        self.log.info("Browsing SAP Note %d" % int(sid))
-        SAP_NOTE_URL = self.srvstg.get('SAP', 'SAP_NOTE_URL')
-        url = SAP_NOTE_URL % sid
-        self.srvuif.grab_focus()
-        self.srvweb.browse(url)
-
-
-    def driver_sapnote_download_pdf(self, button, sid):
-        self.log.info("Browsing PDF for SAP Note %d" % int(sid))
-        SAP_NOTE_URL_PDF = self.srvstg.get('SAP', 'SAP_NOTE_URL_PDF')
-        url = SAP_NOTE_URL_PDF % sid
-        self.srvutl.browse(url)
-
-
-    def database_sapnote_delete(self, button, sid):
-        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        viewmenu = self.srvgui.get_widget('viewmenu')
-
-        answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', [sid])
-        if answer is True:
-            self.srvdtb.delete([sid])
-            # ~ self.srvuif.statusbar_msg("SAP Note %s deleted" % sid, True)
-            visor_sapnotes.reload()
-        else:
-            self.log.info("SAP Note %s not deleted", sid)
-
-
-    def database_sapnote_delete_view(self, button):
-        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        viewmenu = self.srvgui.get_widget('viewmenu')
-
-        bag = visor_sapnotes.get_filtered_bag()
-        answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', bag)
-        if answer is True:
-            self.srvdtb.delete(bag)
-            # ~ visor_sapnotes.populate()
-            msg = "Deleted %d SAP Notes" % len(bag)
-            self.log.info(msg)
-            # ~ self.srvuif.statusbar_msg(msg, True)
-        else:
-            msg = "None of the %d SAP Notes has been deleted" % len(bag)
-            self.log.info(msg)
-            # ~ self.srvuif.statusbar_msg(msg, True)
-        # ~ visor_sapnotes.reload()
-        # ~ viewmenu.populate()
-
-
     def gui_popover_hide(self, popover):
         popover.hide()
 

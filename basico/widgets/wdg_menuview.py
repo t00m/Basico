@@ -410,8 +410,9 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         box.pack_start(button, False, False, 0)
 
         # Popover button "Delete all SAP Notes in this view"
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         button = get_popover_button("<b>Delete</b> %d SAP Notes in this view" % count, 'basico-delete')
-        button.connect('clicked', self.srvclb.database_sapnote_delete_view)
+        button.connect('clicked', visor_sapnotes.delete)
         box.pack_start(button, False, False, 0)
 
         return box
