@@ -184,6 +184,7 @@ def main():
               'openpyxl',
               'rdflib',
               'webdriver_manager',
+              'psutil'
         ],
         include_package_data=True,
         data_files=data_files,

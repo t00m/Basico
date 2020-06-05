@@ -19,11 +19,12 @@ import time
 import uuid
 
 from gi.repository import GObject
+
+import psutil
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as SeleniumService
 from selenium.webdriver.firefox.options import Options
-
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -48,6 +49,7 @@ class DriverStatus(IntEnum):
 
 class DownloadManager(Service):
     th = None
+    gdm = None
     queue = queue.Queue()
     requests = {}
     retry = 0
@@ -57,10 +59,21 @@ class DownloadManager(Service):
     def initialize(self):
         GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        self.kill_gecko_processes()
+        self.gdm = GeckoDriverManager(log_level=logging.ERROR)
+        self.gecko_downloader = SeleniumService(executable_path=self.gdm.install())
         self.th = threading.Thread(name='download', target=self.download)
         self.th.setDaemon(True)
         self.th.start()
         self.log.debug("Basico Download Manager started")
+
+    def kill_gecko_processes(self):
+        np = 0
+        for proc in psutil.process_iter():
+            if proc.name() == 'geckodriver':
+                np += 1
+                proc.kill()
+        self.log.debug("Killed %d geckodriver instances", np)
 
     def check_profile(self, rid):
         files = glob.glob(os.path.join(LPATH['FIREFOX_PROFILE'], '*'))
@@ -139,9 +152,7 @@ class DownloadManager(Service):
                     options.headless = True
                     # ~ 'security.default_personal_cert'
                     # ~ self.log.debug(options.preferences)
-                    GDM = GeckoDriverManager(log_level=logging.ERROR)
-                    gecko = SeleniumService(executable_path=GDM.install())
-                    driver = webdriver.Firefox(options=options, service=gecko)
+                    driver = webdriver.Firefox(options=options, service=self.gecko_downloader)
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.__set_driver(driver)
                     self.log.debug("[%s] Webdriver instance created and ready", rid)
@@ -180,12 +191,16 @@ class DownloadManager(Service):
         try:
             self.browser.get(url)
         except:
+            #selenium.common.exceptions.WebDriverException
+            self.kill_gecko_processes()
+            self.gecko_browser = SeleniumService(executable_path=self.gdm.install())
             options = Options()
             options.profile = LPATH['FIREFOX_PROFILE']
             options.headless = False
-            gecko = SeleniumService(executable_path=self.gdm.install())
-            self.browser = webdriver.Firefox(options=options, service=gecko)
+            self.browser = webdriver.Firefox(options=options, service=self.gecko_browser)
             self.browser.get(url)
+
+
         self.log.debug("Browsing %s", url)
 
     def end(self):
