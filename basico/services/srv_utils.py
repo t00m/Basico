@@ -17,7 +17,7 @@ import subprocess
 import tarfile
 import zipfile
 import shutil
-import requests
+# ~ import requests
 import webbrowser
 import feedparser
 from datetime import datetime
@@ -303,21 +303,21 @@ class Utils(Service):
         self.log.debug("Gecko driver installed to %s" % GECKO_INSTALL_DIR)
 
 
-    def download(self, prgname, source, target):
-        """
-        Missing method docstring (missing-docstring)
-        """
-        try:
-            self.log.debug("Downloading %s from: %s" % (prgname, source))
-            response = requests.get(source, stream=True)
-            with open(target, 'wb') as out_file:
-                shutil.copyfileobj(response.raw, out_file)
-            del response
-            self.log.debug("%s downloaded to %s" % (prgname, target))
-            return True
-        except Exception as error:
-            self.log.error(error)
-            return False
+    # ~ def download(self, prgname, source, target):
+        # ~ """
+        # ~ Missing method docstring (missing-docstring)
+        # ~ """
+        # ~ try:
+            # ~ self.log.debug("Downloading %s from: %s" % (prgname, source))
+            # ~ response = requests.get(source, stream=True)
+            # ~ with open(target, 'wb') as out_file:
+                # ~ shutil.copyfileobj(response.raw, out_file)
+            # ~ del response
+            # ~ self.log.debug("%s downloaded to %s" % (prgname, target))
+            # ~ return True
+        # ~ except Exception as error:
+            # ~ self.log.error(error)
+            # ~ return False
 
 
     def extract(self, filename, target_path, protocol):

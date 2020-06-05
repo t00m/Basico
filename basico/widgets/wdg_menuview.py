@@ -323,10 +323,10 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         box.pack_start(button, False, False, 0)
 
         # Popover button "export to Excel"
-        button = get_popover_button("Export to <b>Excel</b>", 'basico-backup-ms-excel')
-        self.srvgui.add_widget("gtk_button_popover_manage_collections", button)
-        button.connect('clicked', self.srvclb.action_collection_export_excel)
-        box.pack_start(button, False, False, 0)
+        # ~ button = get_popover_button("Export to <b>Excel</b>", 'basico-backup-ms-excel')
+        # ~ self.srvgui.add_widget("gtk_button_popover_manage_collections", button)
+        # ~ button.connect('clicked', self.srvclb.action_collection_export_excel)
+        # ~ box.pack_start(button, False, False, 0)
 
         # Popover button "export to Basico format"
         button = get_popover_button("Export to <b>Basico format</b>", 'basico-component')

@@ -16,8 +16,8 @@ import glob
 import shutil
 from datetime import datetime
 from tempfile import TemporaryDirectory
-from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Font, Border, Side
+# ~ from openpyxl import Workbook
+# ~ from openpyxl.styles import NamedStyle, Font, Border, Side
 from basico.core.mod_srv import Service
 from basico.core.mod_env import LPATH, APP
 
