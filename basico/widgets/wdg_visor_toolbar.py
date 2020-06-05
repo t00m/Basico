@@ -221,7 +221,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         hbox.pack_start(label, True, True, 0)
         button.add(hbox)
         button.set_tooltip_markup('<b>Create a new annotation (not linked to any SAP Note)</b>')
-        button.connect('clicked', self.clb_create_annotation)
+        # ~ button.connect('clicked', self.clb_create_annotation)
         boxan.pack_start(button, False, False, 3)
 
         ### New annotation from template
@@ -258,20 +258,20 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         return False
 
 
-    def clb_create_annotation(self, *args):
-        self.srvclb.action_annotation_create()
+    # ~ def clb_create_annotation(self, *args):
+        # ~ self.srvclb.action_annotation_create()
 
 
-    def clb_create_attachment(self, *args):
-        self.srvclb.gui_attachment_add()
+    # ~ def clb_create_attachment(self, *args):
+        # ~ self.srvclb.gui_attachment_add()
 
 
-    def clb_template_changed(self, combobox):
-        treeiter = combobox.get_active_iter()
-        model = combobox.get_model()
-        aid = model[treeiter][1]
-        if len(aid) > 0:
-            self.srvclb.action_annotation_create_from_template(aid)
+    # ~ def clb_template_changed(self, combobox):
+        # ~ treeiter = combobox.get_active_iter()
+        # ~ model = combobox.get_model()
+        # ~ aid = model[treeiter][1]
+        # ~ if len(aid) > 0:
+            # ~ self.srvclb.action_annotation_create_from_template(aid)
 
 
     def combobox_templates(self, *args):
@@ -290,7 +290,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
 
         templates = Gtk.ComboBox.new_with_model(model)
         templates.set_active_iter(first)
-        templates.connect('changed', self.clb_template_changed)
+        # ~ templates.connect('changed', self.clb_template_changed)
 
         renderer = Gtk.CellRendererPixbuf()
         templates.pack_start(renderer, False)

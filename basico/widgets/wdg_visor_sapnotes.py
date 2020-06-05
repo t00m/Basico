@@ -671,8 +671,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                 self.srvclb.gui_show_popover(None, popover)
 
 
-    def clb_create_annotation(self, button, sid):
-        self.srvclb.action_annotation_create_for_sapnote(sid)
+    # ~ def clb_create_annotation(self, button, sid):
+        # ~ self.srvclb.action_annotation_create_for_sapnote(sid)
 
 
     def build_popover(self, sid, popover, component):
@@ -696,20 +696,20 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             # Popover button "Delete annotation"
             button = get_popover_button("<b>Delete annotation</b>", 'basico-delete')
             button.show_all()
-            button.connect('clicked', self.srvclb.action_annotation_delete)
+            # ~ button.connect('clicked', self.srvclb.action_annotation_delete)
             box.pack_start(button, False, False, 0)
 
             # Popover button "Duplicate annotation"
             button = get_popover_button("<b>Duplicate annotation</b>", 'basico-duplicate')
             button.show_all()
-            button.connect('clicked', self.srvclb.action_annotation_duplicate)
+            # ~ button.connect('clicked', self.srvclb.action_annotation_duplicate)
             box.pack_start(button, False, False, 0)
 
         else:
             # Popover button "Add an annotation"
             button = get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
             button.show_all()
-            button.connect('clicked', self.clb_create_annotation, sid)
+            # ~ button.connect('clicked', self.clb_create_annotation, sid)
             box.pack_start(button, False, False, 0)
 
             fbox = Gtk.VBox()

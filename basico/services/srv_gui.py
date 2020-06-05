@@ -67,7 +67,8 @@ class UIApp(Gtk.Application):
 
     def on_key_press_event(self, widget, event):
         if Gdk.keyval_name(event.keyval) == 'Escape':
-            self.srvclb.action_annotation_cancel()
+            # ~ self.srvclb.action_annotation_cancel()
+            pass
 
 
     def get_services(self):

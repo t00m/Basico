@@ -320,7 +320,8 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
 
     def on_key_press_event(self, widget, event):
         if Gdk.keyval_name(event.keyval) == 'Escape':
-            self.srvclb.action_annotation_cancel()
+            # ~ self.srvclb.action_annotation_cancel()
+            pass
 
     def __setup_header(self):
         # Annotation Header
@@ -581,12 +582,12 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
         hbox = Gtk.HBox()
         self.srvgui.add_widget('annotation_footer_buttons', hbox)
         accept = self.srvgui.add_widget('gtk_button_accept_annotation', Gtk.Button('Accept'))
-        accept.connect('clicked', self.srvclb.action_annotation_accept, self.sid)
+        # ~ accept.connect('clicked', self.srvclb.action_annotation_accept, self.sid)
         accept.set_property('always-show-image', True)
         icon = self.srvicm.get_new_image_icon('basico-check-accept', 24, 24)
         accept.set_image(icon)
         cancel = self.srvgui.add_widget('gtk_button_cancel_annotation', Gtk.Button('Cancel'))
-        cancel.connect('clicked', self.srvclb.action_annotation_cancel)
+        # ~ cancel.connect('clicked', self.srvclb.action_annotation_cancel)
         cancel.set_property('always-show-image', True)
         icon = self.srvicm.get_new_image_icon('basico-check-cancel', 24, 24)
         cancel.set_image(icon)
@@ -831,3 +832,94 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
         stack_main.set_visible_child_name('dashboard')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-annotations')
+
+
+
+
+    def action_annotation_create(self):
+        pass
+        # ~ self.gui_annotation_widget_show('', 'create')
+
+
+    # ~ def action_annotation_create_from_template(self, aid):
+        # ~ new_aid = self.srvant.duplicate_from_template(aid)
+        # ~ self.action_annotation_edit(new_aid)
+
+
+    # ~ def action_annotation_create_for_sapnote(self, sid):
+        # ~ self.gui_annotation_widget_show(sid, 'create')
+
+
+    # ~ def action_annotation_edit(self, aid):
+        # ~ self.gui_annotation_widget_show(aid, 'edit')
+
+
+    # ~ def action_annotation_preview(self, aid):
+        # ~ self.gui_annotation_widget_show(aid, 'preview')
+
+
+    # ~ def action_annotation_duplicate(self, *args):
+        # ~ self.log.debug("ACTION-DUPLICATE: %s" % args)
+
+
+    # ~ def action_annotation_delete(self, *args):
+        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
+        # ~ aids = visor_annotations.rows_toggled()
+        # ~ answer = self.srvuif.warning_message_delete_annotations(None, 'Deleting annotations', 'Are you sure?', aids)
+        # ~ if answer is True:
+            # ~ for aid in aids:
+                # ~ self.srvant.delete(aid)
+            # ~ visor_annotations.populate()
+            # ~ self.log.info("Annotations deleted", True)
+        # ~ else:
+            # ~ self.log.info("Action canceled. Nothing deleted.")
+
+        # ~ self.srvuif.grab_focus()
+
+
+    # ~ def action_annotation_accept(self, button, sid):
+        # ~ widget_annotation = self.srvgui.get_widget('widget_annotation')
+        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        # ~ viewmenu = self.srvgui.get_widget('viewmenu')
+        # ~ notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
+        # ~ notebook.set_current_page(0)
+
+        # ~ aid = widget_annotation.get_aid_from_widget()
+        # ~ annotation = widget_annotation.get_metadata_from_widget()
+
+        # ~ if self.srvant.is_valid(aid):
+            # ~ self.srvant.update(annotation)
+            # ~ title = self.srvant.get_title(aid)
+            # ~ self.log.info("Updated annotation: %s" % title)
+        # ~ else:
+            # ~ self.srvant.create(annotation)
+            # ~ title = self.srvant.get_title(aid)
+            # ~ self.log.info('New annotation created: %s' % title)
+        # ~ visor_annotations.populate()
+        # ~ visor_sapnotes.populate()
+        # ~ widget_annotation.clear()
+        # ~ self.srvuif.set_widget_visibility('visortoolbar', True)
+        # ~ self.srvuif.grab_focus()
+
+
+    # ~ def annotation_save(self):
+        # ~ widget_annotation = self.srvgui.get_widget('widget_annotation')
+        # ~ aid = widget_annotation.get_aid_from_widget()
+        # ~ annotation = widget_annotation.get_metadata_from_widget()
+
+        # ~ if self.srvant.is_valid(aid):
+            # ~ self.srvant.update(annotation)
+            # ~ title = self.srvant.get_title(aid)
+            # ~ self.log.info("Updated annotation: %s" % title, True)
+
+
+    # ~ def action_annotation_cancel(self, *args):
+        # ~ statusbar = self.srvgui.get_widget('widget_statusbar')
+        # ~ widget_annotation = self.srvgui.get_widget('widget_annotation')
+        # ~ notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
+        # ~ notebook.set_current_page(0)
+        # ~ widget_annotation.clear()
+        # ~ self.srvuif.set_widget_visibility('visortoolbar', True)
+        # ~ self.gui_stack_dashboard_show()
+        # ~ self.srvuif.grab_focus()

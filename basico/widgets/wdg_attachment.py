@@ -181,22 +181,22 @@ class AttachmentWidget(BasicoWidget, Gtk.VBox):
         self.container_body.add(vbox)
 
 
-    def __setup_footer(self):
-        # Buttons Accept/Cancel
-        hbox = Gtk.HBox()
-        accept = self.srvgui.add_widget('gtk_button_accept_annotation', Gtk.Button('Accept'))
-        accept.connect('clicked', self.srvclb.action_annotation_accept, self.sid)
-        accept.set_property('always-show-image', True)
-        icon = self.srvicm.get_new_image_icon('basico-check-accept', 24, 24)
-        accept.set_image(icon)
-        cancel = self.srvgui.add_widget('gtk_button_cancel_annotation', Gtk.Button('Cancel'))
-        cancel.connect('clicked', self.srvclb.action_annotation_cancel)
-        cancel.set_property('always-show-image', True)
-        icon = self.srvicm.get_new_image_icon('basico-check-cancel', 24, 24)
-        cancel.set_image(icon)
-        hbox.pack_start(accept, True, False, 3)
-        hbox.pack_start(cancel, True, False, 3)
-        self.pack_start(hbox, False, False, 3)
+    # ~ def __setup_footer(self):
+        # ~ # Buttons Accept/Cancel
+        # ~ hbox = Gtk.HBox()
+        # ~ accept = self.srvgui.add_widget('gtk_button_accept_annotation', Gtk.Button('Accept'))
+        # ~ accept.connect('clicked', self.srvclb.action_annotation_accept, self.sid)
+        # ~ accept.set_property('always-show-image', True)
+        # ~ icon = self.srvicm.get_new_image_icon('basico-check-accept', 24, 24)
+        # ~ accept.set_image(icon)
+        # ~ cancel = self.srvgui.add_widget('gtk_button_cancel_annotation', Gtk.Button('Cancel'))
+        # ~ cancel.connect('clicked', self.srvclb.action_annotation_cancel)
+        # ~ cancel.set_property('always-show-image', True)
+        # ~ icon = self.srvicm.get_new_image_icon('basico-check-cancel', 24, 24)
+        # ~ cancel.set_image(icon)
+        # ~ hbox.pack_start(accept, True, False, 3)
+        # ~ hbox.pack_start(cancel, True, False, 3)
+        # ~ self.pack_start(hbox, False, False, 3)
 
 
     def set_aid_to_widget(self, aid):

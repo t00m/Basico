@@ -860,12 +860,12 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
         self.update_total_annotations_count()
 
 
-    def __clb_preview(self, button, aid):
-        self.srvclb.action_annotation_preview(aid)
+    # ~ def __clb_preview(self, button, aid):
+        # ~ self.srvclb.action_annotation_preview(aid)
 
 
-    def __clb_edit(self, button, aid):
-        self.srvclb.action_annotation_edit(aid)
+    # ~ def __clb_edit(self, button, aid):
+        # ~ self.srvclb.action_annotation_edit(aid)
 
 
     def __clb_row_double_click(self, treeview, row, col):
@@ -878,7 +878,8 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
                     aid = model[treeiter][COLUMN.AID]
                     is_valid = self.srvant.is_valid(aid)
                     if is_valid:
-                        self.srvclb.action_annotation_preview(aid)
+                        # ~ self.srvclb.action_annotation_preview(aid)
+                        raise # Enabled with purpose. Disable when necessary
         except Exception as error:
             self.log.error(error)
 
@@ -952,7 +953,7 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
 
                 button = get_popover_button("<b>Delete</b> annotations", 'basico-delete')
                 button.show_all()
-                button.connect('clicked', self.srvclb.action_annotation_delete)
+                # ~ button.connect('clicked', self.srvclb.action_annotation_delete)
                 box.pack_start(button, False, False, 0)
 
                 button = get_popover_button("<b>Backup</b> annotations", 'basico-backup')
@@ -974,12 +975,12 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
 
                 button = get_popover_button("<b>Preview</b> annotation", 'basico-preview')
                 button.show_all()
-                button.connect('clicked', self.__clb_preview, aid)
+                # ~ button.connect('clicked', self.__clb_preview, aid)
                 box.pack_start(button, False, False, 0)
 
                 button = get_popover_button("<b>Edit</b> annotation", 'basico-edit')
                 button.show_all()
-                button.connect('clicked', self.__clb_edit, aid)
+                # ~ button.connect('clicked', self.__clb_edit, aid)
                 box.pack_start(button, False, False, 0)
 
                 button = get_popover_button("<b>Duplicate</b> annotation", 'basico-copy-paste')

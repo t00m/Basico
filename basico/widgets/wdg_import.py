@@ -33,6 +33,8 @@ class ImportWidget(BasicoWidget, Gtk.VBox):
         self.srvgui = self.get_service("GUI")
         self.srvclb = self.get_service('Callbacks')
         self.srvicm = self.get_service('IM')
+        self.srvdtb = self.get_service('DB')
+        self.srvsap = self.get_service('SAP')
 
     def setup(self):
         # Import Header
@@ -72,12 +74,49 @@ class ImportWidget(BasicoWidget, Gtk.VBox):
         custom_scroller.add(custom_text_view)
         vbox.pack_start(custom_scroller, True, True, 0)
         label = Gtk.Label()
-        message = "<small>Please, be patient:  Firefox will be launched headless so you won't see any window.</small>"
+        message = "<small>SAP Notes will be download in background</small>"
         label.set_markup('%s' % message)
         label.set_justify(Gtk.Justification.LEFT)
         vbox.pack_end(label, False, False, 0)
         custom_button = Gtk.Button("Download")
-        custom_button.connect('clicked', self.srvclb.sapnote_import_from_launchpad)
+        custom_button.connect('clicked', self.import_from_launchpad)
         vbox.pack_end(custom_button, False, False, 3)
         self.pack_start(vbox, True, True, 0)
         self.show_all()
+
+    def import_from_launchpad(self, *args):
+        textview = self.srvgui.get_widget('gtk_textview_download_launchpad')
+        dlbuffer = textview.get_buffer()
+        istart, iend = dlbuffer.get_bounds()
+        text = dlbuffer.get_text(istart, iend, False)
+
+        bag = []
+        all_notes = []
+        sapnotes = set()
+
+        # Get SAP Notes from textview
+        lines = text.replace(' ', ',')
+        lines = lines.replace('\n', ',')
+
+        # Get a unique list of SAP Notes to be imported
+        for sid in lines.split(','):
+            sid = sid.strip()
+            if len(sid) > 0:
+                sapnotes.add(sid)
+
+        # For those SAP Notes, check which ones are valid
+        for sid in sapnotes:
+            is_valid = self.srvdtb.is_valid(sid)
+            # FIXME: Add checkbox in wdg_import to allow overwrite SAP Notes
+            # ~ is_saved = self.srvdtb.get_sapnote_metadata(sid)
+            if is_valid: # and not is_saved:
+                bag.append(sid)
+        lbag = list(bag)
+
+        # If bag is not empty, tell SAP module to start the requests.
+        # If Firefox profile is well configured, SAP Notes will be
+        # downloaded in background one by one.
+        if len(lbag) > 0:
+            self.log.debug("Number of SAP Notes to be downloaded: %d", len(lbag))
+            self.srvsap.download(lbag)
+        dlbuffer.set_text('')

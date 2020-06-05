@@ -355,6 +355,7 @@ class Database(Service):
 
 
     def get_stats(self):
+        self.build_stats()
         return self.stats
 
 
