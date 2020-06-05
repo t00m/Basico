@@ -41,7 +41,8 @@ class Database(Service):
         self.load_notes()
 
     def setup_signals(self):
-        GObject.signal_new('database-add', Database, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('database-updated', Database, GObject.SignalFlags.RUN_LAST, None, () )
+        # ~ GObject.signal_new('database-delete', Database, GObject.SignalFlags.RUN_LAST, None, () )
 
     def __init_config_section(self):
         settings = self.srvstg.load()
@@ -206,7 +207,7 @@ class Database(Service):
             n += 1
 
         self.save_notes()
-        self.emit('database-add')
+        self.emit('database-updated')
         return updated
 
 
@@ -415,20 +416,16 @@ class Database(Service):
                 self.log.error(error)
 
 
-    def delete(self, sid):
-        sid = self.normalize_sid(sid)
-        deleted = False
-        try:
-            del (self.sapnotes[sid])
-            deleted = True
-            self.log.info("SAP Note %s deleted" % sid)
-            self.save_notes()
-        except Exception as error:
-            self.log.debug(error)
-            deleted = False
-
-        return deleted
-
+    def delete(self, lsid):
+        for sid in lsid:
+            sid = self.normalize_sid(sid)
+            try:
+                del (self.sapnotes[sid])
+                self.log.info("SAP Note %s deleted" % sid)
+            except Exception as error:
+                self.log.debug(error)
+        self.save_notes()
+        self.emit('database-updated')
 
     def end(self):
         self.save_notes()

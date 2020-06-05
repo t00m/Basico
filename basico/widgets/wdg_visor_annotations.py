@@ -63,6 +63,8 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
             self.icons['type'][atype.lower()] = self.srvicm.get_pixbuf_icon('basico-annotation-type-%s' % atype.lower(), 32)
         self.log.debug("Annotation Visor initialized")
 
+        # ~ self.connect_signals()
+
 
     def __get_services(self):
         self.srvgui = self.get_service("GUI")

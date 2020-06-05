@@ -17,6 +17,7 @@ from enum import IntEnum
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
+from gi.repository import GLib
 from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import Gtk
@@ -62,8 +63,11 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         paned.set_position(400)
         paned.show_all()
         self.add(paned)
+        self.connect_signals()
         self.log.debug("SAP Notes Visor initialized")
 
+    def connect_signals(self, *args):
+        self.srvdtb.connect('database-updated', self.update)
 
     def get_services(self):
         self.srvgui = self.get_service("GUI")
@@ -447,6 +451,11 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
         return match
 
+    def update(self, *args):
+        def reload():
+            self.populate()
+        GLib.idle_add(reload)
+        self.log.debug("SAP Notes Visor updated")
 
     def update_total_sapnotes_count(self):
         visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')

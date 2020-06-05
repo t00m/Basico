@@ -180,9 +180,6 @@ def main():
               'python-dateutil',
               'selenium',
               'feedparser',
-              'requests',
-              'openpyxl',
-              'rdflib',
               'webdriver_manager',
               'psutil'
         ],

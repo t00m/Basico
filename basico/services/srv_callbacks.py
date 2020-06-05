@@ -10,9 +10,6 @@
 import os
 import json
 import time
-# ~ from threading import Thread
-from concurrent.futures import ThreadPoolExecutor as Executor
-import threading
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -38,7 +35,6 @@ class Callback(Service):
     def get_services(self):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvdtb.connect('database-add', self.gui_visor_sapnotes_update)
         self.srvgui = self.get_service('GUI')
         self.srvuif = self.get_service("UIF")
         self.srvsap = self.get_service('SAP')
@@ -51,18 +47,6 @@ class Callback(Service):
         self.srvweb = self.get_service('Driver')
         self.srvweb.connect('download-profile-missing', self.download_webdriver_setup)
 
-
-
-    def gui_visor_sapnotes_update(self, obj):
-        # Database updated
-        if type(obj) == type(self.srvdtb):
-            def reload():
-                self.log.debug("Database was updated. Refreshing SAP Notes Visor")
-                viewmenu = self.srvgui.get_widget('viewmenu')
-                viewmenu.set_view('collection')
-                visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-                visor_sapnotes.populate()
-            GLib.idle_add(reload)
 
     def download_webdriver_setup(self, *args):
         self.log.warning("Webdriver profile missing")
@@ -158,7 +142,7 @@ class Callback(Service):
 
         answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', [sid])
         if answer is True:
-            self.srvdtb.delete(sid)
+            self.srvdtb.delete([sid])
             # ~ self.srvuif.statusbar_msg("SAP Note %s deleted" % sid, True)
             visor_sapnotes.reload()
         else:
@@ -172,9 +156,8 @@ class Callback(Service):
         bag = visor_sapnotes.get_filtered_bag()
         answer = self.srvuif.warning_message_delete_sapnotes(button, 'Deleting SAP Notes', 'Are you sure?', bag)
         if answer is True:
-            for sid in bag:
-                self.srvdtb.delete(sid)
-            visor_sapnotes.populate()
+            self.srvdtb.delete(bag)
+            # ~ visor_sapnotes.populate()
             msg = "Deleted %d SAP Notes" % len(bag)
             self.log.info(msg)
             # ~ self.srvuif.statusbar_msg(msg, True)

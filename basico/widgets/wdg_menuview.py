@@ -13,6 +13,7 @@ from collections import OrderedDict
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
+from gi.repository import GLib
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -234,6 +235,16 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.srvgui.set_key_value('menuview-row-changed', signal)
         self.connect('button_press_event', self.right_click)
 
+        # Connect to other services signals
+        self.srvdtb.connect('database-updated', self.update)
+
+    def update(self, *args):
+        def reload():
+            view = self.get_view()
+            self.set_view(view)
+            # ~ self.refresh()
+        GLib.idle_add(reload)
+        self.log.debug("View menu updated")
 
     def refresh(self):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
