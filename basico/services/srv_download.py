@@ -12,6 +12,7 @@ import sys
 import time
 import glob
 import logging
+import subprocess
 from enum import IntEnum
 import threading
 import queue
@@ -19,6 +20,8 @@ import time
 import uuid
 
 from gi.repository import GObject
+
+import asyncio
 
 import psutil
 from webdriver_manager.firefox import GeckoDriverManager
@@ -30,7 +33,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-from basico.core.mod_env import LPATH, FILE
+from basico.core.mod_env import LPATH, FILE, SAP_NOTE_URL, SAP_NOTE_URL_PDF
 from basico.core.mod_srv import Service
 
 # Disable logging for imported modules
@@ -138,7 +141,6 @@ class DownloadManager(Service):
             rid = self.queue.get()
             url = self.requests[rid]['url_uri']
             self.log.debug("[%s] Request download: %s", rid, url)
-            # ~ self.log.debug("[%s] %s", rid, url)
             if self.retry > 2:
                 self.__set_driver_status(DriverStatus.DISABLE)
 
@@ -158,8 +160,6 @@ class DownloadManager(Service):
                     options = Options()
                     options.profile = LPATH['FIREFOX_PROFILE']
                     options.headless = True
-                    # ~ 'security.default_personal_cert'
-                    # ~ self.log.debug(options.preferences)
                     driver = webdriver.Firefox(options=options, service=self.gecko_downloader)
                     self.__set_driver_status(DriverStatus.WAITING)
                     self.__set_driver(driver)
@@ -195,21 +195,19 @@ class DownloadManager(Service):
                     self.emit('download-complete', (self.requests[rid]))
             self.queue.task_done()
 
-    def browse(self, url):
-        try:
-            self.browser.get(url)
-        except:
-            #selenium.common.exceptions.WebDriverException
-            self.kill_gecko_processes()
-            self.gecko_browser = SeleniumService(executable_path=self.gdm.install())
-            options = Options()
-            options.profile = LPATH['FIREFOX_PROFILE']
-            options.headless = False
-            self.browser = webdriver.Firefox(options=options, service=self.gecko_browser)
-            self.browser.get(url)
+    def browse_note(self, *args):
+        sid = args[1]
+        url = SAP_NOTE_URL % sid
+        cmd = "firefox --profile %s %s" % (LPATH['FIREFOX_PROFILE'], url)
+        subprocess.Popen(cmd, shell=True)
+        self.log.info("Displaying SAP Note %s", sid)
 
-
-        self.log.debug("Browsing %s", url)
+    def browse_pdf(self, *args):
+        sid = args[1]
+        url = SAP_NOTE_URL_PDF % sid
+        cmd = "firefox --profile %s %s" % (LPATH['FIREFOX_PROFILE'], url)
+        subprocess.Popen(cmd, shell=True)
+        self.log.info("Displaying PDF for SAP Note %s", sid)
 
     def end(self):
         self.queue.join()

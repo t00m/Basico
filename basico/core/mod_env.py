@@ -90,5 +90,14 @@ FILE['L_SAP_PRODUCTS'] = os.path.join(LPATH['RESOURCES'], 'products.txt')
 FILE['FIREFOX_DRIVER'] = os.path.join(LPATH['DRIVERS'], 'geckodriver')
 FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'] = os.path.join(GPATH['SELENIUM'], 'webdriver_prefs.json')
 
+# Default settings for SAP module
+LOGIN_PAGE_URL = "https://accounts.sap.com"
+LOGOUT_PAGE_URL = "https://accounts.sap.com/ui/logout"
+ODATA_NOTE_URL = "https://launchpad.support.sap.com/services/odata/svt/snogwscorr/TrunkSet(SapNotesNumber='%s',Version='0',Language='E')"
+ODATA_NOTE_URL_LONGTEXT = "https://launchpad.support.sap.com/services/odata/svt/snogwscorr/TrunkSet(SapNotesNumber='%s',Version='0',Language='E')?$expand=LongText"
+SAP_NOTE_URL = "https://launchpad.support.sap.com/#/notes/%s"
+SAP_NOTE_URL_PDF = "https://launchpad.support.sap.com/services/pdf/notes/%s/E"
+TIMEOUT = 10
+
 # Annotations
 ATYPES = ['Bookmark', 'Email', 'Fixme', 'Incident', 'Meeting', 'Note', 'Procedure', 'Snippet', 'Template', 'Todo']
