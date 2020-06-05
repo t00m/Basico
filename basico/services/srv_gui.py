@@ -220,7 +220,7 @@ class GUI(Service):
         except KeyError as warning:
             # ~ self.log.warning(warning)
             self.log.error(self.get_traceback())
-            # ~ raise
+            raise
             return None
 
 

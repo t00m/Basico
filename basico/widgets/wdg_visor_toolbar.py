@@ -19,8 +19,8 @@ from basico.core.mod_wdg import BasicoWidget
 
 class VisorToolbar(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
-        super().__init__(app, __class__.__name__)
         Gtk.Box.__init__(self)
+        super().__init__(app, __class__.__name__)
         self.get_services()
         self.set_homogeneous(False)
 
@@ -74,7 +74,8 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         hbox = Gtk.HBox()
         entry = Gtk.Entry()
         entry.set_completion(self.completion)
-        entry.connect('activate', self.srvclb.gui_filter_visor)
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        # ~ entry.connect('activate', self.srvclb.gui_visor_filter)
         self.srvgui.add_widget('gtk_entry_filter_visor', entry)
 
         icon = self.srvicm.get_pixbuf_icon('basico-find')
@@ -89,10 +90,11 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         entry.set_placeholder_text("Filter results...")
 
         def on_icon_pressed(entry, icon_pos, event):
+            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
             if icon_pos == Gtk.EntryIconPosition.PRIMARY:
-                self.srvclb.gui_entry_search(entry)
+                self.entry_search(entry)
             elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
-                self.srvclb.gui_filter_visor(entry)
+                visor_sapnotes.filter()
 
         entry.connect('changed', self.srvclb.gui_filter_visor)
         entry.connect("icon-press", on_icon_pressed)
@@ -230,32 +232,12 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         # ~ widget_import = self.srvgui.add_widget('widget_import', ImportWidget(self.app))
         # ~ boxan.pack_start(widget_import, False, False, 3)
 
-        # Import Attachment button
-        button = Gtk.Button()
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.clb_create_attachment)
-        hbox = Gtk.HBox()
-        icon = self.srvicm.get_image_icon('basico-attachment')
-        label = Gtk.Label()
-        label.set_markup('<b>New attachment(s)</b>')
-        label.set_xalign(0.0)
-        hbox.pack_start(icon, False, False, 3)
-        hbox.pack_start(label, True, True, 0)
-        button.add(hbox)
-        box.pack_start(button, False, False, 3)
-        # ~ ## Attachment button
-        # ~ tool = Gtk.ToolButton()
-        # ~ tool.set_icon_name('basico-attachment')
-        # ~ tool.set_tooltip_markup('<b>Attach any document to this annotation</b>')
-        # ~ popover = self.srvgui.add_widget('gtk_button_main_toolbar_attachment', Gtk.Popover.new(tool))
-        # ~ tool.connect('clicked', self.srvclb.gui_attachment_add)
-        # ~ self.toolbar.insert(tool, -1)
-
 
         # Toolbar initial settings
         self.set_visible(True)
         self.set_no_show_all(False)
         self.toolbar.set_hexpand(True)
+
 
 
     def get_services(self):
@@ -326,3 +308,20 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
 
         templates.show_all()
         return templates
+
+    def entry_search(self, entry):
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        term = entry.get_text()
+
+        stack_visor = stack_visors.get_visible_child_name()
+        completion = self.srvgui.get_widget('gtk_entrycompletion_visor')
+        completion_model = completion.get_model()
+        completion_model.clear()
+        self.log.debug("Search for '%s'" % term)
+        bag = self.srvdtb.search(term)
+        visor_sapnotes.populate(bag)
+        ebuffer = entry.get_buffer()
+        ebuffer.delete_text(0, -1)
+        self.log.info("Found %d SAP Notes for term '%s'" % (len(bag), term))
+

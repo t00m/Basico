@@ -795,3 +795,14 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
         sorted_model.foreach(get_selected_sapnotes)
         return selected
+
+    def display(self):
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        stack_main.set_visible_child_name('dashboard')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        stack_visors.set_visible_child_name('visor-sapnotes')
+
+    def filter(self, *args):
+        visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
+        visible_filter.refilter()
+        visor_sapnotes.update_total_sapnotes_count()

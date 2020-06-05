@@ -825,3 +825,9 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
 
     def product_activated(self, entry):
         pass
+
+    def display(self):
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        stack_main.set_visible_child_name('dashboard')
+        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        stack_visors.set_visible_child_name('visor-annotations')

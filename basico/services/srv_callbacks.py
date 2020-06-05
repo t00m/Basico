@@ -45,80 +45,6 @@ class Callback(Service):
         self.srvclt = self.get_service('Collections')
         # ~ self.srvatc = self.get_service('Attachment')
         self.srvweb = self.get_service('Driver')
-        self.srvweb.connect('download-profile-missing', self.download_webdriver_setup)
-
-
-    def download_webdriver_setup(self, *args):
-        self.log.warning("Webdriver profile missing")
-        cmd = "firefox --profile %s" % LPATH['FIREFOX_PROFILE']
-        os.system(cmd)
-
-    def gui_stack_visor_change(self, stack, gparam):
-        visible_stack_name = stack.get_visible_child_name()
-        if visible_stack_name is None:
-            return
-
-        if visible_stack_name == 'visor-sapnotes':
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            visor_sapnotes.update_total_sapnotes_count()
-        elif visible_stack_name == 'visor-annotations':
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor_annotations = self.srvgui.get_widget('visor_annotations')
-            visor_annotations.populate()
-        else:
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor_attachments = self.srvgui.get_widget('visor_attachments')
-            visor_attachments.populate()
-
-
-    def gui_visor_sapnotes_show(self):
-        stack_main = self.srvgui.get_widget('gtk_stack_main')
-        stack_main.set_visible_child_name('dashboard')
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        stack_visors.set_visible_child_name('visor-sapnotes')
-
-
-    def gui_visor_annotations_show(self):
-        stack_main = self.srvgui.get_widget('gtk_stack_main')
-        stack_main.set_visible_child_name('dashboard')
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        stack_visors.set_visible_child_name('visor-annotations')
-
-
-    def gui_visor_attachments_show(self):
-        stack_main = self.srvgui.get_widget('gtk_stack_main')
-        stack_main.set_visible_child_name('dashboard')
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        stack_visors.set_visible_child_name('visor-attachments')
-
-
-    def gui_entry_search(self, entry):
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        visor_annotations = self.srvgui.get_widget('visor_annotations')
-        term = entry.get_text()
-
-        stack_visor = stack_visors.get_visible_child_name()
-        completion = self.srvgui.get_widget('gtk_entrycompletion_visor')
-        completion_model = completion.get_model()
-        completion_model.clear()
-
-        if stack_visor == 'visor-sapnotes':
-            bag = self.srvdtb.search(term)
-            visor_sapnotes.populate(bag)
-            ebuffer = entry.get_buffer()
-            ebuffer.delete_text(0, -1)
-            msg = "Found %d SAP Notes for term '%s'" % (len(bag), term)
-            self.log.info(msg)
-            # ~ self.srvuif.statusbar_msg(msg)
-        elif stack_visor == 'visor-annotations':
-            annotations = self.srvant.search_term(term)
-            visor_annotations.populate(annotations)
-            msg = "Found %d annotations for term '%s'" % (len(annotations), term)
-            self.log.info(msg)
-            # ~ self.srvuif.statusbar_msg(msg)
-
 
 
     def driver_sapnote_browse(self, button, sid):
@@ -497,7 +423,7 @@ class Callback(Service):
         # ~ self.srvsap.stop_fetching()
         db.build_stats()
         visor_sapnotes.populate(all_notes)
-        self.gui_visor_sapnotes_show()
+        visor_sapnotes.display()
         # ~ return result
 
 
@@ -540,25 +466,9 @@ class Callback(Service):
         selection.select_path("0")
 
 
-    def gui_filter_visor(self, entry=None):
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        visible_stack_name = stack_visors.get_visible_child_name()
-
-        if visible_stack_name == 'visor-sapnotes':
-            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
-            visible_filter.refilter()
-            visor_sapnotes.update_total_sapnotes_count()
-        elif visible_stack_name == 'visor-annotations':
-            visor_annotations = self.srvgui.get_widget('visor_annotations')
-            visor_annotations.populate()
-            visible_filter = self.srvgui.get_widget('visor_annotation_visible_filter')
-            visible_filter.refilter()
-            visor_annotations.update_total_annotations_count()
-
-
     def gui_refresh_view(self, button=None, view=None):
         window = self.srvgui.get_widget('gtk_app_window_main')
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         viewmenu = self.srvgui.get_widget('viewmenu')
         if view is None:
             view = viewmenu.get_view()
@@ -567,10 +477,11 @@ class Callback(Service):
             viewlabel = self.srvgui.get_widget('gtk_label_current_view')
             name = "<b>%-10s</b>" % view.capitalize()
             viewlabel.set_markup(name)
-        viewmenu.set_view(view)
+
         popover = self.srvgui.get_widget('gtk_popover_button_menu_views')
         popover.hide()
-        self.gui_visor_sapnotes_show()
+        viewmenu.set_view(view)
+        visor_sapnotes.display()
 
 
     def gui_toggle_menu_view(self, obj):
@@ -844,7 +755,7 @@ class Callback(Service):
     def gui_jump_to_sapnote(self, widget, sid):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.populate([sid])
-        self.gui_visor_sapnotes_show()
+        visor_sapnotes.display()
         self.srvuif.grab_focus()
         msg = "Jumping to SAP Note %s" % sid
         self.log.info(msg)
@@ -860,7 +771,7 @@ class Callback(Service):
         GObject.signal_handler_block(notebook, signal)
         visor_annotations = self.srvgui.get_widget('visor_annotations')
         visor_annotations.populate([aid])
-        self.gui_visor_annotations_show()
+        visor_annotations.display()
         self.srvuif.grab_focus()
         msg = "Jumping to annotation %s" % aid
         self.log.info(msg)

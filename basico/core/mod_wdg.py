@@ -19,6 +19,7 @@ class BasicoWidget(object):
     Service class is the base class for Basico widgets.
     """
     log=None
+
     def __init__(self, app, logname):
         """Initialize Service instance
         @type app: Basico instance
@@ -30,7 +31,7 @@ class BasicoWidget(object):
         self.log = logging.getLogger(logname)
         self.log.addHandler(self.app.intercepter)
         self.init_section(logname)
-        # ~ self.log.debug("Loading widget: %s", logname)
+        self.log.debug("Loading widget: %s", logname)
 
 
     def get_traceback(self):

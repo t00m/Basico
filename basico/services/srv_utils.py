@@ -44,6 +44,10 @@ class Utils(Service):
         # ~ self.srvdtb = self.get_service('DB')
         pass
 
+    def download_webdriver_setup(self, *args):
+        self.log.warning("Webdriver profile missing. Creating a new one from the scratch")
+        cmd = "firefox --profile %s %s" % (LPATH['FIREFOX_PROFILE'], FILE['HELP_FIREFOX_PROFILE'])
+        os.system(cmd)
 
     def get_file_metadata(self, path):
         self.log.debug("Getting metadata from: %s", path)

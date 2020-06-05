@@ -59,13 +59,21 @@ class DownloadManager(Service):
     def initialize(self):
         GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        self.get_services()
         self.kill_gecko_processes()
+        self.connect_signals()
         self.gdm = GeckoDriverManager(log_level=logging.ERROR)
         self.gecko_downloader = SeleniumService(executable_path=self.gdm.install())
         self.th = threading.Thread(name='download', target=self.download)
         self.th.setDaemon(True)
         self.th.start()
         self.log.debug("Basico Download Manager started")
+
+    def get_services(self):
+        self.srvutl = self.get_service('Utils')
+
+    def connect_signals(self):
+        self.connect('download-profile-missing', self.srvutl.download_webdriver_setup)
 
     def kill_gecko_processes(self):
         np = 0

@@ -259,7 +259,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
     def row_changed(self, selection):
         if self.current_status is None:
             visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            # ~ self.log.warning("gui_visor_sapnotes_show!!!")
+            # ~ visor_sapnotes.display()
 
             try:
                 model, treeiter = selection.get_selected()
