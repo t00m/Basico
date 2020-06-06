@@ -17,6 +17,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import Pango
 
+from basico.core.mod_log import event_log
 from basico.core.mod_wdg import BasicoWidget
 from basico.core.mod_env import ROOT, USER_DIR, APP, LPATH, GPATH, FILE
 
@@ -27,7 +28,6 @@ class LogViewer(BasicoWidget, Gtk.ScrolledWindow):
         Gtk.ScrolledWindow.__init__(self)
         self.get_services()
         self.setup()
-        self.update()
 
 
     def get_services(self):
@@ -35,6 +35,9 @@ class LogViewer(BasicoWidget, Gtk.ScrolledWindow):
         """
         self.srvgui = self.get_service("GUI")
 
+    def connect_signals(self, *args):
+        statusbar = self.srvgui.get_widget('widget_statusbar')
+        statusbar.connect('statusbar-updated', self.update)
 
     def setup(self):
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -49,12 +52,7 @@ class LogViewer(BasicoWidget, Gtk.ScrolledWindow):
         self.show_all()
 
 
-    def update(self):
-        logviewer = self.srvgui.get_widget('gtk_textview_logviewer')
-        buffer_logviewer = logviewer.get_buffer()
-
-        log = open(FILE['EVENTS'], 'r').read() 
-        buffer_logviewer.set_text(log)
-        istart, iend = buffer_logviewer.get_bounds()
-        buffer_logviewer.place_cursor(iend)
+    def update(self, *args):
+        record = args[1]
+        print ("LOGVIEWER: %s" % record.getMessage())
 

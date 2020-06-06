@@ -13,7 +13,6 @@ import stat
 import time
 import logging
 import platform
-import threading
 
 import gi
 gi.require_version('Gdk', '3.0')
@@ -207,7 +206,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.display_log)
+        button.connect('clicked', self.show_stack, 'log')
         box.pack_end(button, False, False, 0)
 
         ### Settings
@@ -327,8 +326,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_main.child_set_property (stack_child, "icon-name", "basico-about")
 
         ### Log stack child
-        # ~ stack_child = self.setup_stack_log()
-        # ~ stack_main.add_titled(stack_child, "log", "Event Viewer")
+        stack_child = self.setup_main_stack_log()
+        stack_main.add_titled(stack_child, "log", "Event Viewer")
 
         return stack_main
 

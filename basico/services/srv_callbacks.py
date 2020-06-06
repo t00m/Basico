@@ -31,6 +31,7 @@ MAX_WORKERS = 1 # Number of simultaneous connections
 class Callback(Service):
     def initialize(self):
         self.get_services()
+        self.connect_signals()
 
     def get_services(self):
         self.srvstg = self.get_service('Settings')
@@ -45,6 +46,18 @@ class Callback(Service):
         # ~ self.srvant = self.get_service('Annotation')
         # ~ self.srvbnr = self.get_service('BNR')
         # ~ self.srvatc = self.get_service('Attachment')
+
+    def connect_signals(self, *args):
+        # ~ uiapp = self.srvgui.get_uiapp()
+        # ~ uiapp.connect('gui-started', self.gui_started)
+        # ~ self.srvgui.connect('gui-update', self.gui_update)
+        # ~ logviewer = self.srvgui.get_widget('logviewer')
+        # ~ statusbar = self.srvgui.get_widget('widget_statusbar')
+        # ~ statusbar.connect('statusbar-updated', logviewer.update)
+        pass
+
+    def gui_started(self, *args):
+        self.log.debug("GUI started")
 
     def display_about(self, *args):
         about = self.srvgui.get_widget('widget_about')
@@ -79,6 +92,9 @@ class Callback(Service):
         popover.hide()
         viewmenu.set_view(view)
         visor_sapnotes.display()
+
+    def gui_update(self, *args):
+        self.gui_statusbar_update()
 
     def gui_statusbar_update(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')

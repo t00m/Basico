@@ -42,12 +42,18 @@ class UIApp(Gtk.Application):
         GLib.set_prgname('basico')
         self.log = logging.getLogger('UIApp')
         self.log.addHandler(self.app.intercepter)
+        # ~ self.connect_signals()
         self.get_services()
 
+
+    # ~ def setup_signals(self, *args):
+        # ~ GObject.signal_new('activate-focus', UIApp, GObject.SignalFlags.RUN_LAST, None, () )
+        # ~ GObject.signal_new('gui-started', UIApp, GObject.SignalFlags.RUN_LAST, None, () )
 
     def do_activate(self):
         # DOC: https://wiki.gnome.org/HowDoI/GtkApplication
         # https://stackoverflow.com/questions/41883527/uniqueness-of-gtk-application-without-creating-any-window
+        # ~ self.emit('gui-started', self.connect_signals)
         if not hasattr(self, "my_app_settings"):
             self.hold()
             self.my_app_settings = "Primary application instance."
@@ -60,16 +66,20 @@ class UIApp(Gtk.Application):
             self.log.debug("Basico is already running!")
         splash = self.app.get_splash()
         splash.hide()
-        self.th = threading.Thread(name='statusbar', target=self.srvclb.gui_statusbar_update)
+        # ~ self.setup_signals()
+        # ~ self.emit('gui-started')
+        self.th = threading.Thread(name='statusbar', target=self.srvclb.gui_update)
         self.th.setDaemon(True)
         self.th.start()
-
+        # ~ self.emit('gui-started', self.connect_signals)
 
     def on_key_press_event(self, widget, event):
         if Gdk.keyval_name(event.keyval) == 'Escape':
             # ~ self.srvclb.action_annotation_cancel()
             pass
 
+    def update(self, *args):
+        self.uiapp.emit('gui-update')
 
     def get_services(self):
         """
@@ -108,9 +118,6 @@ class GUI(Service):
         """
         Setup GUI Service
         """
-        pass
-        # ~ self.srvsap = self.get_service('SAP')
-
 
     def run(self):
         """
@@ -119,10 +126,13 @@ class GUI(Service):
         GObject.threads_init()
         self.uiapp = UIApp(self.app)
         self.log.debug("Setting up GUI")
-        # ~ splash = self.app.get_splash()
-        # ~ splash.show()
+        # ~ GObject.signal_new('gui-started', self.uiapp, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('gui-started', self.uiapp, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.uiapp.run()
 
+    def get_uiapp(self):
+        self.log.debug(self.uiapp)
+        return self.uiapp
 
     def quit(self, window, event):
         """

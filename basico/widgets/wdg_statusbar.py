@@ -9,6 +9,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
+from gi.repository import GObject
 from gi.repository import GLib
 from gi.repository import Gdk
 from gi.repository import Gtk
@@ -22,9 +23,15 @@ class Statusbar(BasicoWidget, Gtk.HBox):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
         Gtk.HBox.__init__(self)
+        GObject.signal_new('statusbar-updated', Statusbar, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.get_services()
         self.setup()
+        self.connect('realize', self.alive)
 
+
+    def alive(self, *args):
+        logviewer = self.srvgui.get_widget('widget_logviewer')
+        logviewer.connect_signals()
 
     def setup(self):
         vbox = Gtk.VBox()
@@ -94,3 +101,8 @@ class Statusbar(BasicoWidget, Gtk.HBox):
             message = record.getMessage()
             label_message.set_markup(message)
             label_priority.set_markup("<b>%s</b>" % priority)
+
+        # Emit signal for logviewer
+        self.emit('statusbar-updated', record)
+
+
