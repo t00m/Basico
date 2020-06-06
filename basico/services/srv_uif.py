@@ -569,3 +569,10 @@ class UIFuncs(Service):
 
     def popover_hide(self, popover):
         popover.hide()
+
+    def activity(self, running):
+        spinner = self.srvgui.get_widget('statusbar_spinner')
+        if running:
+            spinner.start()
+        else:
+            spinner.stop()

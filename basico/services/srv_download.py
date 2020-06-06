@@ -19,10 +19,8 @@ import queue
 import time
 import uuid
 
+from gi.repository import GLib
 from gi.repository import GObject
-
-import asyncio
-
 import psutil
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium import webdriver
@@ -62,6 +60,9 @@ class DownloadManager(Service):
     def initialize(self):
         GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('request-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        GObject.signal_new('download-canceled-user', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('download-canceled-system', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
+
         self.get_services()
         self.kill_gecko_processes()
         self.connect_signals()
@@ -77,6 +78,7 @@ class DownloadManager(Service):
 
     def connect_signals(self):
         self.connect('download-profile-missing', self.srvutl.download_webdriver_setup)
+        self.connect('download-canceled-user', self.cancel)
 
     def kill_gecko_processes(self):
         np = 0
@@ -195,6 +197,17 @@ class DownloadManager(Service):
                     self.emit('request-complete', (self.requests[rid]))
             self.queue.task_done()
 
+    def cancel(self, *args):
+        # ~ def cancel_download():
+        with self.queue.mutex:
+            self.queue.queue.clear()
+        self.log.debug("Download queue empty")
+        # ~ GLib.idle_add(cancel_download)
+
+    def cancel_by_user(self, *args):
+        self.log.warning("Cancel download requested by user")
+        self.emit('download-canceled-user')
+
     def browse_note(self, *args):
         sid = args[1]
         url = SAP_NOTE_URL % sid
@@ -210,9 +223,11 @@ class DownloadManager(Service):
         self.log.info("Displaying PDF for SAP Note %s", sid)
 
     def end(self):
-        self.queue.join()
-        driver = self.get_driver()
-        if driver is not None:
-            driver.quit()
-            self.__set_driver(None)
+        self.log.debug("Stopping Basico Download Manager")
+        # ~ self.queue.join() # FIXME: after cancel download, it doesn't work
+        if self.driver is not None:
+            self.log.debug("Stopping webdriver")
+            self.driver.quit()
+            self.log.debug("Webdriver stopped")
+        self.queue = None
         self.log.debug("Basico Download Manager stopped")

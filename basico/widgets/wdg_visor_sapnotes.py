@@ -822,6 +822,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             bag = args[1]
         except:
             bag = self.get_filtered_bag()
+        self.log.warning("You are about to delete %d notes. Sure?", len(bag))
         # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         # ~ viewmenu = self.srvgui.get_widget('viewmenu')
         answer = self.srvuif.warning_message_delete_sapnotes(None, 'Deleting SAP Notes', 'Are you sure?', bag)

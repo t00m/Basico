@@ -58,6 +58,7 @@ class SAP(Service):
     def connect_signals(self):
         self.connect('sap-download-complete', self.download_complete)
         self.srvweb.connect('request-complete', self.request_complete)
+        self.srvweb.connect('download-canceled-user', self.donwload_canceled)
         self.log.debug("Listening to Firefox Webdriver Service")
 
     def get_services(self):
@@ -145,6 +146,7 @@ class SAP(Service):
             self.log.warning("[%s] \t2. SAP Note %s is not available or doesn't exist", rid, sid)
 
     def request_complete(self, webdrvsrv, data):
+        self.srvuif.activity(True)
         self.log.info("[%s] Request received", data['url_rid'])
         driver = webdrvsrv.get_driver()
         self.log.debug("[%s] %s - URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
@@ -157,12 +159,17 @@ class SAP(Service):
         if bag_empty:
             self.emit('sap-download-complete')
 
+    def donwload_canceled(self, *args):
+        self.srvuif.activity(False)
+
     def download_complete(self, *args):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.update()
+        self.srvuif.activity(False)
         self.log.info("SAP Notes downloaded")
 
     def download(self, bag):
+        self.srvuif.activity(True)
         for sid in bag:
             try:
                 self.log.info("[        ] Requested SAP Note %s" % sid)
