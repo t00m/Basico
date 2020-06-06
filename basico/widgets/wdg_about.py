@@ -23,6 +23,14 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
     """
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
+        self.get_services()
+        self.setup()
+
+    def get_services(self):
+        self.srvgui = self.app.get_service('GUI')
+        self.srvuif = self.app.get_service('UIF')
+
+    def setup(self):
         Gtk.ScrolledWindow.__init__(self)
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.set_hexpand(True)
@@ -83,13 +91,14 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
 
         self.add(viewport)
         self.show_all()
+        self.log.info("About Basico")
 
     def display(self, *args):
-        srvuif = self.get_service('UIF')
         about = self.srvgui.get_widget('widget_about')
         stack = self.srvgui.get_widget('gtk_stack_main')
         stack.set_visible_child_name('about')
         self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
         self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
         # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
-        srvuif.grab_focus()
+        self.srvuif.grab_focus()
+        self.log.info("About Basico")

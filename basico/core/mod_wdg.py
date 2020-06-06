@@ -25,9 +25,7 @@ class BasicoWidget(object):
         @type app: Basico instance
         @param app: current Basico instance reference
         """
-        if app is not None:
-            self.app = app
-
+        self.app = app
         self.log = logging.getLogger(logname)
         self.log.addHandler(self.app.intercepter)
         self.init_section(logname)
