@@ -155,7 +155,6 @@ class SAP(Service):
         bag_empty = len(self.bag_download) == 0
         self.log.debug("SAP Download basket: %s (Empty=%s)", len(self.bag_download), bag_empty)
         if bag_empty:
-            self.log.debug("Download complete")
             self.emit('sap-download-complete')
 
     def download_complete(self, *args):
