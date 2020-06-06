@@ -108,16 +108,26 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         lhbox = self.setup_headerbar_left(hb)
         hb.pack_start(lhbox)
         rhbox = self.setup_headerbar_right(hb)
-
         hb.pack_end(rhbox)
         self.set_titlebar(hb)
         hb.show_all()
 
-
     def setup_headerbar_left(self, hb):
         lhbox = self.srvgui.add_widget('gtk_hbox_hb_left', Gtk.HBox())
-        return lhbox
 
+        ## Visor SAP Notes
+        button = Gtk.Button()
+        icon = self.srvicm.get_pixbuf_icon('basico-dashboard', 24, 24)
+        image = Gtk.Image()
+        image.set_from_pixbuf(icon)
+        button.set_image(image)
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        # ~ popover = Gtk.Popover.new(button)
+        # ~ self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
+        button.connect('clicked', self.show_stack, 'dashboard')
+        lhbox.pack_end(button, False, False, 0)
+
+        return lhbox
 
     def setup_headerbar_right(self, hb):
         rhbox = Gtk.HBox()
@@ -286,12 +296,16 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         self.add(mainbox)
         self.show_all()
 
+    def show_stack(self, *args):
+        stack_name = args[1]
+        stack_main = self.srvgui.get_widget('gtk_stack_main')
+        stack_main.set_visible_child_name(stack_name)
 
     def setup_main_stack(self):
         # Main Stack (Visors / Settings / Help)
         stack_switcher = self.srvgui.add_widget('gtk_stack_switcher_main', Gtk.StackSwitcher())
         lhbox = self.srvgui.get_widget('gtk_hbox_hb_left')
-        lhbox.pack_start(stack_switcher, False, False, 0)
+        # ~ lhbox.pack_start(stack_switcher, False, False, 0)
 
         stack_main = self.srvgui.add_widget('gtk_stack_main', Gtk.Stack())
         stack_switcher.set_stack(stack_main)
@@ -502,12 +516,10 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         box.show_all()
         return box
 
-
     def run(self):
         viewmenu = self.srvgui.get_widget('viewmenu')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-sapnotes')
-
         viewmenu.set_view('collection')
         viewmenu.select_first_entry()
 
