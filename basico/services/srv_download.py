@@ -61,7 +61,7 @@ class DownloadManager(Service):
 
     def initialize(self):
         GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
-        GObject.signal_new('download-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        GObject.signal_new('request-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.get_services()
         self.kill_gecko_processes()
         self.connect_signals()
@@ -192,7 +192,7 @@ class DownloadManager(Service):
                     self.log.debug("[%s] SAP Note %s downloaded", rid, self.requests[rid]['url_sid'])
                     self.retry = 0
                     self.__set_driver_status(DriverStatus.WAITING)
-                    self.emit('download-complete', (self.requests[rid]))
+                    self.emit('request-complete', (self.requests[rid]))
             self.queue.task_done()
 
     def browse_note(self, *args):

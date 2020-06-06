@@ -26,7 +26,7 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         self.sid = sid
         self.current_cid = None
         self.overwrite = overwrite
-        self.log.debug("CollectionsMgtView widget overwrite mode is %s", overwrite)
+        # ~ self.log.debug("CollectionsMgtView widget overwrite mode is %s", overwrite)
         self.get_services()
         self.setup()
         self.update()

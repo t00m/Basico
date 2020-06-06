@@ -12,6 +12,9 @@ import time
 import glob
 import traceback
 from shutil import which
+
+from gi.repository import GObject
+
 from basico.core.mod_srv import Service
 from basico.core.mod_env import LPATH
 from basico.services.srv_collections import COL_DOWNLOADED
@@ -41,66 +44,30 @@ TIMEOUT = 10
 
 
 class SAP(Service):
+    bag_download = set()
+
     def initialize(self):
         '''
         Setup AppLogic Service
         '''
+        GObject.signal_new('sap-download-complete', SAP, GObject.SignalFlags.RUN_LAST, None, () )
         self.get_services()
-        self.__init_config_section()
         self.__fix_collections()
+        self.connect_signals()
 
+    def connect_signals(self):
+        self.connect('sap-download-complete', self.download_complete)
+        self.srvweb.connect('request-complete', self.request_complete)
+        self.log.debug("Listening to Firefox Webdriver Service")
 
     def get_services(self):
+        self.srvgui = self.get_service('GUI')
         self.srvstg = self.get_service('Settings')
         self.srvutl = self.get_service('Utils')
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')
         self.srvweb = self.get_service('Driver')
-        self.srvweb.connect('download-complete', self.download_complete)
-        self.log.debug("Listening to Firefox Webdriver Service")
         self.srvuif = self.get_service("UIF")
-
-
-    def __init_config_section(self):
-        settings = self.srvstg.load()
-        settings[self.section]
-        try:
-            settings[self.section]['LOGIN_PAGE_URL']
-        except:
-            settings[self.section]['LOGIN_PAGE_URL'] = LOGIN_PAGE_URL
-
-        try:
-            settings[self.section]['LOGOUT_PAGE_URL']
-        except:
-            settings[self.section]['LOGOUT_PAGE_URL'] = LOGOUT_PAGE_URL
-
-        try:
-            settings[self.section]['ODATA_NOTE_URL']
-        except:
-            settings[self.section]['ODATA_NOTE_URL'] = ODATA_NOTE_URL
-
-        try:
-            settings[self.section]['ODATA_NOTE_URL_LONGTEXT']
-        except:
-            settings[self.section]['ODATA_NOTE_URL_LONGTEXT'] = ODATA_NOTE_URL_LONGTEXT
-
-        try:
-            settings[self.section]['SAP_NOTE_URL']
-        except:
-            settings[self.section]['SAP_NOTE_URL'] = SAP_NOTE_URL
-
-        try:
-            settings[self.section]['SAP_NOTE_URL_PDF']
-        except:
-            settings[self.section]['SAP_NOTE_URL_PDF'] = SAP_NOTE_URL_PDF
-
-        try:
-            settings[self.section]['TIMEOUT']
-        except:
-            settings[self.section]['TIMEOUT'] = TIMEOUT
-
-        self.srvstg.save(settings)
-
 
     def __fix_collections(self):
         self.log.debug("Fixing collections in SAP Notes")
@@ -132,8 +99,6 @@ class SAP(Service):
             except:
                 pass
         self.log.debug("Fixed %d SAP Notes", n)
-
-
 
     def analyze_sapnote(self, rid, content):
         '''
@@ -173,41 +138,40 @@ class SAP(Service):
             sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add([sapnote])
-            # ~ self.srvuif.statusbar_msg("[%s] SAP Note %s added" % (rid, sid))
         else:
-            # ~ self.srvuif.statusbar_msg("[%s] Error. Metadata for SAP Note %s not valid" % (rid, sid))
             self.log.warning("[%s] Metadata analysis for SAP Note %s failed. Check manually:", rid, sid)
             self.log.warning("[%s] \t1. Make sure you have imported your SAP Passport profile in custom Fireforx profile:", rid)
             self.log.warning("[%s] \t   Edit profile: firefox --profile %s", rid, LPATH['FIREFOX_PROFILE'])
             self.log.warning("[%s] \t2. SAP Note %s is not available or doesn't exist", rid, sid)
 
-    # ~ def dispatch_pdf(self, sid, content):
-        # ~ self.log.debug(glob.glob(os.path.join(LPATH['CACHE_PDF'], '*')))
-        # ~ filename = "%s.pdf" % self.srvutl.format_sid(sid)
-        # ~ target = os.path.join(LPATH['CACHE_PDF'], filename)
-        # ~ with open(target, 'w') as fpdf:
-            # ~ fpdf.write(content)
-        # ~ if os.path.exists(target):
-            # ~ self.log.debug("PDF for SAP Note %s saved to: %s", sid, target)
-
-    def download_complete(self, webdrvsrv, data):
+    def request_complete(self, webdrvsrv, data):
         self.log.info("[%s] Request received", data['url_rid'])
         driver = webdrvsrv.get_driver()
         self.log.debug("[%s] %s - URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
         content = driver.page_source
         eval("self.dispatch_%s(data, content)" % data['url_typ'])
 
+        self.bag_download.remove(data['url_sid'])
+        bag_empty = len(self.bag_download) == 0
+        self.log.debug("SAP Download basket: %s (Empty=%s)", len(self.bag_download), bag_empty)
+        if bag_empty:
+            self.log.debug("Download complete")
+            self.emit('sap-download-complete')
+
+    def download_complete(self, *args):
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        visor_sapnotes.update()
+        self.log.info("SAP Notes downloaded")
+
     def download(self, bag):
         for sid in bag:
             try:
                 self.log.info("[        ] Requested SAP Note %s" % sid)
+                self.bag_download.add(sid)
                 self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
-                # ~ FIXME: self.srvweb.request(sid, SAP_NOTE_URL_PDF % sid, 'pdf')
-
             except Exception as error:
                 self.log.error(error)
                 self.print_traceback()
-
 
     def set_bookmark(self, bag):
         sapnotes = self.srvdtb.get_notes()
@@ -219,7 +183,6 @@ class SAP(Service):
             self.log.info("SAP Note %s bookmarked" % sid)
         self.srvdtb.add(mylist)
 
-
     def set_no_bookmark(self, bag):
         sapnotes = self.srvdtb.get_notes()
         mylist = []
@@ -230,13 +193,11 @@ class SAP(Service):
             self.log.info("SAP Note %s unbookmarked" % sid)
         self.srvdtb.add(mylist)
 
-
     def is_bookmark(self, sapnote):
         try:
             return self.sapnotes[sapnote]['bookmark']
         except:
             return False
-
 
     def switch_bookmark_current_view(self, *args):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
@@ -246,9 +207,9 @@ class SAP(Service):
                 metadata = self.srvdtb.get_sapnote_metadata(sid)
                 bookmark = metadata['bookmark']
                 if bookmark:
-                    self.sapnote_unbookmark([sid])
+                    self.unbookmark([sid])
                 else:
-                    self.sapnote_bookmark([sid])
+                    self.bookmark([sid])
         except:
             self.log.error("Could not bookmark SAP Note %s" % sid)
             self.log.error(self.get_traceback())
@@ -262,10 +223,10 @@ class SAP(Service):
                 metadata = self.srvdtb.get_sapnote_metadata(sid)
                 bookmark = metadata['bookmark']
                 if bookmark:
-                    self.sapnote_unbookmark([sid])
+                    self.unbookmark([sid])
                     self.log.info("SAP Notes unbookmarked")
                 else:
-                    self.sapnote_bookmark([sid])
+                    self.bookmark([sid])
                     self.log.info("SAP Notes bookmarked")
             popover.hide()
         except:
@@ -273,10 +234,8 @@ class SAP(Service):
             self.log.error(self.get_traceback())
         visor_sapnotes.populate()
 
-
-    def sapnote_bookmark(self, lsid):
+    def bookmark(self, lsid):
         self.srvdtb.set_bookmark(lsid)
 
-
-    def sapnote_unbookmark(self, lsid):
+    def unbookmark(self, lsid):
         self.srvdtb.set_no_bookmark(lsid)
