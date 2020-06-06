@@ -182,7 +182,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.connect('clicked', self.srvclb.display_about)
         box.pack_end(button, False, False, 0)
 
-        # ~ ### Help
+        ### Help
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
         icon = self.srvicm.get_pixbuf_icon('basico-help', 48, 48)
         image = Gtk.Image()
@@ -260,9 +260,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
 
     def setup_widgets(self):
-        # Statusbar
-        self.statusbar = self.srvgui.add_widget('widget_statusbar', Statusbar(self.controller))
-
         # Mainbox
         mainbox = self.srvgui.add_widget('gtk_vbox_container_main', Gtk.VBox())
         mainbox.set_hexpand(True)
@@ -272,27 +269,20 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         paned.set_position(0)
 
         # Paned
-        ## left pane (empty)
         paned.add1(Gtk.Box())
 
         ## Right pane
         box = Gtk.VBox()
         box.set_hexpand(True)
-
         stack_main = self.setup_main_stack()
         box.pack_start(stack_main, True, True, 0)
-
-
         paned.add2(box)
         mainbox.pack_start(paned, True, True, 0)
 
-
+        # Statusbar
+        self.statusbar = self.srvgui.add_widget('widget_statusbar', Statusbar(self.controller))
         mainbox.pack_start(self.statusbar, False, False, 0)
 
-        # Connect signals for visor annotations
-        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
-        # ~ visor_annotations.set_menuview_signals()
-        # ~ visor_annotations.set_active_categories()
         self.add(mainbox)
         self.show_all()
 
@@ -300,6 +290,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_name = args[1]
         stack_main = self.srvgui.get_widget('gtk_stack_main')
         stack_main.set_visible_child_name(stack_name)
+        self.log.info("Displaying %s", stack_name)
 
     def setup_main_stack(self):
         # Main Stack (Visors / Settings / Help)

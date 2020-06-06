@@ -67,6 +67,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         self.log.debug("SAP Notes Visor initialized")
 
     def connect_signals(self, *args):
+        self.srvdtb.connect('database-loaded', self.update)
         self.srvdtb.connect('database-updated', self.update)
 
     def get_services(self):
@@ -157,8 +158,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         viewfilter.set_placeholder_text("Filter this view...")
 
         def on_icon_pressed(entry, icon_pos, event):
+            viewmenu = self.srvgui.get_widget('viewmenu')
             if icon_pos == Gtk.EntryIconPosition.PRIMARY:
-                viewmenu = self.srvgui.get_widget('viewmenu')
                 viewmenu.refresh()
             elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
                 viewmenu.menu_expand()

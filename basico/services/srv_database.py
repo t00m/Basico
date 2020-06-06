@@ -42,6 +42,10 @@ class Database(Service):
 
     def setup_signals(self):
         GObject.signal_new('database-updated', Database, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('database-loaded', Database, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('database-closed', Database, GObject.SignalFlags.RUN_LAST, None, () )
+        GObject.signal_new('database-indexed', Database, GObject.SignalFlags.RUN_LAST, None, () )
+
         # ~ GObject.signal_new('database-delete', Database, GObject.SignalFlags.RUN_LAST, None, () )
 
     def __init_config_section(self):
@@ -169,6 +173,7 @@ class Database(Service):
             self.stats['version'].add(version)
             #FIXME self.stats['releaseon'].add(releasedon)
             #FIXME self.stats[''].add(version)
+            self.emit('database-indexed')
 
 
     # ~ def add(self, sapnote, overwrite=True):
@@ -217,7 +222,6 @@ class Database(Service):
         '''
         return self.sapnotes
 
-
     def get_notes_by_node(self, key, value):
         '''
         Return a set of sapnotes which matches with an specific key/value
@@ -253,7 +257,6 @@ class Database(Service):
 
         return bag
 
-
     def get_total(self):
         '''
         Return total sapnotes
@@ -263,7 +266,7 @@ class Database(Service):
 
     def load_notes(self):
         '''
-        If notes.json exists, load notes
+        If notes.json exists, load notes. If not, create it.
         '''
         try:
             with open(FILE['DBSAP'], 'r') as fp:
@@ -272,7 +275,8 @@ class Database(Service):
                 self.log.info("Loaded %d notes from SAP Notes database" % len(self.sapnotes))
         except Exception as error:
             self.save_notes()
-            self.log.info("SAP Notes database not found. Created a new database for SAP Notes")
+            self.log.info("SAP Notes database not found. Created a new database.")
+        self.emit("database-loaded")
 
     def get_sapnote_metadata(self, sid):
         sid = self.normalize_sid(sid)
@@ -282,7 +286,6 @@ class Database(Service):
         except KeyError as error:
             # ~ self.log.debug("SAP Note %s doesn't exist in the database or it's been deleted" % sid)
             return None
-
 
     def exists(self, sid):
         sid = self.normalize_sid(sid)
@@ -309,7 +312,6 @@ class Database(Service):
 
         return component
 
-
     def save_notes(self):
         '''
         Save SAP Notes to json database file
@@ -324,7 +326,6 @@ class Database(Service):
         except Exception as error:
             self.log.error(error)
 
-
     def set_bookmark(self, lsid):
         for sid in lsid:
             sid = self.normalize_sid(sid)
@@ -332,14 +333,12 @@ class Database(Service):
             self.log.info("SAP Note %s bookmarked: True" % sid)
         self.save_notes()
 
-
     def set_no_bookmark(self, lsid):
         for sid in lsid:
             sid = self.normalize_sid(sid)
             self.sapnotes[sid]['bookmark'] = False
             self.log.info("SAP Note %s bookmarked: False" % sid)
         self.save_notes()
-
 
     def is_bookmark(self, sapnote):
         try:
@@ -353,11 +352,9 @@ class Database(Service):
         except:
             return []
 
-
     def get_stats(self):
         self.build_stats()
         return self.stats
-
 
     def search(self, term):
         bag = []
@@ -373,7 +370,6 @@ class Database(Service):
         self.log.debug("Found term '%s' in %d SAP Notes" % (term, len(bag)))
         return bag
 
-
     def normalize_sid(self, sid):
         if isinstance(sid, int):
             sid = "0"*(10 - len(str(sid))) + str(sid)
@@ -381,7 +377,6 @@ class Database(Service):
             sid = "0"*(10 - len(sid)) + sid
 
         return sid
-
 
     def set_collections(self, sid, collections, overwrite=False):
         sid = self.normalize_sid(sid)
@@ -416,7 +411,6 @@ class Database(Service):
             except:
                 self.log.error(error)
 
-
     def delete(self, lsid):
         for sid in lsid:
             sid = self.normalize_sid(sid)
@@ -430,4 +424,5 @@ class Database(Service):
 
     def end(self):
         self.save_notes()
+        self.emit('database-closed')
 
