@@ -966,12 +966,12 @@ class AnnotationsVisor(BasicoWidget, Gtk.HBox):
                 box.pack_start(separator, False, False, 0)
 
                 # Popover button "Jump to SAP Note"
-                if sid != '0000000000':
-                    # Jump to SAP Note
-                    button = get_popover_button("<b>Jump</b> to SAP Note %d" % int(sid), 'basico-jump-sapnote')
-                    button.show_all()
-                    button.connect('clicked', self.srvclb.gui_jump_to_sapnote, sid)
-                    box.pack_start(button, False, False, 0)
+                # ~ if sid != '0000000000':
+                    # ~ # Jump to SAP Note
+                    # ~ button = get_popover_button("<b>Jump</b> to SAP Note %d" % int(sid), 'basico-jump-sapnote')
+                    # ~ button.show_all()
+                    # ~ button.connect('clicked', self.srvclb.gui_jump_to_sapnote, sid)
+                    # ~ box.pack_start(button, False, False, 0)
 
                 button = get_popover_button("<b>Preview</b> annotation", 'basico-preview')
                 button.show_all()

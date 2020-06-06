@@ -93,7 +93,7 @@ class UIFuncs(Service):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.gui_refresh_view, '%s' % view)
+        button.connect('clicked', self.srvclb.gui_menuview_update, '%s' % view)
 
         return button
 
@@ -260,7 +260,7 @@ class UIFuncs(Service):
             pass
 
 
-    def action_collection_copy_to_clipboard(self, button):
+    def action_collection_copy_to_clipboard(self, *args):
         self.srvdtb = self.get_service('DB')
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
@@ -271,16 +271,14 @@ class UIFuncs(Service):
             metadata = self.srvdtb.get_sapnote_metadata(sid)
             text += "SAP Note %s: %s - Component: %s\n" % (str(int(sid)), metadata['title'], metadata['componentkey'])
         clipboard.set_text(text, -1)
-
-        msg = "%d SAP Notes copied to the clipboard" % (len(bag))
-        self.statusbar_msg(msg)
-        self.log.debug(msg)
+        self.log.debug("%d SAP Notes copied to the clipboard: %s" % (len(bag), ', '.join(list(bag))))
+        self.log.info("%d SAP Notes copied to the clipboard" % len(bag))
 
 
     def copy_text_to_clipboard(self, text):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text, -1)
-        msg = "Copied '%s' to clipboard" % text
+        self.log.info("Copied '%s' to clipboard", text)
         self.statusbar_msg(msg)
 
 

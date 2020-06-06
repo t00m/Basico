@@ -501,23 +501,23 @@ class AttachmentsVisor(BasicoWidget, Gtk.VBox):
         # Copy identifier to clipboard
         button = get_popover_button("<b>Copy identifier</b> to clipboard", 'basico-copy-paste')
         button.show_all()
-        button.connect('clicked', self.srvclb.copy_text_to_clipboard, tid)
+        # ~ button.connect('clicked', self.srvclb.copy_text_to_clipboard, tid)
         box.pack_start(button, False, False, 0)
 
-        if sid != '0000000000':
-            # Jump to SAP Note
-            button = get_popover_button("Jump to <b>SAP Note %d</b>" % int(sid), 'basico-jump-sapnote')
-            button.show_all()
-            button.connect('clicked', self.srvclb.gui_jump_to_sapnote, sid)
-            box.pack_start(button, False, False, 0)
+        # ~ if sid != '0000000000':
+            # ~ # Jump to SAP Note
+            # ~ button = get_popover_button("Jump to <b>SAP Note %d</b>" % int(sid), 'basico-jump-sapnote')
+            # ~ button.show_all()
+            # ~ button.connect('clicked', self.srvclb.gui_jump_to_sapnote, sid)
+            # ~ box.pack_start(button, False, False, 0)
 
         if self.srvant.is_valid(aid):
            # Jump to Annotation
-            aid_file = LPATH['ANNOTATIONS'] + aid + '.json'
-            button = get_popover_button("Jump to <b>Annotation</b>", 'basico-jump-sapnote')
-            button.show_all()
-            button.connect('clicked', self.srvclb.gui_jump_to_annotation, aid_file)
-            box.pack_start(button, False, False, 0)
+            # ~ aid_file = LPATH['ANNOTATIONS'] + aid + '.json'
+            # ~ button = get_popover_button("Jump to <b>Annotation</b>", 'basico-jump-sapnote')
+            # ~ button.show_all()
+            # ~ button.connect('clicked', self.srvclb.gui_jump_to_annotation, aid_file)
+            # ~ box.pack_start(button, False, False, 0)
 
         # Separator
         separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)

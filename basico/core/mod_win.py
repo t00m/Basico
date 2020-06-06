@@ -442,26 +442,26 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         return box
 
 
-    def setup_stack_visor_attachments(self):
-        box = Gtk.VBox()
-        box.set_hexpand(True)
+    # ~ def setup_stack_visor_attachments(self):
+        # ~ box = Gtk.VBox()
+        # ~ box.set_hexpand(True)
 
-        ### Visor
-        scr = Gtk.ScrolledWindow()
-        scr.set_hexpand(True)
-        scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scr.set_shadow_type(Gtk.ShadowType.NONE)
-        vwp = Gtk.Viewport()
-        vwp.set_hexpand(True)
-        visor_attachments = self.srvgui.add_widget('visor_attachments', AttachmentsVisor(self.controller))
-        visor_attachments.set_hexpand(True)
-        visor_attachments.set_vexpand(True)
-        vwp.add(visor_attachments)
-        scr.add(vwp)
-        box.pack_start(scr, True, True, 0)
-        visor_attachments.show_all()
-        box.show_all()
-        return box
+        # ~ ### Visor
+        # ~ scr = Gtk.ScrolledWindow()
+        # ~ scr.set_hexpand(True)
+        # ~ scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        # ~ scr.set_shadow_type(Gtk.ShadowType.NONE)
+        # ~ vwp = Gtk.Viewport()
+        # ~ vwp.set_hexpand(True)
+        # ~ visor_attachments = self.srvgui.add_widget('visor_attachments', AttachmentsVisor(self.controller))
+        # ~ visor_attachments.set_hexpand(True)
+        # ~ visor_attachments.set_vexpand(True)
+        # ~ vwp.add(visor_attachments)
+        # ~ scr.add(vwp)
+        # ~ box.pack_start(scr, True, True, 0)
+        # ~ visor_attachments.show_all()
+        # ~ box.show_all()
+        # ~ return box
 
 
     def setup_main_stack_about(self):
@@ -506,11 +506,10 @@ class GtkAppWindow(Gtk.ApplicationWindow):
     def run(self):
         viewmenu = self.srvgui.get_widget('viewmenu')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-
         stack_visors.set_visible_child_name('visor-sapnotes')
-        viewmenu.set_view('collection')
 
-        # ~ self.srvclb.gui_viewmenu_select_first_entry()
+        viewmenu.set_view('collection')
+        viewmenu.select_first_entry()
 
     def window_stack_visor_change(self, stack, gparam):
         visible_stack_name = stack.get_visible_child_name()
@@ -530,31 +529,58 @@ class GtkAppWindow(Gtk.ApplicationWindow):
             visor_attachments = self.srvgui.get_widget('visor_attachments')
             visor_attachments.populate()
 
-    def gui_stack_dashboard_show(self, *args):
-        stack = self.srvgui.get_widget('gtk_stack_main')
-        # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        current_view = viewmenu.get_view()
+    # ~ def gui_stack_dashboard_show(self, *args):
+        # ~ stack = self.srvgui.get_widget('gtk_stack_main')
+        # ~ # # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
+        # ~ viewmenu = self.srvgui.get_widget('viewmenu')
+        # ~ current_view = viewmenu.get_view()
 
-        # ~ notebook_menuview.show_all()
-        stack.set_visible_child_name('dashboard')
-        self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
+        # notebook_menuview.show_all()
+        # ~ stack.set_visible_child_name('dashboard')
+        # ~ self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
+        # ~ # # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
 
-        if current_view == 'annotation':
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        else:
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        # ~ self.srvuif.statusbar_msg("Displaying application dashboard")
+        # ~ if current_view == 'annotation':
+            # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
+        # ~ else:
+            # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
+        # ~ # # ~ self.srvuif.statusbar_msg("Displaying application dashboard")
 
-    def gui_toggle_help_visor(self, *args):
-        button = self.srvgui.get_widget('gtk_togglebutton_help')
-        notebook = self.srvgui.get_widget('gtk_notebook_visor')
+    # ~ def gui_toggle_help_visor(self, *args):
+        # ~ button = self.srvgui.get_widget('gtk_togglebutton_help')
+        # ~ notebook = self.srvgui.get_widget('gtk_notebook_visor')
 
-        if button.get_active():
-            self.srvuif.set_widget_visibility('gtk_notebook_help_page', True)
-            notebook.set_current_page(2)
-        else:
-            self.srvuif.set_widget_visibility('gtk_notebook_help_page', False)
-            notebook.set_current_page(0)
+        # ~ if button.get_active():
+            # ~ self.srvuif.set_widget_visibility('gtk_notebook_help_page', True)
+            # ~ notebook.set_current_page(2)
+        # ~ else:
+            # ~ self.srvuif.set_widget_visibility('gtk_notebook_help_page', False)
+            # ~ notebook.set_current_page(0)
         # ~ self.srvuif.statusbar_msg("Displaying application help")
+
+    # ~ def gui_toggle_fullscreen(self, button):
+        # ~ icon_container = self.srvgui.get_widget('gtk_box_container_icon_fullscreen')
+        # ~ icon_fullscreen = self.srvicm.get_new_image_icon('basico-fullscreen', 24, 24)
+        # ~ icon_unfullscreen = self.srvicm.get_new_image_icon('basico-unfullscreen', 24, 24)
+        # ~ active = button.get_active()
+        # ~ window = self.srvgui.get_window()
+        # ~ if active:
+            # ~ self.srvgui.swap_widget(icon_container, icon_unfullscreen)
+            # ~ window.fullscreen()
+        # ~ else:
+            # ~ self.srvgui.swap_widget(icon_container, icon_fullscreen)
+            # ~ window.unfullscreen()
+
+    # ~ def gui_toggle_menu_view(self, obj):
+        # ~ paned = self.srvgui.get_widget('gtk_vbox_container_menu_view')
+        # ~ button = self.srvgui.get_widget('gtk_toogletoolbutton_menu_view')
+        # ~ if isinstance(obj, Gtk.ToggleToolButton):
+            # ~ if button.get_active():
+                # ~ paned.show_all()
+            # ~ else:
+                # ~ paned.hide()
+        # ~ elif isinstance(obj, bool):
+            # ~ if obj == True:
+                # ~ button.set_active(True)
+            # ~ else:
+                # ~ button.set_active(False)

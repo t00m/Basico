@@ -60,7 +60,7 @@ class UIApp(Gtk.Application):
             self.log.debug("Basico is already running!")
         splash = self.app.get_splash()
         splash.hide()
-        self.th = threading.Thread(name='statusbar', target=self.srvclb.update_statusbar)
+        self.th = threading.Thread(name='statusbar', target=self.srvclb.gui_statusbar_update)
         self.th.setDaemon(True)
         self.th.start()
 

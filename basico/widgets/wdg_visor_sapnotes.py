@@ -143,7 +143,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         viewmenu.set_vexpand(True)
         completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
         viewfilter.set_completion(completion)
-        viewfilter.connect('activate', self.srvclb.gui_viewmenu_filter)
+        viewfilter.connect('activate', viewmenu.filter)
 
         icon = self.srvicm.get_pixbuf_icon('basico-refresh')
         viewfilter.set_icon_from_pixbuf(Gtk.EntryIconPosition.PRIMARY, icon)
@@ -161,7 +161,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
                 viewmenu = self.srvgui.get_widget('viewmenu')
                 viewmenu.refresh()
             elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
-                self.srvclb.expand_menuview()
+                viewmenu.menu_expand()
 
         viewfilter.connect("icon-press", on_icon_pressed)
 
@@ -722,7 +722,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             button = get_popover_button("<b>Add</b> new to SAP Note %d" % isid, 'basico-attachment')
             button.set_property('margin', 3)
             button.show_all()
-            button.connect('clicked', self.srvclb.gui_attachment_add_to_sapnote, sid)
+            # ~ button.connect('clicked', self.srvclb.gui_attachment_add_to_sapnote, sid)
             fbox.pack_start(button, False, False, 0)
 
             # Popover button "Show attachments"
@@ -747,12 +747,12 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
             # Popover button "Bookmark"
             button = get_popover_button("<b>(Un)bookmark</b> SAP Note %d" % isid, 'basico-bookmarks')
-            button.connect('clicked', self.srvclb.switch_bookmark, [sid], popover)
+            button.connect('clicked', self.srvsap.switch_bookmark, [sid], popover)
             box.pack_start(button, False, False, 0)
 
             # Popover button "Copy to clipboard"
             button = get_popover_button("<b>Copy</b> SAP Note %d details <b>to clipboard</b>" % isid, 'basico-clipboard')
-            button.connect('clicked', self.srvclb.gui_copy_to_clipboard_sapnote, [sid], popover)
+            button.connect('clicked', self.copy_to_clipboard, [sid], popover)
             box.pack_start(button, False, False, 0)
 
             # Separator
@@ -829,3 +829,15 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             self.log.info("Deleted %d SAP Notes", len(bag))
         else:
             self.log.info("Action canceled by user. Nothing deleted!")
+
+    def copy_to_clipboard(self, widget, lsid, popover):
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        text = ''
+        for sid in lsid:
+            metadata = self.srvdtb.get_sapnote_metadata(sid)
+            text += "SAP Note %10s: %s - Component: %s\n" % (sid, metadata['title'], metadata['componentkey'])
+        clipboard.set_text(text, -1)
+        if popover is not None:
+            popover.hide()
+            self.srvuif.grab_focus()
+        self.log.info("%d SAP Notes copied to clipboard", len(lsid))

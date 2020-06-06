@@ -330,7 +330,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         # Popover button "export to CSV"
         button = get_popover_button("Export to <b>csv</b>", 'basico-backup-text-csv')
         self.srvgui.add_widget("gtk_button_popover_manage_collections", button)
-        button.connect('clicked', self.srvclb.action_collection_export_text_csv)
+        # ~ button.connect('clicked', self.srvclb.action_collection_export_text_csv)
         box.pack_start(button, False, False, 0)
 
         # Popover button "export to Excel"
@@ -342,7 +342,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         # Popover button "export to Basico format"
         button = get_popover_button("Export to <b>Basico format</b>", 'basico-component')
         self.srvgui.add_widget("gtk_button_popover_manage_collections", button)
-        button.connect('clicked', self.srvclb.action_collection_export_basico)
+        # ~ button.connect('clicked', self.srvbnr.action_collection_export_basico)
         box.pack_start(button, False, False, 0)
 
         return box
@@ -382,7 +382,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
         # Popover button copy to clipboard
         button = get_popover_button("<b>Copy to clipboard</b> %d SAP Notes" % count, 'basico-clipboard')
-        button.connect('clicked', self.srvclb.action_collection_copy_to_clipboard)
+        button.connect('clicked', self.srvuif.action_collection_copy_to_clipboard)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Export collection"
@@ -406,7 +406,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
         # Popover button "Bookmark all SAP Notes in this view"
         button = get_popover_button("<b>(Un)Bookmark</b> %d SAP Notes in this view" % count, 'basico-bookmarks')
-        button.connect('clicked', self.srvclb.switch_bookmark_current_view)
+        button.connect('clicked', self.srvsap.switch_bookmark_current_view)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Delete all SAP Notes in this view"
@@ -803,3 +803,38 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 node = self.get_node_date_day(downloaded, key_day, str(count))
                 treepids[key_day] = self.model.append(treepids[key_month], node)
 
+    def select_first_entry(self):
+        viewmenu = self.srvgui.get_widget('viewmenu')
+        selection = viewmenu.get_selection()
+        selection.select_path("0")
+
+    def filter(self, *args):
+        entry = self.srvgui.get_widget('gtk_entry_filter_view')
+        filter = entry.get_text()
+        viewmenu = self.srvgui.get_widget('viewmenu')
+        selection = viewmenu.get_selection()
+
+        def gui_iterate_over_data(model, path, itr):
+            rowkey = model.get(itr, 0)[0]
+            rowtype, rowval = rowkey.split('@')
+            dsc = model.get(itr, 1)[0]
+            contents = model.get(itr, 1)[0]
+            cleanstr = contents.replace('<b>', '')
+            cleanstr = cleanstr.replace('</b>', '')
+            model.set(itr, 1, '%s' % cleanstr)
+            viewmenu.collapse_row(path)
+
+            if len(filter) > 0:
+                if filter.upper() in rowval.upper() or filter.upper() in dsc.upper():
+                    viewmenu.expand_to_path (path)
+                    selection.select_path(path)
+                    model.set(itr, 1, '<b>%s</b>' % contents)
+            else:
+                return
+
+        model = viewmenu.get_model()
+        model.foreach(gui_iterate_over_data)
+
+    def menu_expand(self, *args):
+        viewmenu = self.srvgui.get_widget('viewmenu')
+        viewmenu.expand_all()

@@ -96,14 +96,12 @@ class Collections(Service):
 
     def create(self, name, cid=None, batch=False):
         if len(name) == 0:
-            msg = "Trying to create a collection without name is not allowed"
-            self.log.debug(msg)
+            self.log.debug("Trying to create a collection without name is not allowed")
             return (False, msg)
 
         name_exists = name in self.get_collections_name()
-        if name_exists:                
+        if name_exists:
             cid = self.get_cid_by_name(name)
-            msg = "Collection '%s' already exists in the database with cid: %s" % (name, cid)
             self.log.info("Collection '%s' already exists in the database with cid: %s" % (name, cid))
             return (False, "Collection '%s' already exists in the database" % name)
         else:
@@ -113,12 +111,11 @@ class Collections(Service):
                 if cid_exists:
                     self.log.info("Collision? :) Let's try again with another id...")
                     self.create(name)
-        
-            self.clts[cid] = name            
-            msg = "Created collection: '%s' with cid: '%s'" % (name, cid)
-            self.log.info(msg)
+
+            self.clts[cid] = name
+            self.log.info("Created collection: '%s' with cid: '%s'", name, cid)
             if batch is False:
-                self.save()            
+                self.save()
             return (True, "Created collection: %s" % name)
 
 
@@ -128,15 +125,14 @@ class Collections(Service):
         if name == 'Downloaded':
             self.log.warning("You can't delete this collection")
             return
-            
+
         try:
             sapnotes = self.srvdtb.get_notes_by_node('collection', cid)
             if len(sapnotes) > 0:
                 return False
             else:
                 del(self.clts[cid])
-                msg = "Collection %s deleted" % name
-                self.log.info(msg)
+                self.log.info("Collection %s deleted", name)
                 self.save()
                 return True
         except KeyError:
@@ -148,7 +144,7 @@ class Collections(Service):
 
 
     def get_name_by_cid(self, cid):
-        try: 
+        try:
             return self.clts[cid]
         except KeyError:
             return None

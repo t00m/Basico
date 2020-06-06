@@ -491,3 +491,84 @@ class BackupRestoreMan(Service):
 
         # ~ dialog.destroy()
         # ~ self.srvuif.grab_focus()
+
+
+    # ~ def action_collection_export_text_csv(self, *args):
+        # ~ rootwin = self.srvgui.get_window()
+        # ~ timestamp = self.srvutl.timestamp()
+        # ~ filename = "%s%s.csv" % (LPATH['EXPORT'], timestamp)
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+
+        # ~ bag = visor_sapnotes.get_filtered_bag()
+
+        # ~ dialog = Gtk.FileChooserDialog("Save file", rootwin,
+            # ~ Gtk.FileChooserAction.SAVE,
+                # ~ (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 # ~ Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        # ~ dialog.set_filename(filename)
+        # ~ dialog.set_current_name(os.path.basename(filename))
+        # ~ response = dialog.run()
+
+        # ~ if response == Gtk.ResponseType.OK:
+            # ~ export_path = dialog.get_filename()
+            # ~ res = self.srvbnr.export_to_text_csv(bag, export_path)
+            # ~ self.log.info("%d SAP Notes exported to CSV format: %s", len(bag), export_path)
+            # ~ self.srvuif.copy_text_to_clipboard(export_path)
+        # ~ else:
+            # ~ self.log.info("Export canceled by user")
+        # ~ dialog.destroy()
+
+
+    # ~ def action_collection_export_excel(self, *args):
+        # ~ rootwin = self.srvgui.get_window()
+        # ~ timestamp = self.srvutl.timestamp()
+        # ~ filename = "%s%s.xlsx" % (LPATH['EXPORT'], timestamp)
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+
+        # ~ bag = visor_sapnotes.get_filtered_bag()
+
+        # ~ dialog = Gtk.FileChooserDialog("Save file", rootwin,
+            # ~ Gtk.FileChooserAction.SAVE,
+                # ~ (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 # ~ Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        # ~ dialog.set_filename(filename)
+        # ~ dialog.set_current_name(os.path.basename(filename))
+        # ~ response = dialog.run()
+
+        # ~ if response == Gtk.ResponseType.OK:
+            # ~ export_path = dialog.get_filename()
+            # ~ res = self.srvbnr.export_to_excel(bag, export_path)
+            # ~ if res:
+                # ~ self.log.info("Selected SAP Notes exported to MS Excel format (xlsx): %s" % export_path)
+                # ~ self.srvuif.copy_text_to_clipboard(export_path)
+            # ~ else:
+                # ~ self.log.error(self.get_traceback())
+        # ~ else:
+            # ~ self.log.info("Export canceled by user")
+        # ~ dialog.destroy()
+
+
+    # ~ def action_collection_export_basico(self, *args):
+        # ~ rootwin = self.srvgui.get_window()
+        # ~ timestamp = self.srvutl.timestamp()
+        # ~ filename = "%s%s.bco" % (LPATH['EXPORT'], timestamp)
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+
+        # ~ bag = visor_sapnotes.get_filtered_bag()
+
+        # ~ dialog = Gtk.FileChooserDialog("Save file", rootwin,
+            # ~ Gtk.FileChooserAction.SAVE,
+                # ~ (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 # ~ Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        # ~ dialog.set_filename(filename)
+        # ~ dialog.set_current_name(os.path.basename(filename))
+        # ~ response = dialog.run()
+
+        # ~ if response == Gtk.ResponseType.OK:
+            # ~ export_path = dialog.get_filename()
+            # ~ target = self.srvbnr.export_to_basico(bag, export_path)
+            # ~ self.log.info("%d SAP Notes exported to Basico %s format: %s", len(bag), APP['version'], target)
+            # ~ self.srvuif.copy_text_to_clipboard(export_path)
+        # ~ else:
+            # ~ self.log.info("Export canceled by user")
+        # ~ dialog.destroy()

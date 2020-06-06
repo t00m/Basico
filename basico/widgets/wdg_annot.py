@@ -177,12 +177,11 @@ class AnnotationToolbar(BasicoWidget, Gtk.HBox):
         self.toolbar.insert(tool, -1)
 
         # Attachment button
-        tool = self.srvgui.add_widget('gtk_button_annotation_toolbar_attachment', Gtk.ToolButton())
-        tool.set_tooltip_markup('<b>Attach file(s) to this annotation</b>')
-        tool.set_icon_name('basico-attachment')
-        # ~ popover = self.srvgui.add_widget('gtk_button_annotation_toolbar_attachment', Gtk.Popover.new(tool))
-        tool.connect('clicked', self.srvclb.gui_attachment_add_to_annotation)
-        self.toolbar.insert(tool, -1)
+        # ~ tool = self.srvgui.add_widget('gtk_button_annotation_toolbar_attachment', Gtk.ToolButton())
+        # ~ tool.set_tooltip_markup('<b>Attach file(s) to this annotation</b>')
+        # ~ tool.set_icon_name('basico-attachment')
+        # ~ tool.connect('clicked', self.srvclb.gui_attachment_add_to_annotation)
+        # ~ self.toolbar.insert(tool, -1)
 
         # Separator
         tool = self.srvuif.get_toolbar_separator(False, True)
@@ -236,7 +235,7 @@ class AnnotationToolbar(BasicoWidget, Gtk.HBox):
         # ~ tool.set_is_important(True)
         tool.set_tooltip_markup('<b>Previous annotation</b>')
         tool.set_icon_name('basico-arrow-up')
-        tool.connect('clicked', self.srvclb.gui_annotation_previous_row)
+        # ~ tool.connect('clicked', self.srvclb.gui_annotation_previous_row)
         self.toolbar.insert(tool, -1)
 
         # Arrow DOWN
@@ -249,7 +248,7 @@ class AnnotationToolbar(BasicoWidget, Gtk.HBox):
         # ~ tool.set_expand(False)
         tool.set_tooltip_markup('<b>Next annotation</b>')
         tool.set_icon_name('basico-arrow-down')
-        tool.connect('clicked', self.srvclb.gui_annotation_next_row)
+        # ~ tool.connect('clicked', self.srvclb.gui_annotation_next_row)
         self.toolbar.insert(tool, -1)
 
         # ~ # Separator
@@ -923,3 +922,12 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
         # ~ self.srvuif.set_widget_visibility('visortoolbar', True)
         # ~ self.gui_stack_dashboard_show()
         # ~ self.srvuif.grab_focus()
+
+    # ~ def gui_annotation_previous_row(self, *args):
+        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
+        # ~ visor_annotations.row_previous()
+
+
+    # ~ def gui_annotation_next_row(self, *args):
+        # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
+        # ~ visor_annotations.row_next()

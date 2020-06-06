@@ -237,3 +237,46 @@ class SAP(Service):
         except:
             return False
 
+
+    def switch_bookmark_current_view(self, *args):
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        bag = visor_sapnotes.get_filtered_bag()
+        try:
+            for sid in bag:
+                metadata = self.srvdtb.get_sapnote_metadata(sid)
+                bookmark = metadata['bookmark']
+                if bookmark:
+                    self.sapnote_unbookmark([sid])
+                else:
+                    self.sapnote_bookmark([sid])
+        except:
+            self.log.error("Could not bookmark SAP Note %s" % sid)
+            self.log.error(self.get_traceback())
+        visor_sapnotes.populate(bag)
+        self.log.info("%d SAP Notes (un)bookmarked", len(bag))
+
+    def switch_bookmark(self, button, lsid, popover):
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        try:
+            for sid in lsid:
+                metadata = self.srvdtb.get_sapnote_metadata(sid)
+                bookmark = metadata['bookmark']
+                if bookmark:
+                    self.sapnote_unbookmark([sid])
+                    self.log.info("SAP Notes unbookmarked")
+                else:
+                    self.sapnote_bookmark([sid])
+                    self.log.info("SAP Notes bookmarked")
+            popover.hide()
+        except:
+            self.log.error("Could not bookmark SAP Note %s" % sid)
+            self.log.error(self.get_traceback())
+        visor_sapnotes.populate()
+
+
+    def sapnote_bookmark(self, lsid):
+        self.srvdtb.set_bookmark(lsid)
+
+
+    def sapnote_unbookmark(self, lsid):
+        self.srvdtb.set_no_bookmark(lsid)

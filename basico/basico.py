@@ -209,8 +209,6 @@ class Basico(object):
         Start Basico
         """
         GUI = self.get_service('GUI')
-        # ~ self.srvclb = self.get_service('Callbacks')
-        # ~ GLib.timeout_add(500, self.srvclb.update_statusbar)
         GUI.run()
 
 
