@@ -99,6 +99,7 @@ class LogViewer(BasicoWidget, Gtk.Box):
         column.set_expand(False)
         column.set_clickable(False)
         column.set_sort_indicator(False)
+        column.set_cell_data_func(renderer, self.change_color)
         treeview.append_column(column)
 
         # Module
@@ -109,6 +110,7 @@ class LogViewer(BasicoWidget, Gtk.Box):
         column.set_expand(False)
         column.set_clickable(False)
         column.set_sort_indicator(False)
+        column.set_cell_data_func(renderer, self.change_color)
         treeview.append_column(column)
 
         # Timestamp seconds
@@ -129,6 +131,7 @@ class LogViewer(BasicoWidget, Gtk.Box):
         column.set_expand(False)
         column.set_clickable(False)
         column.set_sort_indicator(False)
+        column.set_cell_data_func(renderer, self.change_color)
         treeview.append_column(column)
 
         # Message
@@ -139,6 +142,7 @@ class LogViewer(BasicoWidget, Gtk.Box):
         column.set_expand(True)
         column.set_clickable(False)
         column.set_sort_indicator(False)
+        column.set_cell_data_func(renderer, self.change_color)
         treeview.append_column(column)
         self.column_message = column
 
@@ -150,6 +154,12 @@ class LogViewer(BasicoWidget, Gtk.Box):
         treeview.set_enable_tree_lines(True)
         treeview.set_model(model)
         self.show_all()
+
+    def change_color(self, column, renderer, model, riter, data):
+        levelno = model.get(riter, 0)
+        if levelno == 10:
+            renderer.set_property('cell-background','red')
+
 
     def update(self, *args):
         treeview = self.srvgui.get_widget('logviewer_treeview')
