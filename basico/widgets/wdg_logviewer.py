@@ -156,9 +156,17 @@ class LogViewer(BasicoWidget, Gtk.Box):
         self.show_all()
 
     def change_color(self, column, renderer, model, riter, data):
-        levelno = model.get(riter, 0)
+        levelno = model.get(riter, 0)[0]
         if levelno == 10:
-            renderer.set_property('cell-background','red')
+            renderer.set_property('background', 'lightgray')
+        elif levelno == 20:
+            renderer.set_property('background', 'lightgreen')
+        elif levelno == 30:
+            renderer.set_property('background', 'orange')
+        elif levelno == 40:
+            renderer.set_property('background', 'red')
+        elif levelno == 40:
+            renderer.set_property('background', 'purple')
 
 
     def update(self, *args):
