@@ -29,8 +29,9 @@ class Collections(Service):
 
         # Always check if 'Downloaded' collection exists
         if not self.exists(COL_DOWNLOADED):
+            self.log.warning("Default collection <i>Download</i> not found")
             self.create('Downloaded', COL_DOWNLOADED)
-
+            self.log.info("Created collection <i>Download</i>")
 
     def get_services(self):
         self.srvgui = self.get_service("GUI")
@@ -52,11 +53,12 @@ class Collections(Service):
         try:
             with open(FILE['DBCOLS'], 'r') as ft:
                 self.clts = json.load(ft)
-                self.log.info("Collections Database found at: %s", FILE['DBCOLS'])
-                self.log.info ("Loaded %d collections" % len(self.clts))
+                self.log.info("Collections database found")
+                self.log.debug("Collections Database found at: %s with %d collections", FILE['DBCOLS'], len(self.clts))
         except Exception as error:
+            self.log.warning("Collections database not found.")
             self.save()
-            self.log.info("Collections database not found. Created a new database.")
+            self.log.info("Created a new Collections database.")
 
 
     def save(self, collections={}):
@@ -105,20 +107,19 @@ class Collections(Service):
         name_exists = name in self.get_collections_name()
         if name_exists:
             cid = self.get_cid_by_name(name)
-            msg = "Collection '%s' already exists in the database with cid: %s" % (name, cid)
-            self.log.info("Collection '%s' already exists in the database with cid: %s" % (name, cid))
+            self.log.warning("Collection '%s' already exists in the database with cid: %s" % (name, cid))
             return (False, "Collection '%s' already exists in the database" % name)
         else:
             if cid is None:
                 cid = str(uuid.uuid4())
                 cid_exists = cid in self.get_collections_id()
                 if cid_exists:
-                    self.log.info("Collision? :) Let's try again with another id...")
+                    self.log.error("Collision? :) Let's try again with another id...")
                     self.create(name)
 
             self.clts[cid] = name
-            msg = "Created collection: '%s' with cid: '%s'" % (name, cid)
-            self.log.info(msg)
+            self.log.debug("Created collection: '%s'", name)
+            self.log.debug("Created collection: '%s' with cid: '%s'",name, cid)
             if batch is False:
                 self.save()
             return (True, "Created collection: %s" % name)
@@ -127,8 +128,8 @@ class Collections(Service):
     def delete(self, cid):
         # Do not allow to delete this 'system' collection
         name = self.get_name_by_cid(cid)
-        if name == 'Downloaded':
-            self.log.warning("You can't delete this collection")
+        if cid == COL_DOWNLOADED:
+            self.log.warning("You can't delete this collection: <i>%s</i>", name)
             return
 
         try:
@@ -137,16 +138,13 @@ class Collections(Service):
                 return False
             else:
                 del(self.clts[cid])
-                msg = "Collection %s deleted" % name
-                self.log.info(msg)
+                self.log.info("<b>Collection <i>%s</i> deleted</b>", name)
                 self.save()
                 return True
         except KeyError:
-            self.log.debug("You can't delete a non existent collection...")
+            self.log.error("<b>You can't delete a non existent collection...</b>")
         except Exception as error:
-            self.log.debug("Error deleting collection: %s" % error)
-            self.log.debug(self.clts)
-            raise
+            self.log.error("<b>Error deleting collection: <i>%s</i></b>" % self.get_traceback())
 
 
     def get_name_by_cid(self, cid):
@@ -169,17 +167,17 @@ class Collections(Service):
         # check if collections name are the same
         source = self.get_name_by_cid(cid)
         if source == target:
-            self.log.debug("Rename not possible: same name.")
+            self.log.warning("Rename not possible: same name.")
             return
 
         # check if the new name already exists in database
         acid = self.get_cid_by_name(target)
         if acid is not None:
-            self.log.debug("Rename not possible: there is already another collection with this name.")
+            self.log.warning("Rename not possible: there is already another collection with this name.")
             return
 
         # Finally, rename the collection and save it.
         self.clts[cid] = target
-        msg = "Collection '%s' renamed from '%s' to '%s'" % (cid, source, target)
-        self.log.debug(msg)
+        self.log.info("Collection <i>%s</i> renamed to <i>%s</i>", source, target)
+        self.log.debug("Collection '%s' renamed from '%s' to '%s'", cid, source, target)
         self.save()
