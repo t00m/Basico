@@ -289,7 +289,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_name = args[1]
         stack_main = self.srvgui.get_widget('gtk_stack_main')
         stack_main.set_visible_child_name(stack_name)
-        self.log.info("Displaying %s", stack_name)
+        self.log.debug("Displaying %s", stack_name)
 
     def setup_main_stack(self):
         # Main Stack (Visors / Settings / Help)

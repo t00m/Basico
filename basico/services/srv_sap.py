@@ -58,6 +58,7 @@ class SAP(Service):
     def connect_signals(self):
         self.connect('sap-download-complete', self.download_complete)
         self.srvweb.connect('request-complete', self.request_complete)
+        self.srvweb.connect('request-canceled', self.request_canceled)
         self.srvweb.connect('download-canceled-user', self.donwload_canceled)
         self.log.debug("Listening to Firefox Webdriver Service")
 
@@ -159,6 +160,12 @@ class SAP(Service):
         if bag_empty:
             self.emit('sap-download-complete')
 
+    def request_canceled(self, webdrvsrv, data):
+        self.srvuif.activity(True)
+        self.log.error("[%s] Request canceled", data['url_rid'])
+        self.bag_download.remove(data['url_sid'])
+        self.bag_download = set()
+
     def donwload_canceled(self, *args):
         self.srvuif.activity(False)
 
@@ -176,8 +183,9 @@ class SAP(Service):
                 self.bag_download.add(sid)
                 self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
             except Exception as error:
-                self.log.error(error)
-                self.print_traceback()
+                pass
+                # ~ self.log.error(error)
+                # ~ self.print_traceback()
 
     def set_bookmark(self, bag):
         sapnotes = self.srvdtb.get_notes()

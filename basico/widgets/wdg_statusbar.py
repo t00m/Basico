@@ -94,7 +94,6 @@ class Statusbar(BasicoWidget, Gtk.HBox):
     def message(self, record):
         # Display messages with priority INFO|WARNING|ERROR|CRITICAL
         if record.levelno > 10:
-            # ~ print(dir(record))
             label_message = self.srvgui.get_widget('statusbar_label_message')
             label_priority = self.srvgui.get_widget('statusbar_label_priority')
             priority = record.levelname

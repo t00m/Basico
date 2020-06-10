@@ -60,6 +60,7 @@ class DownloadManager(Service):
     def initialize(self):
         GObject.signal_new('download-profile-missing', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('request-complete', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        GObject.signal_new('request-canceled', DownloadManager, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         GObject.signal_new('download-canceled-user', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('download-canceled-system', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
 
@@ -117,13 +118,19 @@ class DownloadManager(Service):
     def request(self, url_sid, url_uri, url_type):
         uuid4 = str(uuid.uuid4())
         rid = uuid4[:uuid4.find('-')]
-        alive = self.th.is_alive()
-        self.log.debug("[%s] Download thread alive? %s" , rid, alive)
-        if not alive:
-            self.log.debug("[%s] Restarting download process", rid)
-            self.th = threading.Thread(name='download', target=self.download)
-            self.th.setDaemon(True)
-            self.th.start()
+
+        try:
+            alive = self.th.is_alive()
+            self.log.debug("[%s] Download thread alive? %s" , rid, alive)
+            if not alive:
+                self.log.debug("[%s] Restarting download process", rid)
+                self.th = threading.Thread(name='download', target=self.download)
+                self.th.setDaemon(True)
+                self.th.start()
+        except Exception:
+            self.log.error("You need an internet connection and having configured your custom Firefox profile")
+            self.emit("request-canceled", self.request[rid])
+            return
 
         has_profile = self.check_profile(rid)
         if not has_profile:
