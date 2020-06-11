@@ -140,11 +140,11 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
         hbox = Gtk.HBox()
         viewfilter = self.srvgui.add_widget('gtk_entry_filter_view', Gtk.Entry())
-        viewmenu = self.srvgui.add_widget('viewmenu', MenuView(self.app))
-        viewmenu.set_vexpand(True)
-        completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
+        menuview = self.srvgui.add_widget('menuview', MenuView(self.app))
+        menuview.set_vexpand(True)
+        completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         viewfilter.set_completion(completion)
-        viewfilter.connect('activate', viewmenu.filter)
+        viewfilter.connect('activate', menuview.filter)
 
         icon = self.srvicm.get_pixbuf_icon('basico-refresh')
         viewfilter.set_icon_from_pixbuf(Gtk.EntryIconPosition.PRIMARY, icon)
@@ -158,11 +158,11 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         viewfilter.set_placeholder_text("Filter this view...")
 
         def on_icon_pressed(entry, icon_pos, event):
-            viewmenu = self.srvgui.get_widget('viewmenu')
+            menuview = self.srvgui.get_widget('menuview')
             if icon_pos == Gtk.EntryIconPosition.PRIMARY:
-                viewmenu.refresh()
+                menuview.refresh()
             elif icon_pos == Gtk.EntryIconPosition.SECONDARY:
-                viewmenu.menu_expand()
+                menuview.menu_expand()
 
         viewfilter.connect("icon-press", on_icon_pressed)
 
@@ -186,13 +186,13 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         vwp.set_hexpand(True)
         viewsbox = self.srvgui.add_widget('gtk_box_container_views', Gtk.Box())
         # ~ viewsbox.set_hexpand(True)
-        viewsbox.pack_start(viewmenu, True, True, 0)
+        viewsbox.pack_start(menuview, True, True, 0)
         vwp.add(viewsbox)
         scr.add(vwp)
         box_trv.pack_start(scr, True, True, 0)
         box.pack_start(box_trv, True, True, 0)
         # ~ box.show_all()
-        # ~ box.add(viewmenu)
+        # ~ box.add(menuview)
         return box
 
 
@@ -462,8 +462,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
     def update_total_sapnotes_count(self):
         entry = self.srvgui.get_widget('gtk_entry_filter_visor')
         term = entry.get_text()
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        view = viewmenu.get_view()
+        menuview = self.srvgui.get_widget('menuview')
+        view = menuview.get_view()
         visible_filter = self.srvgui.get_widget('visor_sapnotes_visible_filter')
         statusbar = self.srvgui.get_widget('widget_statusbar')
         lblnotescount = self.srvgui.get_widget('gtk_label_total_notes')
@@ -762,10 +762,10 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
             # Assing SAP Notes in current view to a category
             # Only available in Donwloaded category
-            viewmenu = self.srvgui.get_widget('viewmenu')
-            current_viewmenu = viewmenu.get_view()
-            current_collection = viewmenu.get_current_collection()
-            view_is_collection = current_viewmenu == 'collection'
+            menuview = self.srvgui.get_widget('menuview')
+            current_menuview = menuview.get_view()
+            current_collection = menuview.get_current_collection()
+            view_is_collection = current_menuview == 'collection'
             collection_is_downloaded = current_collection == COL_DOWNLOADED
 
             # Popover button Collection Management
@@ -824,7 +824,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
             bag = self.get_filtered_bag()
         self.log.warning("You are about to delete %d notes. Sure?", len(bag))
         # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        # ~ viewmenu = self.srvgui.get_widget('viewmenu')
+        # ~ menuview = self.srvgui.get_widget('menuview')
         answer = self.srvuif.warning_message_delete_sapnotes(None, 'Deleting SAP Notes', 'Are you sure?', bag)
         if answer is True:
             self.srvdtb.delete(bag)

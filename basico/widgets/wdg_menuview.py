@@ -43,7 +43,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.toggled = 0
         self.selected = set()
         self.count = 0
-        self.completion = self.srvgui.add_widget('gtk_entrycompletion_viewmenu', Gtk.EntryCompletion())
+        self.completion = self.srvgui.add_widget('gtk_entrycompletion_menuview', Gtk.EntryCompletion())
         self.completion.set_match_func(self.completion_match_func)
         self.completion_model = Gtk.ListStore(str)
         self.completion.set_model(self.completion_model)
@@ -131,7 +131,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
 
     def get_node(self, rowid, rowname, rowcount='0'):
-        completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
+        completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         completion_model = completion.get_model()
         title = self.srvutl.clean_html(rowname)
         completion_model.append([title])
@@ -474,7 +474,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
     def populate(self, sapnotes=[]):
         self.current_status = "working"
         self.set_headers_visible(False) # Set
-        completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
+        completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         completion_model = completion.get_model()
         completion_model.clear()
 
@@ -509,7 +509,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
             self.populate_by_components(sapnotes)
 
         viewfilter = self.srvgui.get_widget('gtk_entry_filter_view')
-        completion = self.srvgui.get_widget('gtk_entrycompletion_viewmenu')
+        completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         completion.set_model(completion_model)
         viewfilter.set_completion(completion)
         # ~ self.srvclb.gui_stack_dashboard_show()
@@ -804,15 +804,15 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 treepids[key_day] = self.model.append(treepids[key_month], node)
 
     def select_first_entry(self):
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        selection = viewmenu.get_selection()
+        menuview = self.srvgui.get_widget('menuview')
+        selection = menuview.get_selection()
         selection.select_path("0")
 
     def filter(self, *args):
         entry = self.srvgui.get_widget('gtk_entry_filter_view')
         filter = entry.get_text()
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        selection = viewmenu.get_selection()
+        menuview = self.srvgui.get_widget('menuview')
+        selection = menuview.get_selection()
 
         def gui_iterate_over_data(model, path, itr):
             rowkey = model.get(itr, 0)[0]
@@ -822,19 +822,19 @@ class MenuView(BasicoWidget, Gtk.TreeView):
             cleanstr = contents.replace('<b>', '')
             cleanstr = cleanstr.replace('</b>', '')
             model.set(itr, 1, '%s' % cleanstr)
-            viewmenu.collapse_row(path)
+            menuview.collapse_row(path)
 
             if len(filter) > 0:
                 if filter.upper() in rowval.upper() or filter.upper() in dsc.upper():
-                    viewmenu.expand_to_path (path)
+                    menuview.expand_to_path (path)
                     selection.select_path(path)
                     model.set(itr, 1, '<b>%s</b>' % contents)
             else:
                 return
 
-        model = viewmenu.get_model()
+        model = menuview.get_model()
         model.foreach(gui_iterate_over_data)
 
     def menu_expand(self, *args):
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        viewmenu.expand_all()
+        menuview = self.srvgui.get_widget('menuview')
+        menuview.expand_all()

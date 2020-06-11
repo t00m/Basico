@@ -77,11 +77,10 @@ class Callback(Service):
 
     def gui_menuview_update(self, *args):
         view = args[1]
-        window = self.srvgui.get_widget('gtk_app_window_main')
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        viewmenu = self.srvgui.get_widget('viewmenu')
+        menuview = self.srvgui.get_widget('menuview')
         if view is None:
-            view = viewmenu.get_view()
+            view = menuview.get_view()
 
         if view is not None:
             viewlabel = self.srvgui.get_widget('gtk_label_current_view')
@@ -90,7 +89,7 @@ class Callback(Service):
 
         popover = self.srvgui.get_widget('gtk_popover_button_menu_views')
         popover.hide()
-        viewmenu.set_view(view)
+        menuview.set_view(view)
         visor_sapnotes.display()
 
     def gui_update(self, *args):

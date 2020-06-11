@@ -880,7 +880,7 @@ class AnnotationWidget(BasicoWidget, Gtk.VBox):
         # ~ widget_annotation = self.srvgui.get_widget('widget_annotation')
         # ~ visor_annotations = self.srvgui.get_widget('visor_annotations')
         # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        # ~ viewmenu = self.srvgui.get_widget('viewmenu')
+        # ~ menuview = self.srvgui.get_widget('menuview')
         # ~ notebook = self.srvgui.get_widget('gtk_notebook_annotations_visor')
         # ~ notebook.set_current_page(0)
 

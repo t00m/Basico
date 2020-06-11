@@ -225,9 +225,9 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
 
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.populate()
-        viewmenu = self.srvgui.get_widget('viewmenu')
-        viewmenu.populate()
-        viewmenu.grab_focus()
+        menuview = self.srvgui.get_widget('menuview')
+        menuview.populate()
+        menuview.grab_focus()
 
 
 
@@ -282,8 +282,8 @@ class CollectionsMgtView(BasicoWidget, Gtk.VBox):
         deleted = self.srvclt.delete(self.current_cid)
         if deleted:
             self.update()
-            viewmenu = self.srvgui.get_widget('viewmenu')
-            viewmenu.populate()
+            menuview = self.srvgui.get_widget('menuview')
+            menuview.populate()
             msg = "Collection '%s' deleted" % name
             self.log.info(msg)
             # ~ self.srvuif.statusbar_msg(msg, True)

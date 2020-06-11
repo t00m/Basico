@@ -507,11 +507,11 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         return box
 
     def run(self):
-        viewmenu = self.srvgui.get_widget('viewmenu')
+        menuview = self.srvgui.get_widget('menuview')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-sapnotes')
-        viewmenu.set_view('collection')
-        viewmenu.select_first_entry()
+        menuview.set_view('collection')
+        menuview.select_first_entry()
 
     def window_stack_visor_change(self, stack, gparam):
         visible_stack_name = stack.get_visible_child_name()
@@ -534,8 +534,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
     # ~ def gui_stack_dashboard_show(self, *args):
         # ~ stack = self.srvgui.get_widget('gtk_stack_main')
         # ~ # # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
-        # ~ viewmenu = self.srvgui.get_widget('viewmenu')
-        # ~ current_view = viewmenu.get_view()
+        # ~ menuview = self.srvgui.get_widget('menuview')
+        # ~ current_view = menuview.get_view()
 
         # notebook_menuview.show_all()
         # ~ stack.set_visible_child_name('dashboard')
