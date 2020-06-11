@@ -576,3 +576,24 @@ class UIFuncs(Service):
             spinner.start()
         else:
             spinner.stop()
+
+    ### DECORATORS
+    def hide_popovers(func):
+        """
+        FIXME: Quick and dirty hack to popdown all popovers when they
+        remain open.
+        """
+        def exec_gui_method(self, *args):
+            gui = self.app.get_service('GUI')
+            uif = self.app.get_service('UIF')
+            for name in gui.get_widgets():
+                widget = gui.get_widget(name)
+                if isinstance(widget, Gtk.Popover):
+                    # ~ self.log.debug("Popover %s down", name)
+                    widget.popdown()
+                    widget.hide()
+            uif.grab_focus()
+            func(self)
+        return exec_gui_method
+
+    hide_popovers = staticmethod( hide_popovers )

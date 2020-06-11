@@ -19,6 +19,7 @@ from gi.repository import Pango
 
 from basico.core.mod_wdg import BasicoWidget
 from basico.core.mod_env import ROOT, USER_DIR, APP, LPATH, GPATH, FILE
+from basico.services.srv_uif import UIFuncs
 
 class ImportWidget(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
@@ -83,7 +84,7 @@ class ImportWidget(BasicoWidget, Gtk.VBox):
         self.pack_start(vbox, True, True, 0)
         self.show_all()
 
-    @BasicoWidget.hide_popovers
+    @UIFuncs.hide_popovers
     def import_from_launchpad(self, *args):
         textview = self.srvgui.get_widget('gtk_textview_download_launchpad')
         dlbuffer = textview.get_buffer()

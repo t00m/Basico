@@ -23,6 +23,7 @@ from basico.core.mod_log import event_log, queue_log
 from basico.core.mod_env import FILE, LPATH, ATYPES, APP
 from basico.widgets.wdg_cols import CollectionsMgtView
 from basico.widgets.wdg_settingsview import SettingsView
+from basico.services.srv_uif import UIFuncs
 
 MAX_WORKERS = 1 # Number of simultaneous connections
 
@@ -59,21 +60,32 @@ class Callback(Service):
     def gui_started(self, *args):
         self.log.debug("GUI started")
 
+    @UIFuncs.hide_popovers
+    def display_dashboard(self, *args):
+        window = self.srvgui.get_widget('gtk_app_window_main')
+        window.show_stack('dashboard')
+
+    @UIFuncs.hide_popovers
     def display_about(self, *args):
-        about = self.srvgui.get_widget('widget_about')
-        about.display()
+        window = self.srvgui.get_widget('gtk_app_window_main')
+        window.show_stack('about')
 
+    @UIFuncs.hide_popovers
     def display_log(self, *args):
-        # ~ logviewer.update()
-        return
+        window = self.srvgui.get_widget('gtk_app_window_main')
+        window.show_stack('log')
 
+    @UIFuncs.hide_popovers
     def display_settings(self, *args):
-        # ~ view_settings = self.srvgui.get_widget('widget_settings')
-        # ~ view_settings.update()
-        return
+        view_settings = self.srvgui.get_widget('widget_settings')
+        view_settings.update()
+        window = self.srvgui.get_widget('gtk_app_window_main')
+        window.show_stack('settings')
 
+    @UIFuncs.hide_popovers
     def display_help(self, *args):
-        return
+        window = self.srvgui.get_widget('gtk_app_window_main')
+        window.show_stack('help')
 
     def gui_menuview_update(self, *args):
         view = args[1]

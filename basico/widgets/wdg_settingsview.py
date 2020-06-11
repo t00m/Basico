@@ -28,16 +28,13 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         Gtk.ScrolledWindow.__init__(self)
         self.get_services()
         self.setup()
+        self.update()
 
     def get_services(self):
         """Load services to be used in this class
         """
         self.srvgui = self.get_service("GUI")
-        self.srvbnr = self.get_service('BNR')
-        self.srvutl = self.get_service('Utils')
-        self.srvant = self.get_service('Annotation')
         self.srvdtb = self.get_service('DB')
-        self.srvbnr = self.get_service('BNR')
 
 
     def setup(self):
@@ -93,7 +90,7 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         self.treeview.modify_font(Pango.FontDescription('Monospace 10'))
 
         self.treeview.set_can_focus(False)
-        self.treeview.set_headers_visible(False)
+        self.treeview.set_headers_visible(True)
         self.treeview.set_enable_search(True)
         self.treeview.set_hover_selection(False)
         self.treeview.set_grid_lines(Gtk.TreeViewGridLines.HORIZONTAL)
@@ -102,10 +99,14 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.SINGLE)
 
+        # Assign model
+        self.treeview.set_model(self.model)
+        self.treeview.show_all()
         self.show_all()
 
 
     def update(self):
+        self.log.debug("Updating settings stats")
         self.model.clear()
         self.srvstg = self.get_service('Settings')
         config = self.srvstg.load()
@@ -151,7 +152,6 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
                 pkey = '%s-%s-%s' % (skey, key, value)
                 self.model.append(pid, [pkey, '<span color="blue">%s</span>' % key, value])
 
-
         # WIDGETS NODE
         root = self.model.append(None, ['root', '<big><b>Runtime Objects</b></big>', ''])
 
@@ -169,7 +169,6 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
                 ppid_left = self.model.append(root, [gobj_left, '<b>%s</b>' % gobj_left, ''])
                 wdgdict[gobj_left] = ppid_left
 
-
             try:
                 ppid_right = wdgdict[gobj_right]
             except:
@@ -182,11 +181,11 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         # STATS NODE
         root = self.model.append(None, ['root', '<big><b>Stats Overview</b></big>', ''])
         s_count = self.srvdtb.get_total()
-        a_count = self.srvant.get_total()
+        # ~ a_count = self.srvant.get_total()
         stats = self.srvdtb.get_stats()
         sapnotes_node = self.model.append(root, ['', 'SAP Notes', "%6d" % s_count])
         components_node = self.model.append(sapnotes_node, ['', 'Components', ''])
         for component in stats['maincomp']:
             self.model.append(components_node, [component, component, "%6d" % stats['maincomp'][component]])
-        self.model.append(root, ['', 'Annotations', "%6d" % a_count])
-
+        # ~ self.model.append(root, ['', 'Annotations', "%6d" % a_count])
+        self.treeview.set_model(self.model)

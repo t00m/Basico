@@ -25,6 +25,7 @@ from gi.repository import Gtk
 
 from basico.core.mod_wdg import BasicoWidget
 
+
 class BasicoBrowser(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
         # ~ def __init__(self, *args, **kwargs):

@@ -123,7 +123,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.set_relief(Gtk.ReliefStyle.NONE)
         # ~ popover = Gtk.Popover.new(button)
         # ~ self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
-        button.connect('clicked', self.show_stack, 'dashboard')
+        # ~ button.connect('clicked', self.show_stack, 'dashboard')
+        button.connect('clicked', self.srvclb.display_dashboard)
         lhbox.pack_end(button, False, False, 0)
 
         return lhbox
@@ -206,7 +207,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.show_stack, 'log')
+        # ~ button.connect('clicked', self.show_stack, 'log')
+        button.connect('clicked', self.srvclb.display_log)
         box.pack_end(button, False, False, 0)
 
         ### Settings
@@ -223,37 +225,37 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.connect('clicked', self.srvclb.display_settings)
         box.pack_start(button, False, False, 0)
 
-        ### Backup
-        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-backup-restore', 48, 48)
-        image = Gtk.Image()
-        image.set_from_pixbuf(icon)
-        label = Gtk.Label("Backup/Restore")
-        hbox.pack_start(image, False, False, 3)
-        hbox.pack_start(label, False, False, 3)
-        button = Gtk.Button()
-        button.add(hbox)
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        box.pack_start(button, False, False, 0)
+        # ~ ### Backup
+        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        # ~ icon = self.srvicm.get_pixbuf_icon('basico-backup-restore', 48, 48)
+        # ~ image = Gtk.Image()
+        # ~ image.set_from_pixbuf(icon)
+        # ~ label = Gtk.Label("Backup/Restore")
+        # ~ hbox.pack_start(image, False, False, 3)
+        # ~ hbox.pack_start(label, False, False, 3)
+        # ~ button = Gtk.Button()
+        # ~ button.add(hbox)
+        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
+        # ~ box.pack_start(button, False, False, 0)
 
-        box_bnr = Gtk.VBox()
-        popover_bnr = Gtk.Popover.new(button)
-        popover_bnr.set_position(Gtk.PositionType.LEFT)
-        popover_bnr.add(box_bnr)
-        self.srvgui.add_widget('gtk_popover_button_menu_system', popover_bnr)
-        button.connect('clicked', self.srvuif.popover_show, popover_bnr)
+        # ~ box_bnr = Gtk.VBox()
+        # ~ popover_bnr = Gtk.Popover.new(button)
+        # ~ popover_bnr.set_position(Gtk.PositionType.LEFT)
+        # ~ popover_bnr.add(box_bnr)
+        # ~ self.srvgui.add_widget('gtk_popover_button_menu_system', popover_bnr)
+        # ~ button.connect('clicked', self.srvuif.popover_show, popover_bnr)
 
-        hbox_backup = Gtk.VBox()
-        button_backup = self.srvuif.create_button('basico-backup', 48, 48, '<b>Backup database</b> ')
-        # ~ button_backup.connect('clicked', self.srvclb.gui_database_backup)
-        box_bnr.pack_start(button_backup, False, False, 0)
-        button_restore = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from backup</b>')
-        # ~ button_restore.connect('clicked', self.srvclb.gui_database_restore)
-        # ~ button_cache = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from cache</b>')
-        # ~ button_cache.connect('clicked', self.srvbnr.restore_from_cache)
+        # ~ hbox_backup = Gtk.VBox()
+        # ~ button_backup = self.srvuif.create_button('basico-backup', 48, 48, '<b>Backup database</b> ')
+        # ~ # # ~ button_backup.connect('clicked', self.srvclb.gui_database_backup)
+        # ~ box_bnr.pack_start(button_backup, False, False, 0)
+        # ~ button_restore = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from backup</b>')
+        # ~ # # ~ button_restore.connect('clicked', self.srvclb.gui_database_restore)
+        # ~ # # ~ button_cache = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from cache</b>')
+        # ~ # # ~ button_cache.connect('clicked', self.srvbnr.restore_from_cache)
 
-        box_bnr.pack_start(button_restore, False, False, 0)
-        # ~ box_bnr.pack_start(button_cache, False, False, 0)
+        # ~ box_bnr.pack_start(button_restore, False, False, 0)
+        # ~ # # ~ box_bnr.pack_start(button_cache, False, False, 0)
 
         return rhbox
 
@@ -285,8 +287,9 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         self.add(mainbox)
         self.show_all()
 
-    def show_stack(self, *args):
-        stack_name = args[1]
+    def show_stack(self, stack_name):
+        # ~ self.log.debug(args)
+        # ~ stack_name = args[1]
         stack_main = self.srvgui.get_widget('gtk_stack_main')
         stack_main.set_visible_child_name(stack_name)
         self.log.debug("Displaying %s", stack_name)
@@ -311,14 +314,14 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_main.child_set_property (stack_child, "icon-name", "basico-dashboard")
 
         ### Settings stack child
-        # ~ stack_child = self.setup_main_stack_settings()
-        # ~ stack_main.add_titled(stack_child, "settings", "Basico Settings")
-        # ~ stack_main.child_set_property (stack_child, "icon-name", "basico-settings")
+        stack_child = self.setup_main_stack_settings()
+        stack_main.add_titled(stack_child, "settings", "Basico Settings")
+        stack_main.child_set_property (stack_child, "icon-name", "basico-settings")
 
         ### Help stack child
-        # ~ stack_child = self.setup_main_stack_settings()
-        # ~ stack_main.add_titled(stack_child, "help", "Basico Help")
-        # ~ stack_main.child_set_property (stack_child, "icon-name", "basico-help")
+        stack_child = self.setup_main_stack_help()
+        stack_main.add_titled(stack_child, "help", "Basico Help")
+        stack_main.child_set_property (stack_child, "icon-name", "basico-help")
 
         # ~ ### About stack child
         stack_child = self.setup_main_stack_about()
@@ -497,7 +500,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
     def setup_main_stack_help(self):
         box = Gtk.VBox()
         box.set_hexpand(True)
-        browser = BasicoBrowser()
+        browser = BasicoBrowser(self.controller)
         self.log.debug(FILE['HELP_INDEX'])
         help_page = "file://%s" % FILE['HELP_INDEX']
         browser.load_url(help_page)
@@ -508,8 +511,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
     def run(self):
         menuview = self.srvgui.get_widget('menuview')
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        stack_visors.set_visible_child_name('visor-sapnotes')
+        # ~ stack_visors = self.srvgui.get_widget('gtk_stack_visors')
+        # ~ stack_visors.set_visible_child_name('visor-sapnotes')
         menuview.set_view('collection')
         menuview.select_first_entry()
 
