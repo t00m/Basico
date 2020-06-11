@@ -515,6 +515,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         # ~ stack_visors.set_visible_child_name('visor-sapnotes')
         menuview.set_view('collection')
         menuview.select_first_entry()
+        self.show_stack('dashboard')
 
     def window_stack_visor_change(self, stack, gparam):
         visible_stack_name = stack.get_visible_child_name()
