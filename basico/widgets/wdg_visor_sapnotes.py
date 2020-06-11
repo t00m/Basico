@@ -543,9 +543,11 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         completion_model.clear()
         model.clear()
         if bag is None:
-            bag = self.bag
+            # ~ self.log.debug("Bag empty. Get all SAP Notes from database")
+            self.bag = self.srvdtb.get_notes()
         else:
             self.bag = bag
+            # ~ self.log.debug("Displaying %d notes" % len(bag))
 
         for sid in self.bag:
             metadata = self.srvdtb.get_sapnote_metadata(sid)

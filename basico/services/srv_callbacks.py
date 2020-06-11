@@ -93,6 +93,12 @@ class Callback(Service):
         visor_sapnotes.display()
 
     def gui_update(self, *args):
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        # ~ menuview = self.srvgui.get_widget('menuview')
+        # ~ view = menuview.get_view()
+        # ~ menuview.set_view(view)
+        # ~ menuview.select_first_entry()
+        visor_sapnotes.update()
         self.gui_statusbar_update()
 
     def gui_statusbar_update(self, *args):
@@ -100,7 +106,7 @@ class Callback(Service):
         alive = statusbar is not None
         while alive:
             record = queue_log.get()
-            time.sleep(0.2)
+            time.sleep(0.25)
             statusbar.message(record)
             queue_log.task_done()
-        time.sleep(0.5)
+        time.sleep(0.25)
