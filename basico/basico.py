@@ -18,25 +18,25 @@ import selenium
 
 from gi.repository import GLib
 from gi.repository import GObject
-from basico.core.mod_env import APP, LPATH, GPATH, FILE
-from basico.core.mod_log import LogIntercepter, queue_log
-from basico.services.srv_utils import Utils
-from basico.services.srv_gui import GUI
-from basico.services.srv_iconmgt import IconManager
-from basico.services.srv_bnr import BackupRestoreMan
-from basico.services.srv_sap import SAP
-from basico.services.srv_settings import Settings
-from basico.services.srv_uif import UIFuncs
-from basico.services.srv_callbacks import Callback
-from basico.services.srv_notify import Notification
-from basico.services.srv_database import Database
-from basico.services.srv_download import DownloadManager
-from basico.services.srv_collections import Collections
-from basico.services.srv_annotations import Annotation
-from basico.services.srv_attachment import Attachment
-from basico.services.srv_notify import Notification
-from basico.services.srv_asciidoctor import Asciidoctor
-from basico.widgets.wdg_splash import Splash
+from basico.core.env import APP, LPATH, GPATH, FILE
+from basico.core.log import LogIntercepter, queue_log
+from basico.services.util import Utils
+from basico.services.gui import GUI
+from basico.services.icons import IconManager
+from basico.services.bnr import BackupRestoreMan
+from basico.services.sap import SAP
+from basico.services.settings import Settings
+from basico.services.uif import UIFuncs
+from basico.services.callbacks import Callback
+from basico.services.notify import Notification
+from basico.services.database import Database
+from basico.services.download import DownloadManager
+from basico.services.collections import Collections
+from basico.services.annotations import Annotation
+from basico.services.attachment import Attachment
+from basico.services.notify import Notification
+from basico.services.asciidoctor import Asciidoctor
+from basico.widgets.splash import Splash
 
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
