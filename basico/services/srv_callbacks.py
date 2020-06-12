@@ -118,7 +118,7 @@ class Callback(Service):
         alive = statusbar is not None
         while alive:
             record = queue_log.get()
-            time.sleep(0.25)
+            time.sleep(0.1)
             statusbar.message(record)
             queue_log.task_done()
-        time.sleep(0.25)
+        time.sleep(0.1)

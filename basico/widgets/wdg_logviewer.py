@@ -152,6 +152,7 @@ class LogViewer(BasicoWidget, Gtk.Box):
 
         treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
         treeview.set_enable_tree_lines(True)
+        treeview.modify_font(Pango.FontDescription('Monospace 10'))
         treeview.set_model(model)
         self.show_all()
 
