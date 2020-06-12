@@ -25,10 +25,7 @@ class UIFuncs(Service):
         self.srvgui = self.get_service('GUI')
         self.srvclb = self.get_service('Callbacks')
         self.srvicm = self.get_service('IM')
-        # ~ self.srvdtb = self.get_service('DB')
-        # ~ self.srvant = self.get_service('Annotation')
         self.srvutl = self.get_service('Utils')
-        # ~ self.srvntf = self.get_service('Notify')
 
 
     def get_gtk_version(self):

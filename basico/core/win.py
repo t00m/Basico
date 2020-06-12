@@ -27,15 +27,12 @@ from gi.repository import Pango
 from gi.repository.GdkPixbuf import Pixbuf
 
 from basico.core.srv import Service
-from basico.core.env import APP, FILE, ATYPES
+from basico.core.env import APP, FILE
 from basico.widgets.visor_sapnotes import SAPNotesVisor
-# ~ from basico.widgets.visor_annotations import AnnotationsVisor
-# ~ from basico.widgets.visor_attachments import AttachmentsVisor
 from basico.widgets.visor_toolbar import VisorToolbar
 from basico.widgets.about import About
 from basico.widgets.settingsview import SettingsView
 from basico.widgets.logviewer import LogViewer
-from basico.widgets.annot import AnnotationWidget
 from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
 
@@ -55,13 +52,10 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
 
     def get_services(self):
-        # ~ self.srvbnr = self.controller.get_service("BNR")
         self.srvgui = self.controller.get_service("GUI")
-        # ~ self.srvdtb = self.controller.get_service("DB")
         self.srvuif = self.controller.get_service("UIF")
         self.srvicm = self.controller.get_service('IM')
         self.srvclb = self.controller.get_service('Callbacks')
-        # ~ self.srvant = self.controller.get_service('Annotation')
 
 
     def setup_controller(self, uiapp):
@@ -132,26 +126,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
     def setup_headerbar_right(self, hb):
         rhbox = Gtk.HBox()
-
-        ## Help togglebutton
-        # ~ if self.srvuif.webkit_support():
-            # ~ button = self.srvgui.add_widget('gtk_togglebutton_help', Gtk.ToggleButton())
-            # ~ icon = self.srvicm.get_pixbuf_icon('basico-help', 24, 24)
-            # ~ image = Gtk.Image()
-            # ~ image.set_from_pixbuf(icon)
-            # ~ button.set_image(image)
-            # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-            # ~ button.connect('toggled', self.srvclb.gui_toggle_help_visor)
-        # ~ else:
-            # ~ button = self.srvgui.add_widget('gtk_button_help', Gtk.Button())
-            # ~ icon = self.srvicm.get_pixbuf_icon('basico-help', 24, 24)
-            # ~ image = Gtk.Image()
-            # ~ image.set_from_pixbuf(icon)
-            # ~ button.set_image(image)
-            # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-            # ~ button.connect('clicked', self.srvclb.display_help)
-
-        # ~ rhbox.pack_end(button, False, False, 0)
 
         ## System Menu
         button = Gtk.Button()
@@ -354,7 +328,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_visors = self.srvgui.add_widget('gtk_stack_visors', Gtk.Stack())
         stack_switcher.set_stack(stack_visors)
         stack_switcher.set_property('icon-size', 3)
-        stack_visors.connect('notify::visible-child', self.window_stack_visor_change)
+        # ~ stack_visors.connect('notify::visible-child', self.window_stack_visor_change)
         stack_visors.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         stack_visors.set_transition_duration(250)
         box.pack_start(stack_visors, True, True, 0)
@@ -364,31 +338,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_visors.add_titled(stack_child, "visor-sapnotes", "SAP Notes")
         stack_visors.child_set_property (stack_child, "icon-name", "basico-sapnote")
 
-        #### Stack for Visor Annotations
-        # ~ stack_child = self.setup_stack_visor_annotations()
-        # ~ stack_visors.add_titled(stack_child, "visor-annotations", "Annotations")
-        # ~ stack_visors.child_set_property (stack_child, "icon-name", "basico-filter")
-
-        #### Stack for Visor Annotations
-        # ~ stack_child = self.setup_stack_visor_attachments()
-        # ~ stack_visors.add_titled(stack_child, "visor-attachments", "Attachments")
-        # ~ stack_visors.child_set_property (stack_child, "icon-name", "basico-attachment")
-
         return box
-
-    # ~ def setup_tab_help_visor(self):
-        # ~ from basico.widgets.browser import BasicoBrowser
-        # ~ box = Gtk.VBox()
-        # ~ box.set_hexpand(True)
-
-        # ~ ### Help Visor
-        # ~ browser = BasicoBrowser()
-        # ~ self.controller.debug(FILE['HELP_INDEX'])
-        # ~ browser.load_url("file://%s" % FILE['HELP_INDEX'])
-        # ~ box.pack_start(browser, True, True, 0)
-        # ~ box.show_all()
-        # ~ return box
-
 
     def setup_stack_visor_sapnotes(self):
         box = Gtk.VBox()
@@ -411,67 +361,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         box.show_all()
         return box
 
-
-    def setup_stack_visor_annotations(self):
-        box = Gtk.VBox()
-        box.set_hexpand(True)
-
-        ### Visor
-
-        notebook = self.srvgui.add_widget('gtk_notebook_annotations_visor', Gtk.Notebook())
-        notebook.set_show_border(False)
-        notebook.set_hexpand(True)
-        notebook.set_show_tabs(False)
-
-        # Visor tab
-        scr = Gtk.ScrolledWindow()
-        scr.set_hexpand(True)
-        scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scr.set_shadow_type(Gtk.ShadowType.NONE)
-        vwp = Gtk.Viewport()
-        vwp.set_hexpand(True)
-        # ~ visor_annotations = self.srvgui.add_widget('visor_annotations', AnnotationsVisor(self.controller))
-        # ~ visor_annotations.set_hexpand(True)
-        # ~ visor_annotations.set_vexpand(True)
-        # ~ vwp.add(visor_annotations)
-        scr.add(vwp)
-
-        tab_widget = self.srvuif.create_notebook_tab_label('basico-annotation-visor', '<b>Annotations Visor</b>')
-        notebook.append_page(scr, tab_widget)
-
-        # Annotation Widget tab
-        # ~ annotation_widget = self.srvgui.add_widget('widget_annotation', AnnotationWidget(self.controller))
-        # ~ tab_widget = self.srvuif.create_notebook_tab_label('basico-annotation-widget', '<b>Annotation Widget</b>')
-        # ~ notebook.append_page(annotation_widget, tab_widget)
-
-        box.pack_start(notebook, True, True, 0)
-        visor_annotations.show_all()
-        box.show_all()
-        return box
-
-
-    # ~ def setup_stack_visor_attachments(self):
-        # ~ box = Gtk.VBox()
-        # ~ box.set_hexpand(True)
-
-        # ~ ### Visor
-        # ~ scr = Gtk.ScrolledWindow()
-        # ~ scr.set_hexpand(True)
-        # ~ scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        # ~ scr.set_shadow_type(Gtk.ShadowType.NONE)
-        # ~ vwp = Gtk.Viewport()
-        # ~ vwp.set_hexpand(True)
-        # ~ visor_attachments = self.srvgui.add_widget('visor_attachments', AttachmentsVisor(self.controller))
-        # ~ visor_attachments.set_hexpand(True)
-        # ~ visor_attachments.set_vexpand(True)
-        # ~ vwp.add(visor_attachments)
-        # ~ scr.add(vwp)
-        # ~ box.pack_start(scr, True, True, 0)
-        # ~ visor_attachments.show_all()
-        # ~ box.show_all()
-        # ~ return box
-
-
     def setup_main_stack_about(self):
         box = Gtk.VBox()
         box.set_hexpand(True)
@@ -480,7 +369,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         box.show_all()
         return box
 
-
     def setup_main_stack_settings(self):
         box = Gtk.VBox()
         box.set_hexpand(True)
@@ -488,7 +376,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         box.pack_start(settings, True, True, 0)
         box.show_all()
         return box
-
 
     def setup_main_stack_log(self):
         box = Gtk.VBox()
@@ -512,82 +399,10 @@ class GtkAppWindow(Gtk.ApplicationWindow):
 
     def run(self):
         menuview = self.srvgui.get_widget('menuview')
-        # ~ stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        # ~ stack_visors.set_visible_child_name('visor-sapnotes')
         menuview.set_view('collection')
         menuview.select_first_entry()
         self.show_stack('dashboard')
 
-    def window_stack_visor_change(self, stack, gparam):
-        visible_stack_name = stack.get_visible_child_name()
-        if visible_stack_name is None:
-            return
-
-        if visible_stack_name == 'visor-sapnotes':
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            visor_sapnotes.update_total_sapnotes_count()
-        elif visible_stack_name == 'visor-annotations':
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor_annotations = self.srvgui.get_widget('visor_annotations')
-            visor_annotations.populate()
-        else:
-            self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-            visor_attachments = self.srvgui.get_widget('visor_attachments')
-            visor_attachments.populate()
-
-    # ~ def gui_stack_dashboard_show(self, *args):
-        # ~ stack = self.srvgui.get_widget('gtk_stack_main')
-        # ~ # # ~ notebook_menuview = self.srvgui.get_widget('gtk_notebook_menuview')
-        # ~ menuview = self.srvgui.get_widget('menuview')
-        # ~ current_view = menuview.get_view()
-
-        # notebook_menuview.show_all()
-        # ~ stack.set_visible_child_name('dashboard')
-        # ~ self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        # ~ # # ~ self.srvuif.set_widget_visibility('gtk_button_dashboard', False)
-
-        # ~ if current_view == 'annotation':
-            # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        # ~ else:
-            # ~ self.srvuif.set_widget_visibility('gtk_label_total_notes', True)
-        # ~ # # ~ self.srvuif.statusbar_msg("Displaying application dashboard")
-
-    # ~ def gui_toggle_help_visor(self, *args):
-        # ~ button = self.srvgui.get_widget('gtk_togglebutton_help')
-        # ~ notebook = self.srvgui.get_widget('gtk_notebook_visor')
-
-        # ~ if button.get_active():
-            # ~ self.srvuif.set_widget_visibility('gtk_notebook_help_page', True)
-            # ~ notebook.set_current_page(2)
-        # ~ else:
-            # ~ self.srvuif.set_widget_visibility('gtk_notebook_help_page', False)
-            # ~ notebook.set_current_page(0)
-        # ~ self.srvuif.statusbar_msg("Displaying application help")
-
-    # ~ def gui_toggle_fullscreen(self, button):
-        # ~ icon_container = self.srvgui.get_widget('gtk_box_container_icon_fullscreen')
-        # ~ icon_fullscreen = self.srvicm.get_new_image_icon('basico-fullscreen', 24, 24)
-        # ~ icon_unfullscreen = self.srvicm.get_new_image_icon('basico-unfullscreen', 24, 24)
-        # ~ active = button.get_active()
-        # ~ window = self.srvgui.get_window()
-        # ~ if active:
-            # ~ self.srvgui.swap_widget(icon_container, icon_unfullscreen)
-            # ~ window.fullscreen()
-        # ~ else:
-            # ~ self.srvgui.swap_widget(icon_container, icon_fullscreen)
-            # ~ window.unfullscreen()
-
-    # ~ def gui_toggle_menu_view(self, obj):
-        # ~ paned = self.srvgui.get_widget('gtk_vbox_container_menu_view')
-        # ~ button = self.srvgui.get_widget('gtk_toogletoolbutton_menu_view')
-        # ~ if isinstance(obj, Gtk.ToggleToolButton):
-            # ~ if button.get_active():
-                # ~ paned.show_all()
-            # ~ else:
-                # ~ paned.hide()
-        # ~ elif isinstance(obj, bool):
-            # ~ if obj == True:
-                # ~ button.set_active(True)
-            # ~ else:
-                # ~ button.set_active(False)
+    # ~ def window_stack_visor_change(self, stack, gparam):
+        # ~ visible_stack_name = stack.get_visible_child_name()
+        # ~ [..]

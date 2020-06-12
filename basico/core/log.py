@@ -18,7 +18,5 @@ class LogIntercepter(logging.Handler):
         """Send the log records (created by loggers) to
         the appropriate destination.
         """
-        # ~ print("--> %s" % record.getMessage())
-        global queue_log
         queue_log.put(record)
         event_log.append(record)

@@ -7,9 +7,6 @@
 # Description: Logviewer Widget
 """
 
-from os.path import sep as SEP
-from html import escape
-import logging
 from enum import IntEnum
 
 import gi

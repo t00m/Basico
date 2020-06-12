@@ -14,7 +14,7 @@
 
 import os
 import logging
-# Make sure the right Gtk version is loaded
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk

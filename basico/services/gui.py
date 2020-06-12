@@ -22,7 +22,6 @@ from gi.repository import Gio
 from basico.core.srv import Service
 from basico.core.win import GtkAppWindow
 from basico.core.env import FILE
-# ~ from basico.widgets.splash import Splash
 
 
 class UIApp(Gtk.Application):

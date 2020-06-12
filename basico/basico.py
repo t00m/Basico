@@ -18,24 +18,19 @@ import selenium
 
 from gi.repository import GLib
 from gi.repository import GObject
+
 from basico.core.env import APP, LPATH, GPATH, FILE
 from basico.core.log import LogIntercepter, queue_log
 from basico.services.util import Utils
 from basico.services.gui import GUI
 from basico.services.icons import IconManager
-from basico.services.bnr import BackupRestoreMan
 from basico.services.sap import SAP
 from basico.services.settings import Settings
 from basico.services.uif import UIFuncs
 from basico.services.callbacks import Callback
-from basico.services.notify import Notification
 from basico.services.database import Database
 from basico.services.download import DownloadManager
 from basico.services.collections import Collections
-from basico.services.annotations import Annotation
-from basico.services.attachment import Attachment
-from basico.services.notify import Notification
-from basico.services.asciidoctor import Asciidoctor
 from basico.widgets.splash import Splash
 
 
@@ -113,17 +108,11 @@ class Basico(object):
                 'UIF'           :   UIFuncs(),
                 'SAP'           :   SAP(),
                 'Settings'      :   Settings(),
-                # ~ 'Notify'        :   Notification(),
                 'IM'            :   IconManager(),
                 'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
                 'Driver'        :   DownloadManager(),
                 'Collections'   :   Collections(),
-                # ~ 'Annotation'    :   Annotation(),
-                # ~ 'Attachment'    :   Attachment(),
-                # ~ 'BNR'           :   BackupRestoreMan(),
-                # ~ 'Notify'        :   Notification(),
-                # ~ 'Asciidoctor'   :   Asciidoctor(),
             }
 
             for name in services:

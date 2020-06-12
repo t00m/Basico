@@ -10,6 +10,8 @@
 from enum import IntEnum
 from html import escape
 from collections import OrderedDict
+
+from dateutil import parser as dateparser
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
@@ -19,7 +21,8 @@ from gi.repository import Gtk
 from gi.repository import Pango
 from gi.repository import GObject
 from gi.repository.GdkPixbuf import Pixbuf
-from dateutil import parser as dateparser
+
+
 from basico.widgets.cols import CollectionsMgtView
 from basico.core.wdg import BasicoWidget
 from basico.services.collections import COL_DOWNLOADED

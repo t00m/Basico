@@ -14,14 +14,12 @@ try:
     gi.require_version('WebKit2', '4.0')
     from gi.repository import WebKit2 as WebKit
     WEBKIT_RELEASE = 4
-
 except:
     gi.require_version('WebKit', '3.0')
     from gi.repository import WebKit
     WEBKIT_RELEASE = 3
 
 from gi.repository import Gtk
-
 
 from basico.core.wdg import BasicoWidget
 

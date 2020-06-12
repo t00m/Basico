@@ -11,17 +11,18 @@ import os
 import re
 import sys
 import json
-from html import escape
-from stat import ST_SIZE
-import subprocess
+import shutil
 import tarfile
 import zipfile
-import shutil
-# ~ import requests
+import subprocess
 import webbrowser
-import feedparser
+from html import escape
+from stat import ST_SIZE
 from datetime import datetime
+
+import feedparser
 from gi.repository import Gio
+
 from basico.core.env import GPATH, LPATH, FILE
 from basico.core.srv import Service
 
@@ -34,15 +35,6 @@ class Utils(Service):
         """
         Missing method docstring (missing-docstring)
         """
-        self.get_services()
-
-
-    def get_services(self):
-        """
-        Missing method docstring (missing-docstring)
-        """
-        # ~ self.srvdtb = self.get_service('DB')
-        pass
 
     def download_webdriver_setup(self, *args):
         self.log.warning("Webdriver profile missing. Creating a new one from the scratch")
@@ -305,24 +297,6 @@ class Utils(Service):
         else:
             shutil.copy(GECKODRIVER_WIN32, GECKO_INSTALL_DIR)
         self.log.debug("Gecko driver installed to %s" % GECKO_INSTALL_DIR)
-
-
-    # ~ def download(self, prgname, source, target):
-        # ~ """
-        # ~ Missing method docstring (missing-docstring)
-        # ~ """
-        # ~ try:
-            # ~ self.log.debug("Downloading %s from: %s" % (prgname, source))
-            # ~ response = requests.get(source, stream=True)
-            # ~ with open(target, 'wb') as out_file:
-                # ~ shutil.copyfileobj(response.raw, out_file)
-            # ~ del response
-            # ~ self.log.debug("%s downloaded to %s" % (prgname, target))
-            # ~ return True
-        # ~ except Exception as error:
-            # ~ self.log.error(error)
-            # ~ return False
-
 
     def extract(self, filename, target_path, protocol):
         """
