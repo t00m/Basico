@@ -329,8 +329,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_main.child_set_property (stack_child, "icon-name", "basico-about")
 
         ### Log stack child
-        stack_child = self.setup_main_stack_log()
-        stack_main.add_titled(stack_child, "log", "Event Viewer")
+        # ~ stack_child = self.setup_main_stack_log()
+        # ~ stack_main.add_titled(stack_child, "log", "Event Viewer")
 
         return stack_main
 

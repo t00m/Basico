@@ -111,7 +111,7 @@ class Callback(Service):
         # ~ menuview.set_view(view)
         # ~ menuview.select_first_entry()
         visor_sapnotes.update()
-        self.gui_statusbar_update()
+        # ~ self.gui_statusbar_update()
 
     def gui_statusbar_update(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')
@@ -121,4 +121,4 @@ class Callback(Service):
             time.sleep(0.1)
             statusbar.message(record)
             queue_log.task_done()
-        time.sleep(0.1)
+        time.sleep(0.25)

@@ -1,6 +1,0 @@
-== Metadata
-
-
-[NOTE]
-====
-

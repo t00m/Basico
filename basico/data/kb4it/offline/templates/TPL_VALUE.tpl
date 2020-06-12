@@ -1,5 +1,0 @@
-= %s: %s
-
-== Related documents
-
-
