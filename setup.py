@@ -196,7 +196,7 @@ def add_data_basico():
 
 data_files = []
 data_files += add_data_basico()
-# ~ data_files += add_data_from_dir('basico/data/help')
+data_files += add_data_from_dir('basico/data/help')
 
 
 def main():

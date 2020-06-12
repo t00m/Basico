@@ -20,15 +20,15 @@ except:
     WEBKIT_RELEASE = 3
 
 from gi.repository import Gtk
+from gi.repository import Gio
 
+from basico.core.env import FILE
 from basico.core.wdg import BasicoWidget
 
 
 class BasicoBrowser(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
-        # ~ def __init__(self, *args, **kwargs):
         super().__init__(app, __class__.__name__)
-        # ~ super(BasicoBrowser, self).__init__(*args, **kwargs)
         Gtk.VBox.__init__(self)
         self.app = app
         if WEBKIT_RELEASE == 4:
@@ -36,9 +36,8 @@ class BasicoBrowser(BasicoWidget, Gtk.VBox):
         else:
             self.log.debug("Using WebKit (3.0)")
 
-        # ~ session = WebKit.get_default_session()
-        # ~ session.set_property("ssl-use-system-ca-file", True)
         self.webview = WebKit.WebView()
+        self.webview.connect('context-menu', self.append_items)
 
         settings = self.webview.get_settings()
         if WEBKIT_RELEASE == 3:
@@ -67,7 +66,6 @@ class BasicoBrowser(BasicoWidget, Gtk.VBox):
             settings.set_property('enable-webaudio', False)
             settings.set_property('enable-webgl', False)
 
-        # ~ self.show()
         scrolled_window = Gtk.ScrolledWindow()
         scrolled_window.add(self.webview)
         scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -75,8 +73,16 @@ class BasicoBrowser(BasicoWidget, Gtk.VBox):
         scrolled_window.set_hexpand(True)
         scrolled_window.set_vexpand(True)
         self.pack_start(scrolled_window, True, True, 0)
-        # ~ scrolled_window.show_all()
 
+    def append_items(self, webview, context_menu, hit_result_event, event):
+        """Attach custom actions to browser context menu"""
+        action = Gtk.Action("help", "Basico Help", None, None)
+        action.connect("activate", self.display_help)
+        option = WebKit.ContextMenuItem().new(action)
+        context_menu.prepend(option)
+
+    def display_help(self, *args):
+        self.load_url(FILE['HELP_INDEX'])
 
     def load_url(self, url):
         self.webview.load_uri(url)
