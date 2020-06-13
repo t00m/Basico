@@ -21,6 +21,7 @@ from gi.repository import GObject
 
 from basico.core.env import APP, LPATH, GPATH, FILE
 from basico.core.log import LogIntercepter, queue_log
+from basico.services.kb4it import KB4Basico
 from basico.services.util import Utils
 from basico.services.gui import GUI
 from basico.services.icons import IconManager
@@ -32,6 +33,7 @@ from basico.services.database import Database
 from basico.services.download import DownloadManager
 from basico.services.collections import Collections
 from basico.widgets.splash import Splash
+
 
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
@@ -113,6 +115,7 @@ class Basico(object):
                 'DB'            :   Database(),
                 'Driver'        :   DownloadManager(),
                 'Collections'   :   Collections(),
+                'KB4IT'         :   KB4Basico()
             }
 
             for name in services:
@@ -138,6 +141,8 @@ class Basico(object):
         if not os.path.exists(FILE['L_SAP_PRODUCTS']):
             shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
             self.log.debug("SAP Products file copied to local database resources directory")
+
+        self.get_service('KB4IT')
 
 
     def get_service(self, name):
