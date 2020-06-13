@@ -62,6 +62,7 @@ GPATH = {}
 GPATH['ROOT'] = ROOT
 GPATH['DATA'] = os.path.join(GPATH['ROOT'], 'data')
 GPATH['UI'] = os.path.join(GPATH['DATA'], 'ui')
+GPATH['KB4IT'] = os.path.join(GPATH['DATA'], 'kb4it')
 GPATH['ICONS'] = os.path.join(GPATH['DATA'], 'icons')
 GPATH['PLUGINS'] = os.path.join(GPATH['DATA'], 'plugins')
 GPATH['SHARE'] = os.path.join(GPATH['DATA'], 'share')

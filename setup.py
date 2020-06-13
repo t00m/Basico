@@ -197,7 +197,7 @@ def add_data_basico():
 data_files = []
 data_files += add_data_basico()
 data_files += add_data_from_dir('basico/data/help')
-
+data_files += add_data_from_dir('basico/data/kb4it')
 
 def main():
     setup(
@@ -217,7 +217,7 @@ def main():
         # ~ 'install': CustomInstallCommand,
         # ~ },
         install_requires=[
-            # ~ 'kb4it',
+            'kb4it',
             'python-dateutil',
             'selenium',
             'feedparser',
@@ -250,7 +250,6 @@ def main():
                 ]
             },
     )
-
 
 if __name__ == '__main__':
     main()
