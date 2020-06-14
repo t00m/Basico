@@ -24,7 +24,7 @@ class Theme(KB4ITBuilder):
         self.create_page_properties()
         self.create_page_stats()
         self.create_page_index_all()
-        # ~ self.create_page_index()
+        self.create_page_index()
         self.create_page_about_app()
         self.create_page_about_theme()
         self.create_page_about_kb4it()

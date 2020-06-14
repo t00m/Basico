@@ -43,6 +43,8 @@ class Callback(Service):
         self.srvutl = self.get_service('Utils')
         self.srvclt = self.get_service('Collections')
         self.srvweb = self.get_service('Driver')
+        self.srvbkb = self.get_service('KB4IT')
+        self.srvbkb.connect('kb-updated', self.kb_updated)
 
     def gui_started(self, *args):
         self.log.debug("GUI started")
@@ -104,3 +106,7 @@ class Callback(Service):
             statusbar.message(record)
             queue_log.task_done()
         time.sleep(0.25)
+
+    def kb_updated(self, *args):
+        self.log.debug(args)
+        self.log.info("Basico KB updated")
