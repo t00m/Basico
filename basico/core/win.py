@@ -39,17 +39,16 @@ from basico.widgets.browser import BasicoBrowser
 
 class GtkAppWindow(Gtk.ApplicationWindow):
     def __init__(self, uiapp):
+        self.uiapp = uiapp
         self.setup_controller(uiapp)
         self.log = logging.getLogger('GtkAppWindow')
         self.app = uiapp.get_controller()
         self.log.addHandler(self.app.intercepter)
         self.get_services()
-        self.srvgui.add_widget('uiapp', uiapp)
         self.setup_window(uiapp)
         self.setup_widgets()
         self.srvgui.add_widget('gtk_app_window', self)
         self.run()
-
 
     def get_services(self):
         self.srvgui = self.controller.get_service("GUI")
@@ -57,10 +56,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         self.srvicm = self.controller.get_service('IM')
         self.srvclb = self.controller.get_service('Callbacks')
 
-
     def setup_controller(self, uiapp):
         self.controller = uiapp.get_controller()
-
 
     def get_signal(self, signal):
         return self.signals[key]
@@ -80,17 +77,17 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         """
         Change Gtk+ Style
         """
-        screen = Gdk.Screen.get_default()
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_path(FILE['CSS'])
-        context = Gtk.StyleContext()
-        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        # ~ screen = Gdk.Screen.get_default()
+        # ~ css_provider = Gtk.CssProvider()
+        # ~ css_provider.load_from_path(FILE['CSS'])
+        # ~ context = Gtk.StyleContext()
+        # ~ context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.set_default_size(1024, 728)
         self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         self.setup_headerbar()
 
-        self.maximize ()
+        # ~ self.maximize ()
         self.show_all()
 
 
@@ -119,7 +116,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         # ~ popover = Gtk.Popover.new(button)
         # ~ self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
         # ~ button.connect('clicked', self.show_stack, 'dashboard')
-        button.connect('clicked', self.srvclb.display_dashboard)
+        # ~ button.connect('clicked', self.srvclb.display_dashboard)
         lhbox.pack_end(button, False, False, 0)
 
         return lhbox
@@ -154,7 +151,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.display_about)
+        # ~ button.connect('clicked', self.srvclb.display_about)
         box.pack_end(button, False, False, 0)
 
         ### Help
@@ -168,23 +165,25 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.display_help)
+        # ~ button.connect('clicked', self.srvclb.display_help)
         box.pack_end(button, False, False, 0)
 
         ### Log viewer
-        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        # ~ icon = self.srvicm.get_pixbuf_icon('basico-logviewer', 48, 48)
-        # ~ image = Gtk.Image()
-        # ~ image.set_from_pixbuf(icon)
-        # ~ label = Gtk.Label("Event viewer")
-        # ~ hbox.pack_start(image, False, False, 3)
-        # ~ hbox.pack_start(label, False, False, 3)
-        # ~ button = Gtk.Button()
-        # ~ button.add(hbox)
-        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
+        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        icon = self.srvicm.get_pixbuf_icon('basico-logviewer', 48, 48)
+        image = Gtk.Image()
+        image.set_from_pixbuf(icon)
+        label = Gtk.Label("Event viewer")
+        hbox.pack_start(image, False, False, 3)
+        hbox.pack_start(label, False, False, 3)
+        button = Gtk.Button()
+        button.add(hbox)
+        button.set_relief(Gtk.ReliefStyle.NONE)
         # ~ button.connect('clicked', self.show_stack, 'log')
         # ~ button.connect('clicked', self.srvclb.display_log)
-        # ~ box.pack_end(button, False, False, 0)
+        box.pack_end(button, False, False, 0)
+        self.srvgui.add_widget('gtk_button_logviewer', button)
+        self.srvgui.add_signal('gtk_button_logviewer', 'clicked', 'self.srvclb.display_log')
 
         ### Settings
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
@@ -197,7 +196,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.display_settings)
+        # ~ button.connect('clicked', self.srvclb.display_settings)
         box.pack_start(button, False, False, 0)
 
         # ~ ### Backup
@@ -304,8 +303,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_main.child_set_property (stack_child, "icon-name", "basico-about")
 
         ### Log stack child
-        # ~ stack_child = self.setup_main_stack_log()
-        # ~ stack_main.add_titled(stack_child, "log", "Event Viewer")
+        stack_child = self.setup_main_stack_log()
+        stack_main.add_titled(stack_child, "log", "Event Viewer")
 
         return stack_main
 

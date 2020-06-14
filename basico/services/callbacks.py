@@ -10,6 +10,7 @@
 import os
 import json
 import time
+import threading
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -26,13 +27,36 @@ from basico.widgets.settingsview import SettingsView
 from basico.services.uif import UIFuncs
 from basico.services.kb4it import KBStatus
 
-MAX_WORKERS = 1 # Number of simultaneous connections
-
-# def naming rule: <service>_<widget>_<action>
-
 class Callback(Service):
     def initialize(self):
+        GObject.signal_new('gui-started', Callback, GObject.SignalFlags.RUN_LAST, None, () )
+        self.connect('gui-started', self.gui_started)
         self.get_services()
+        self.th = threading.Thread(name='startup', target=self.on_startup)
+        self.th.setDaemon(True)
+        self.th.start()
+
+    def on_startup(self, *args):
+        """
+        Awesome way :( to know when all widgets are ready to work...
+        It waits until statusbar widget is loaded and then emit
+        the signal 'gui-started'...
+        """
+        GUI_READY = False
+        while not GUI_READY:
+            try:
+                statusbar = self.srvgui.get_widget('widget_statusbar')
+                if statusbar is not None:
+                    GUI_READY = True
+                    break
+            except Exception as error:
+                self.log.debug(error)
+                GUI_READY = False
+            time.sleep(0.5)
+
+        if GUI_READY:
+            self.emit('gui-started')
+
 
     def get_services(self):
         self.srvstg = self.get_service('Settings')
@@ -48,7 +72,28 @@ class Callback(Service):
         self.srvbkb.connect('kb-updated', self.kb_updated)
 
     def gui_started(self, *args):
-        self.log.debug("GUI started")
+        # Update statusbar and logviewer
+        statusbar = self.srvgui.get_widget('widget_statusbar')
+        statusbar.alive()
+        self.th = threading.Thread(name='statusbar', target=self.gui_statusbar_update)
+        self.th.setDaemon(True)
+        self.th.start()
+        self.log.debug("Logging activated")
+
+        # Connect signals
+        self.connect_signals()
+        self.log.debug("Signals connected")
+
+        self.log.debug("Basico ready!")
+
+    def connect_signals(self):
+        wsdict = self.srvgui.get_signals()
+        for widget in wsdict:
+            for signal in wsdict[widget]:
+                callback, data = wsdict[widget][signal]
+                self.srvuif.connect_signal(widget, signal, callback, data)
+
+        # ~ self.srvuif.connect_signal('gtk_button_logviewer', 'clicked', self.display_log)
 
     @UIFuncs.hide_popovers
     def display_dashboard(self, *args):
@@ -105,5 +150,4 @@ class Callback(Service):
         time.sleep(0.1)
 
     def kb_updated(self, *args):
-        self.log.debug(args)
         self.log.info("Basico KB updated")

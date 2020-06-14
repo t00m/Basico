@@ -103,4 +103,4 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
         self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
         # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
         self.srvuif.grab_focus()
-        self.log.info("About Basico")
+        self.log.debug("About Basico")

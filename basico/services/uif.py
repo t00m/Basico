@@ -90,7 +90,7 @@ class UIFuncs(Service):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.gui_menuview_update, '%s' % view)
+        # ~ button.connect('clicked', self.srvclb.gui_menuview_update, '%s' % view)
 
         return button
 
@@ -574,6 +574,11 @@ class UIFuncs(Service):
         else:
             spinner.stop()
 
+    def connect_signal(self, widget_name, signal, callback, data=None):
+        widget = self.srvgui.get_widget(widget_name)
+        widget.connect(signal, eval(callback), data)
+        self.log.debug("Signal '%s' connected for widget '%s'", signal, widget_name)
+
     ### DECORATORS
     def hide_popovers(func):
         """
@@ -594,3 +599,4 @@ class UIFuncs(Service):
         return exec_gui_method
 
     hide_popovers = staticmethod( hide_popovers )
+

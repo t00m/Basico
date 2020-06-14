@@ -41,13 +41,11 @@ class UIApp(Gtk.Application):
         GLib.set_prgname('basico')
         self.log = logging.getLogger('UIApp')
         self.log.addHandler(self.app.intercepter)
-        # ~ self.connect_signals()
         self.get_services()
+        self.connect('startup', self.on_startup)
 
-
-    # ~ def setup_signals(self, *args):
-        # ~ GObject.signal_new('activate-focus', UIApp, GObject.SignalFlags.RUN_LAST, None, () )
-        # ~ GObject.signal_new('gui-started', UIApp, GObject.SignalFlags.RUN_LAST, None, () )
+    def on_startup(self, *args):
+        self.log.debug("Gtk Application loaded")
 
     def do_activate(self):
         # DOC: https://wiki.gnome.org/HowDoI/GtkApplication
@@ -60,41 +58,28 @@ class UIApp(Gtk.Application):
             self.window.connect("delete-event", self.srvgui.quit)
             self.window.connect("key-press-event",self.on_key_press_event)
             self.log.debug("New Basico instance created")
-            # ~ self.srvuif.statusbar_msg("Welcome to Basico", True)
         else:
             self.log.debug("Basico is already running!")
         splash = self.app.get_splash()
         splash.hide()
-        # ~ self.setup_signals()
-        # ~ self.emit('gui-started')
-        self.th = threading.Thread(name='statusbar', target=self.srvclb.gui_statusbar_update)
-        self.th.setDaemon(True)
-        self.th.start()
-        # ~ self.emit('gui-started', self.connect_signals)
 
     def on_key_press_event(self, widget, event):
         if Gdk.keyval_name(event.keyval) == 'Escape':
             # ~ self.srvclb.action_annotation_cancel()
             pass
 
-    def update(self, *args):
-        self.uiapp.emit('gui-update')
-
     def get_services(self):
         """
         Missing method docstring (missing-docstring)
         """
         self.srvgui = self.app.get_service('GUI')
-        self.srvclb = self.app.get_service('Callbacks')
         self.srvuif = self.app.get_service('UIF')
-
 
     def get_window(self):
         """
         Missing method docstring (missing-docstring)
         """
         return self.window
-
 
     def get_controller(self):
         """
@@ -125,12 +110,9 @@ class GUI(Service):
         GObject.threads_init()
         self.uiapp = UIApp(self.app)
         self.log.debug("Setting up GUI")
-        # ~ GObject.signal_new('gui-started', self.uiapp, GObject.SignalFlags.RUN_LAST, None, () )
-        GObject.signal_new('gui-started', self.uiapp, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.uiapp.run()
 
     def get_uiapp(self):
-        self.log.debug(self.uiapp)
         return self.uiapp
 
     def quit(self, window, event):
@@ -139,14 +121,12 @@ class GUI(Service):
         """
         self.app.stop()
 
-
     def end(self):
         """
         End GUI Service
         """
         self.uiapp.quit()
         self.log.debug("GUI terminated")
-
 
     def swap_widget(self, parent, widget):
         """
@@ -164,7 +144,6 @@ class GUI(Service):
 
         widget.show_all()
 
-
     def get_keys(self):
         return self.keys
 
@@ -177,13 +156,11 @@ class GUI(Service):
 
         return matches
 
-
     def get_key_value(self, key):
         """
         Return current value from var cache
         """
         return self.keys[key]
-
 
     def set_key_value(self, key, value):
         """
@@ -191,25 +168,23 @@ class GUI(Service):
         """
         self.keys[key] = value
 
-
-    def add_signal(self, widget, signal, value):
+    def add_signal(self, widget, signal, callback, data=None):
         """
         Add signal to signals cache
         """
-        signal_name = "%s::%s" % (widget, signal)
-        self.signals[signal_name] = value
+        if not widget in self.signals:
+            self.signals[widget] = {}
 
+        self.signals[widget][signal] = (callback, data)
 
-    def get_signal(self, widget, signal):
+        # ~ signal_name = "%s::%s" % (widget, signal)
+        # ~ self.signals[signal_name] = value
+
+    def get_signals(self):
         """
-        Return signal from cache
+        Return all signals stored
         """
-        signal_name = "%s::%s" % (widget, signal)
-        try:
-            return self.signals[signal_name]
-        except KeyError:
-            return None
-
+        return self.signals
 
     def add_widget(self, name, obj=None):
         """
@@ -220,7 +195,6 @@ class GUI(Service):
 
         return obj
 
-
     def get_widget(self, name):
         """
         Return widget from cache
@@ -228,11 +202,8 @@ class GUI(Service):
         try:
             return self.widgets[name]
         except KeyError as warning:
-            # ~ self.log.warning(warning)
-            self.log.error(self.get_traceback())
-            raise
+            # Check manually if widget is None
             return None
-
 
     def get_widgets(self):
         """
@@ -240,13 +211,11 @@ class GUI(Service):
         """
         return self.widgets
 
-
     def get_app(self):
         """
         Missing method docstring (missing-docstring)
         """
         return self.uiapp
-
 
     def get_window(self):
         """

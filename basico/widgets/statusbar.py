@@ -26,8 +26,6 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         GObject.signal_new('statusbar-updated', Statusbar, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.get_services()
         self.setup()
-        # ~ self.connect('realize', self.alive)
-
 
     def alive(self, *args):
         logviewer = self.srvgui.get_widget('widget_logviewer')
@@ -102,6 +100,5 @@ class Statusbar(BasicoWidget, Gtk.HBox):
             label_priority.set_markup("<b>%s</b>" % priority)
 
         # Emit signal for logviewer
-        # ~ self.emit('statusbar-updated', record)
-
+        self.emit('statusbar-updated', record)
 

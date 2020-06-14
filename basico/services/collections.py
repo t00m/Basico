@@ -36,7 +36,6 @@ class Collections(Service):
     def get_services(self):
         self.srvgui = self.get_service("GUI")
         self.srvuif = self.get_service("UIF")
-        self.srvclb = self.get_service('Callbacks')
         self.srvicm = self.get_service('IM')
         self.srvdtb = self.get_service('DB')
 

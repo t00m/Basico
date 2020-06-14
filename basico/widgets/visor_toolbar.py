@@ -241,7 +241,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
 
     def get_services(self):
         self.srvgui = self.get_service("GUI")
-        self.srvclb = self.get_service('Callbacks')
+        # ~ self.srvclb = self.get_service('Callbacks')
         self.srvsap = self.get_service('SAP')
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
