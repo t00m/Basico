@@ -10,9 +10,9 @@ Server module.
 # Description: Basico theme for Basico app
 """
 
-from kb4it.services.builder import Builder
+from kb4it.services.builder import KB4ITBuilder
 
-class Theme(Builder):
+class Theme(KB4ITBuilder):
     def hello(self):
         self.log.debug("This is the theme Basico")
 
