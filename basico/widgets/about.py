@@ -93,7 +93,6 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
 
         self.add(viewport)
         self.show_all()
-        self.log.info("About Basico")
 
     def display(self, *args):
         about = self.srvgui.get_widget('widget_about')

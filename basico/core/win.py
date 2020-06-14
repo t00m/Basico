@@ -113,10 +113,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         image.set_from_pixbuf(icon)
         button.set_image(image)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ popover = Gtk.Popover.new(button)
-        # ~ self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
-        # ~ button.connect('clicked', self.show_stack, 'dashboard')
-        # ~ button.connect('clicked', self.srvclb.display_dashboard)
+        self.srvgui.add_widget('gtk_button_dashboard', button)
+        self.srvgui.add_signal('gtk_button_dashboard', 'clicked', 'self.srvclb.display_dashboard')
         lhbox.pack_end(button, False, False, 0)
 
         return lhbox
@@ -133,7 +131,9 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.set_relief(Gtk.ReliefStyle.NONE)
         popover = Gtk.Popover.new(button)
         self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
-        button.connect('clicked', self.srvuif.popover_show, popover)
+        self.srvgui.add_widget('gtk_button_menu_system', button)
+        self.srvgui.add_signal('gtk_button_menu_system', 'clicked', 'self.srvuif.popover_show', popover)
+        # ~ button.connect('clicked', self.srvuif.popover_show, popover)
         rhbox.pack_end(button, False, False, 0)
 
         # Popover body
@@ -151,7 +151,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ button.connect('clicked', self.srvclb.display_about)
+        self.srvgui.add_widget('gtk_button_about', button)
+        self.srvgui.add_signal('gtk_button_about', 'clicked', 'self.srvclb.display_about')
         box.pack_end(button, False, False, 0)
 
         ### Help
@@ -165,6 +166,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
+        self.srvgui.add_widget('gtk_button_help', button)
+        self.srvgui.add_signal('gtk_button_help', 'clicked', 'self.srvclb.display_help')
         # ~ button.connect('clicked', self.srvclb.display_help)
         box.pack_end(button, False, False, 0)
 
@@ -179,8 +182,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ button.connect('clicked', self.show_stack, 'log')
-        # ~ button.connect('clicked', self.srvclb.display_log)
         box.pack_end(button, False, False, 0)
         self.srvgui.add_widget('gtk_button_logviewer', button)
         self.srvgui.add_signal('gtk_button_logviewer', 'clicked', 'self.srvclb.display_log')
@@ -196,6 +197,8 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
+        self.srvgui.add_widget('gtk_button_settings', button)
+        self.srvgui.add_signal('gtk_button_settings', 'clicked', 'self.srvclb.display_settings')
         # ~ button.connect('clicked', self.srvclb.display_settings)
         box.pack_start(button, False, False, 0)
 
