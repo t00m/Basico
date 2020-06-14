@@ -74,11 +74,15 @@ class KB4Basico(Service):
 
     def update(self):
         while True:
+            self.status = KBStatus.UPDATING
             self.queue.get()
             self.kb.run()
             self.queue.task_done()
             if self.queue.empty():
+                self.status = KBStatus.UPTODATE
                 self.log.info("Basico KB updated")
                 self.emit('kb-updated')
 
+    def get_status(self):
+        return self.status
 

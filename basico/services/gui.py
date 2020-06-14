@@ -67,7 +67,7 @@ class UIApp(Gtk.Application):
         splash.hide()
         # ~ self.setup_signals()
         # ~ self.emit('gui-started')
-        self.th = threading.Thread(name='statusbar', target=self.srvclb.gui_update)
+        self.th = threading.Thread(name='statusbar', target=self.srvclb.gui_statusbar_update)
         self.th.setDaemon(True)
         self.th.start()
         # ~ self.emit('gui-started', self.connect_signals)

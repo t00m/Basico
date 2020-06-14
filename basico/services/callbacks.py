@@ -24,6 +24,7 @@ from basico.core.env import FILE, LPATH, ATYPES, APP
 from basico.widgets.cols import CollectionsMgtView
 from basico.widgets.settingsview import SettingsView
 from basico.services.uif import UIFuncs
+from basico.services.kb4it import KBStatus
 
 MAX_WORKERS = 1 # Number of simultaneous connections
 
@@ -93,19 +94,15 @@ class Callback(Service):
         menuview.set_view(view)
         visor_sapnotes.display()
 
-    def gui_update(self, *args):
-        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        visor_sapnotes.update()
-
     def gui_statusbar_update(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')
         alive = statusbar is not None
         while alive:
             record = queue_log.get()
-            time.sleep(0.1)
+            time.sleep(0.25)
             statusbar.message(record)
             queue_log.task_done()
-        time.sleep(0.25)
+        time.sleep(0.1)
 
     def kb_updated(self, *args):
         self.log.debug(args)
