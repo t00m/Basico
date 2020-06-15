@@ -97,6 +97,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         box.set_property('margin-left', 0)
         box.set_property('margin-right', 0)
         box.set_property('margin-bottom', 0)
+        box.set_no_show_all(True)
+        box.hide()
 
         # View combobox button/popover
         lhbox = Gtk.HBox()
@@ -337,7 +339,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         renderer.set_property('background', '#e4f1f1')
         widget = get_column_header_widget('Type', 'basico-type')
         column.set_widget(widget)
-        column.set_visible(True)
+        column.set_visible(False)
         column.set_expand(False)
         column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
         column.set_clickable(True)
@@ -351,7 +353,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         renderer.set_property('background', '#f1e4f1')
         widget = get_column_header_widget('Priority', 'basico-priority')
         column.set_widget(widget)
-        column.set_visible(True)
+        column.set_visible(False)
         column.set_expand(False)
         column.set_clickable(True)
         column.set_sort_indicator(True)

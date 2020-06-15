@@ -122,6 +122,17 @@ class Callback(Service):
         window = self.srvgui.get_widget('gtk_app_window_main')
         window.show_stack('help')
 
+    def gui_menuview_toggled(self, *args):
+        button = self.srvgui.get_widget('gtk_togglebutton_toolbar_menuview')
+        menuview_container = self.srvgui.get_widget('gtk_vbox_container_menu_view')
+        toggled = button.get_active()
+        if toggled:
+            menuview_container.set_no_show_all(False)
+            menuview_container.show_all()
+        else:
+            menuview_container.hide()
+            menuview_container.set_no_show_all(True)
+
     def gui_menuview_update(self, *args):
         view = args[1]
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')

@@ -60,6 +60,22 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         # ~ tool.connect('clicked', self.srvclb.gui_attachment_add)
         # ~ self.toolbar.insert(tool, -1)
 
+        ## Show/Hide Menuviews
+        tool = Gtk.ToolItem()
+        tool.set_expand(False)
+        icon = self.srvicm.get_new_image_icon('basico-component', 24, 24)
+        box = Gtk.Box()
+        box.pack_start(icon, False, False, 3)
+        button = Gtk.ToggleButton()
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        button.set_active(False)
+        self.srvgui.add_widget('gtk_togglebutton_toolbar_menuview', button)
+        self.srvgui.add_signal('gtk_togglebutton_toolbar_menuview', 'toggled', 'self.srvclb.gui_menuview_toggled')
+        button.add(box)
+        tool.add(button)
+        tool.set_tooltip_markup('<b>Show/Hide views</b>')
+        self.toolbar.insert(tool, -1)
+
         ## Filter entry
 
         ### Completion
