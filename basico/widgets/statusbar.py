@@ -74,6 +74,8 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         self.srvgui.add_widget('statusbar_button_cancel', button)
         button.connect('clicked', self.srvweb.cancel_by_user)
         hbox.pack_end(button, False, False, 0)
+        button.set_property('margin-right', 6)
+        button.set_property('margin-bottom', 6)
 
         # SPINNER
         spinner = self.srvgui.add_widget('statusbar_spinner', Gtk.Spinner())

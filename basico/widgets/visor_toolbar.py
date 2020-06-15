@@ -140,12 +140,12 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         tool.set_expand(False)
         self.toolbar.insert(tool, -1)
 
-        ## Visor Stack Switcher
-        tool = Gtk.ToolItem()
-        tool.set_expand(False)
-        hbox = self.srvgui.add_widget('gtk_hbox_toolbar_stack_switcher', Gtk.HBox())
-        tool.add(hbox)
-        self.toolbar.insert(tool, -1)
+        # ~ ## Visor Stack Switcher
+        # ~ tool = Gtk.ToolItem()
+        # ~ tool.set_expand(False)
+        # ~ hbox = self.srvgui.add_widget('gtk_hbox_toolbar_stack_switcher', Gtk.HBox())
+        # ~ tool.add(hbox)
+        # ~ self.toolbar.insert(tool, -1)
 
         ## Separator
         tool = Gtk.SeparatorToolItem.new()

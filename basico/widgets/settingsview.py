@@ -27,6 +27,7 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         self.get_services()
         self.setup()
         self.update()
+        self.show_all()
 
     def get_services(self):
         """Load services to be used in this class

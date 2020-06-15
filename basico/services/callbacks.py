@@ -96,31 +96,36 @@ class Callback(Service):
         # ~ self.srvuif.connect_signal('gtk_button_logviewer', 'clicked', self.display_log)
 
     @UIFuncs.hide_popovers
-    def display_dashboard(self, *args):
+    def display_visor_sapnotes(self, *args):
         window = self.srvgui.get_widget('gtk_app_window_main')
-        window.show_stack('dashboard')
+        window.show_stack_visors('visor-sapnotes')
+
+    @UIFuncs.hide_popovers
+    def display_visor_annotations(self, *args):
+        window = self.srvgui.get_widget('gtk_app_window_main')
+        window.show_stack_visors('visor-annotations')
 
     @UIFuncs.hide_popovers
     def display_about(self, *args):
         window = self.srvgui.get_widget('gtk_app_window_main')
-        window.show_stack('about')
+        window.show_stack_system('about')
 
     @UIFuncs.hide_popovers
     def display_log(self, *args):
         window = self.srvgui.get_widget('gtk_app_window_main')
-        window.show_stack('log')
+        window.show_stack_system('log')
 
     @UIFuncs.hide_popovers
     def display_settings(self, *args):
         view_settings = self.srvgui.get_widget('widget_settings')
         view_settings.update()
         window = self.srvgui.get_widget('gtk_app_window_main')
-        window.show_stack('settings')
+        window.show_stack_system('settings')
 
     @UIFuncs.hide_popovers
     def display_help(self, *args):
         window = self.srvgui.get_widget('gtk_app_window_main')
-        window.show_stack('help')
+        window.show_stack_system('help')
 
     def gui_menuview_toggled(self, *args):
         button = self.srvgui.get_widget('gtk_togglebutton_toolbar_menuview')

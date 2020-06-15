@@ -95,11 +95,6 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
         self.show_all()
 
     def display(self, *args):
-        about = self.srvgui.get_widget('widget_about')
-        stack = self.srvgui.get_widget('gtk_stack_main')
+        stack = self.srvgui.get_widget('gtk_stack_system')
         stack.set_visible_child_name('about')
-        self.srvuif.popover_hide(self.srvgui.get_widget('gtk_popover_button_menu_system'))
-        self.srvuif.set_widget_visibility('gtk_label_total_notes', False)
-        # self.srvuif.set_widget_visibility('gtk_button_dashboard', True)
-        self.srvuif.grab_focus()
         self.log.debug("About Basico")

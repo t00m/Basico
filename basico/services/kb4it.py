@@ -39,7 +39,7 @@ class KB4Basico(Service):
         self.log.debug("Basico is using %s" % KB4IT().get_version())
 
         # Make sure the last theme version is installed
-        self.params = Namespace(FORCE=True, LOGLEVEL='INFO', SORT_ATTRIBUTE=None, SOURCE_PATH=LPATH['DOC_SOURCE'], TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+        self.params = Namespace(FORCE=False, LOGLEVEL='INFO', SORT_ATTRIBUTE=None, SOURCE_PATH=LPATH['DOC_SOURCE'], TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
         self.install_theme()
 
         # Get KB4IT Basico theme properties

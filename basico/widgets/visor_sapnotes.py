@@ -31,6 +31,7 @@ from basico.services.collections import COL_DOWNLOADED
 from basico.widgets.cols import CollectionsMgtView
 from basico.widgets.sapimport import ImportWidget
 from basico.widgets.menuview import MenuView
+from basico.widgets.visor_toolbar import VisorToolbar
 
 
 class COLUMN(IntEnum):
@@ -47,14 +48,17 @@ class COLUMN(IntEnum):
     UPDATED_TIMESTAMP = 10
 
 
-class SAPNotesVisor(BasicoWidget, Gtk.Box):
+class SAPNotesVisor(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
-        Gtk.Box.__init__(self, app)
+        Gtk.VBox.__init__(self, app)
+        self.set_property('margin-left', 6)
+        self.set_homogeneous(False)
         self.get_services()
         self.bag = []
         self.icons = {}
         self.icons['type'] = {}
+        toolbar = self.setup_toolbar()
         panel = self.setup_panel()
         visor = self.setup_visor()
         paned = Gtk.HPaned()
@@ -62,7 +66,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         paned.add2(visor)
         paned.set_position(400)
         paned.show_all()
-        self.add(paned)
+        self.pack_start(toolbar, False, False, 0)
+        self.pack_start(paned, True, True, 0)
         self.connect_signals()
         self.log.debug("SAP Notes Visor initialized")
 
@@ -87,15 +92,14 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         sorted_model = self.srvgui.get_widget('visor_sapnotes_sorted_model')
         sorted_model.set_sort_column_id(COLUMN.UPDATED_TIMESTAMP, Gtk.SortType.ASCENDING)
 
+    def setup_toolbar(self):
+        return self.srvgui.add_widget('visor_sapnotes_toolbar', VisorToolbar(self.app))
 
     def setup_panel(self):
         ## Left view - SAP Notes Menu view
         box = self.srvgui.add_widget('gtk_vbox_container_menu_view', Gtk.VBox())
-        # ~ self.pack_start(box, False, True, 3)
-        # ~ separator = Gtk.Separator(orientation = Gtk.Orientation.VERTICAL)
-        # ~ self.pack_start(separator, False, False, 3)
-        box.set_property('margin-left', 0)
-        box.set_property('margin-right', 0)
+        box.set_property('margin-left', 6)
+        box.set_property('margin-right', 3)
         box.set_property('margin-bottom', 0)
         box.set_no_show_all(True)
         box.hide()
@@ -176,30 +180,26 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
 
         ### View treeview
         box_trv = Gtk.VBox()
-        box_trv.set_property('margin-left', 3)
+        box_trv.set_property('margin-left', 6)
         box_trv.set_property('margin-right', 3)
         box_trv.set_property('margin-bottom', 0)
         scr = Gtk.ScrolledWindow()
-        # ~ scr.set_hexpand(True)
         scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scr.set_shadow_type(Gtk.ShadowType.IN)
         vwp = Gtk.Viewport()
         vwp.set_hexpand(True)
         viewsbox = self.srvgui.add_widget('gtk_box_container_views', Gtk.Box())
-        # ~ viewsbox.set_hexpand(True)
         viewsbox.pack_start(menuview, True, True, 0)
         vwp.add(viewsbox)
         scr.add(vwp)
         box_trv.pack_start(scr, True, True, 0)
         box.pack_start(box_trv, True, True, 0)
-        # ~ box.show_all()
-        # ~ box.add(menuview)
         return box
-
-
 
     def setup_visor(self):
         visor = Gtk.VBox()
+        # ~ visor.set_property('margin-left', 3)
+        visor.set_property('margin-right', 6)
         scr = Gtk.ScrolledWindow()
         scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scr.set_shadow_type(Gtk.ShadowType.IN)
@@ -810,8 +810,6 @@ class SAPNotesVisor(BasicoWidget, Gtk.Box):
         return selected
 
     def display(self):
-        stack_main = self.srvgui.get_widget('gtk_stack_main')
-        stack_main.set_visible_child_name('dashboard')
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
         stack_visors.set_visible_child_name('visor-sapnotes')
 
