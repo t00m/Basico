@@ -78,7 +78,7 @@ class Callback(Service):
         self.th = threading.Thread(name='statusbar', target=self.gui_statusbar_update)
         self.th.setDaemon(True)
         self.th.start()
-        self.log.debug("Logging activated")
+        self.log.debug("UI Logging activated")
 
         # Connect signals
         self.connect_signals()
@@ -149,6 +149,10 @@ class Callback(Service):
         popover.hide()
         menuview.set_view(view)
         visor_sapnotes.display()
+
+    def gui_menuview_row_changed(self, *args):
+        menuview = self.srvgui.get_widget('menuview')
+        menuview.row_changed()
 
     def gui_statusbar_update(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')

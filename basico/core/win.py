@@ -340,6 +340,11 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_visors.add_titled(stack_child, "visor-sapnotes", "SAP Notes")
         stack_visors.child_set_property (stack_child, "icon-name", "basico-sapnote")
 
+        #### Stack for Visor SAP Notes
+        stack_child = self.setup_stack_visor_annotations()
+        stack_visors.add_titled(stack_child, "visor-annotations", "My notes")
+        stack_visors.child_set_property (stack_child, "icon-name", "basico-annotation")
+
         return box
 
     def setup_stack_visor_sapnotes(self):
@@ -360,6 +365,28 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         scr.add(vwp)
         box.pack_start(scr, True, True, 0)
         visor_sapnotes.show_all()
+        box.show_all()
+        return box
+
+    def setup_stack_visor_annotations(self):
+        box = Gtk.VBox()
+        box.set_hexpand(True)
+
+        ### Visor
+        scr = Gtk.ScrolledWindow()
+        scr.set_hexpand(True)
+        scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scr.set_shadow_type(Gtk.ShadowType.NONE)
+        vwp = Gtk.Viewport()
+        vwp.set_hexpand(True)
+        visor_annotations = self.srvgui.add_widget('visor_annotations', BasicoBrowser(self.controller))
+        visor_annotations.load_url("file://%s" % FILE['KB4IT_INDEX'])
+        visor_annotations.set_hexpand(True)
+        visor_annotations.set_vexpand(True)
+        vwp.add(visor_annotations)
+        scr.add(vwp)
+        box.pack_start(scr, True, True, 0)
+        visor_annotations.show_all()
         box.show_all()
         return box
 

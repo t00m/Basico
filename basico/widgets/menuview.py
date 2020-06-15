@@ -111,6 +111,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         # Selection
         self.selection = self.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.SINGLE)
+        self.srvgui.add_widget('menuview_selection', self.selection)
 
         font_desc = Pango.FontDescription('Monospace 10')
         if font_desc:
@@ -232,6 +233,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.set_hover_selection(False)
         self.set_grid_lines(Gtk.TreeViewGridLines.NONE)
         self.set_level_indentation(0)
+        self.srvgui.add_signal('menuview_selection', 'changed', 'self.srvclb.gui_menuview_row_changed')
         signal = self.selection.connect('changed', self.row_changed)
         self.srvgui.set_key_value('menuview-selection', self.selection)
         self.srvgui.set_key_value('menuview-row-changed', signal)
@@ -258,11 +260,11 @@ class MenuView(BasicoWidget, Gtk.TreeView):
             pass
 
 
-    def row_changed(self, selection):
+    def row_changed(self, *args):
+        selection = self.srvgui.get_widget('menuview_selection')
+
         if self.current_status is None:
             visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            # ~ visor_sapnotes.display()
-
             try:
                 model, treeiter = selection.get_selected()
                 row = model[treeiter][0]

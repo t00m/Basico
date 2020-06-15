@@ -91,8 +91,8 @@ class UIFuncs(Service):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ button.connect('clicked', self.srvclb.gui_menuview_update, '%s' % view)
-
+        self.srvgui.add_widget('gtk_button_menuview_%s' % view, button)
+        self.srvgui.add_signal('gtk_button_menuview_%s' % view, 'clicked', 'self.srvclb.gui_menuview_update', view)
         return button
 
     def create_notebook_tab_label(self, iconname, title):
