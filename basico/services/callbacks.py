@@ -69,6 +69,7 @@ class Callback(Service):
         self.srvclt = self.get_service('Collections')
         self.srvweb = self.get_service('Driver')
         self.srvbkb = self.get_service('KB4IT')
+        self.srvclb = self # Trick
         self.srvbkb.connect('kb-updated', self.kb_updated)
 
     def gui_started(self, *args):
@@ -92,8 +93,6 @@ class Callback(Service):
             for signal in wsdict[widget]:
                 callback, data = wsdict[widget][signal]
                 self.srvuif.connect_signal(widget, signal, callback, data)
-
-        # ~ self.srvuif.connect_signal('gtk_button_logviewer', 'clicked', self.display_log)
 
     @UIFuncs.hide_popovers
     def display_visor_sapnotes(self, *args):

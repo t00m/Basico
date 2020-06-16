@@ -26,6 +26,7 @@ class UIFuncs(Service):
         self.srvclb = self.get_service('Callbacks')
         self.srvicm = self.get_service('IM')
         self.srvutl = self.get_service('Utils')
+        self.srvweb = self.get_service('Driver')
         self.srvuif = self # Trick
 
 

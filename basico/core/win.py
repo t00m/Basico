@@ -143,7 +143,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         self.srvgui.add_widget('gtk_popover_button_menu_system', popover)
         self.srvgui.add_widget('gtk_button_menu_system', button)
         self.srvgui.add_signal('gtk_button_menu_system', 'clicked', 'self.srvuif.popover_show', popover)
-        # ~ button.connect('clicked', self.srvuif.popover_show, popover)
         rhbox.pack_end(button, False, False, 0)
 
         # Popover body
@@ -178,7 +177,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.set_relief(Gtk.ReliefStyle.NONE)
         self.srvgui.add_widget('gtk_button_help', button)
         self.srvgui.add_signal('gtk_button_help', 'clicked', 'self.srvclb.display_help')
-        # ~ button.connect('clicked', self.srvclb.display_help)
         box.pack_end(button, False, False, 0)
 
         ### Log viewer
@@ -209,7 +207,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         button.set_relief(Gtk.ReliefStyle.NONE)
         self.srvgui.add_widget('gtk_button_settings', button)
         self.srvgui.add_signal('gtk_button_settings', 'clicked', 'self.srvclb.display_settings')
-        # ~ button.connect('clicked', self.srvclb.display_settings)
         box.pack_start(button, False, False, 0)
 
         # ~ ### Backup
@@ -287,23 +284,12 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         self.log.debug("Displaying visor %s", stack_name)
 
     def setup_stack_system(self):
-        # System Stack (Settings / Help / etc...)
-        # ~ stack_switcher = self.srvgui.add_widget('gtk_stack_switcher_system', Gtk.StackSwitcher())
         lhbox = self.srvgui.get_widget('gtk_hbox_hb_left')
-        # ~ lhbox.pack_start(stack_switcher, False, False, 0)
 
+        # System Stack (Settings / Help / etc...)
         stack_system = self.srvgui.add_widget('gtk_stack_system', Gtk.Stack())
-        # ~ stack_switcher.set_stack(stack_system)
-        # ~ stack_switcher.set_property('icon-size', 3)
-        # ~ stack_system.connect('notify::visible-child', self.stack_changed)
         stack_system.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         stack_system.set_transition_duration(250)
-
-
-        ### Visor stack child
-        # ~ stack_child = self.setup_stack_visors()
-        # ~ stack_system.add_titled(stack_child, "dashboard", "Dashboard")
-        # ~ stack_system.child_set_property (stack_child, "icon-name", "basico-dashboard")
 
         ### Settings stack child
         stack_child = self.setup_stack_system_settings()
@@ -327,7 +313,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_system.show_all()
         return stack_system
 
-
     def setup_stack_visors(self):
         box = Gtk.VBox()
         box.set_hexpand(True)
@@ -336,7 +321,6 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_visors = self.srvgui.add_widget('gtk_stack_visors', Gtk.Stack())
         stack_visors.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         stack_visors.set_transition_duration(250)
-        # ~ stack_visors.connect('notify::visible-child', self.window_stack_visor_change)
         box.pack_start(stack_visors, True, True, 0)
 
         #### Stack for Visor SAP Notes

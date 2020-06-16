@@ -72,7 +72,7 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         button.set_image(image)
         button.set_relief(Gtk.ReliefStyle.NONE)
         self.srvgui.add_widget('statusbar_button_cancel', button)
-        button.connect('clicked', self.srvweb.cancel_by_user)
+        self.srvgui.add_signal('statusbar_button_cancel', 'clicked', 'self.srvweb.cancel_by_user')
         hbox.pack_end(button, False, False, 0)
         button.set_property('margin-right', 6)
         button.set_property('margin-bottom', 6)

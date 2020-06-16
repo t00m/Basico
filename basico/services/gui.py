@@ -50,7 +50,6 @@ class UIApp(Gtk.Application):
     def do_activate(self):
         # DOC: https://wiki.gnome.org/HowDoI/GtkApplication
         # https://stackoverflow.com/questions/41883527/uniqueness-of-gtk-application-without-creating-any-window
-        # ~ self.emit('gui-started', self.connect_signals)
         if not hasattr(self, "my_app_settings"):
             self.hold()
             self.my_app_settings = "Primary application instance."
