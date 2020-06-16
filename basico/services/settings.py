@@ -33,7 +33,7 @@ class Settings(Service):
         config = self.load()
 
 
-    def get(self, section, key):
+    def get_value(self, section, key):
         config = self.load()
         try:
             return config[section][key]
@@ -42,7 +42,7 @@ class Settings(Service):
             return None
 
 
-    def set(self, section, key, value):
+    def set_value(self, section, key, value):
         config = self.load()
         try:
             config[section][key] = value

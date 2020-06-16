@@ -86,10 +86,18 @@ class Callback(Service):
         # Connect signals
         self.connect_signals()
 
-        #
+        # Alive
         self.srvgui.set_running(True)
         self.log.debug("Signals connected")
         self.log.debug("Basico ready!")
+        try:
+            appwindow = self.srvgui.get_widget('gtk_app_window')
+            appwindow.connect('configure-event', self.gui_appwindow_changed)
+            width, height, x, y = appwindow.get_last_size_pos()
+            appwindow.set_size_request(width, height)
+        except:
+            self.log.warning("Window couldn't be resized")
+
 
     def connect_signals(self):
         wsdict = self.srvgui.get_signals()
@@ -101,6 +109,18 @@ class Callback(Service):
     def connect_signal(self, *args):
         widget, signal, callback, data = args[1]
         self.srvuif.connect_signal(widget, signal, callback, data)
+
+    ## GTK APP WINDOW ##
+    def gui_appwindow_changed(self, widget, e):
+        widget.set_config_value('size_pos', (e.width, e.height, e.x, e.y))
+
+        return False
+
+    def gui_appwindow_quit(self, widget, e):
+        # ~ self.log.debug("QUIT: %dx%d", e.height, e.width)
+        self.log.debug("QUIT: %s", widget.get_size_request())
+        self.app.stop()
+        return True
 
     @UIFuncs.hide_popovers
     def display_visor_sapnotes(self, *args):

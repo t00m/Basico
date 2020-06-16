@@ -17,15 +17,20 @@ from gi.repository import Gtk
 
 class BasicoWidget(object):
     """Service class is the base class for Basico widgets"""
-    log=None
+    app = None
+    log = None
+    name = None
+    section = None
 
-    def __init__(self, app, logname):
+    def __init__(self, app, name):
         """Initialize Service instance"""
         self.app = app
-        self.log = logging.getLogger(logname)
+        self.name = name
+        self.log = logging.getLogger(name)
         self.log.addHandler(self.app.intercepter)
-        self.init_section(logname)
-        self.log.debug("Loading widget: %s", logname)
+        self.srvstg = self.get_service('Settings')
+        self.__init_section(name)
+        self.log.debug("Loading widget: %s", name)
 
     def get_traceback(self):
         """Get traceback"""
@@ -35,14 +40,23 @@ class BasicoWidget(object):
         """Get a service"""
         return self.app.get_service(name)
 
-    def init_section(self, name):
+    def __init_section(self, name):
         """Check if section exists in config. If not, create it"""
-        self.srvstg = self.get_service('Settings')
+        self.section = 'Widget#%s' % name
         config = self.srvstg.load()
 
         try:
-            config['Widget#%s' % name]
+            config[self.section]
         except:
-            config['Widget#%s' % name] = {}
+            config[self.section] = {}
             self.srvstg.save(config)
             self.log.debug("Section '%s' initialized in config file" % name)
+
+    def get_section_name(self):
+        return self.name
+
+    def set_config_value(self, key, value):
+        self.srvstg.set_value(self.section, key, value)
+
+    def get_config_value(self, key):
+        return self.srvstg.get_value(self.section, key)

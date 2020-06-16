@@ -116,7 +116,7 @@ class Splash():
 
     def hide(self):
         self.window.hide()
-        # ~ self.log.debug("Hide the splash screen")
+        self.log.debug("Hide the splash screen")
 
 
     def destroy(self):

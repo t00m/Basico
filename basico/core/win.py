@@ -26,6 +26,7 @@ from gi.repository import Gio
 from gi.repository import Pango
 from gi.repository.GdkPixbuf import Pixbuf
 
+from basico.core.wdg import BasicoWidget
 from basico.core.srv import Service
 from basico.core.env import APP, FILE
 from basico.widgets.visor_sapnotes import SAPNotesVisor
@@ -36,18 +37,31 @@ from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
 
 
-class GtkAppWindow(Gtk.ApplicationWindow):
+class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
+    size_pos = None
+
     def __init__(self, uiapp):
         self.uiapp = uiapp
         self.setup_controller(uiapp)
-        self.log = logging.getLogger('GtkAppWindow')
         self.app = uiapp.get_controller()
-        self.log.addHandler(self.app.intercepter)
+        super().__init__(self.app, __class__.__name__)
+
+        self.size_pos = self.get_size_pos_from_config()
+        if self.size_pos is None:
+            self.log.warning("No last size and position saved. First time execution?")
+
+        self.log.debug("LAST WINDOW SIZE POS: %s", self.size_pos)
         self.get_services()
         self.setup_window(uiapp)
         self.setup_widgets()
         self.srvgui.add_widget('gtk_app_window', self)
         self.run()
+
+    def get_size_pos_from_config(self):
+        return self.get_config_value('size_pos')
+
+    def get_last_size_pos(self):
+        return self.size_pos
 
     def get_services(self):
         self.srvgui = self.controller.get_service("GUI")
@@ -82,7 +96,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         # ~ context = Gtk.StyleContext()
         # ~ context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        self.set_default_size(1024, 728)
+        # ~ self.set_default_size(1024, 728)
         self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         self.setup_headerbar()
 
