@@ -270,27 +270,19 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         self.add(mainbox)
         self.show_all()
 
-    def show_stack_system(self, stack_name):
+    def switch_notebook_page(self, page_num):
         notebook = self.srvgui.get_widget('gtk_notebook_main')
-        notebook.set_current_page(1)
-        stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        stack_visors.set_no_show_all(True)
-        stack_visors.hide()
+        notebook.set_current_page(page_num)
+
+    def show_stack_system(self, stack_name):
+        self.switch_notebook_page(1)
         stack_system = self.srvgui.get_widget('gtk_stack_system')
-        stack_system.set_no_show_all(False)
-        stack_system.show_all()
         stack_system.set_visible_child_name(stack_name)
         self.log.debug("Displaying system %s", stack_name)
 
     def show_stack_visors(self, stack_name):
-        notebook = self.srvgui.get_widget('gtk_notebook_main')
-        notebook.set_current_page(0)
-        stack_system = self.srvgui.get_widget('gtk_stack_system')
-        stack_system.set_no_show_all(True)
-        stack_system.hide()
+        self.switch_notebook_page(0)
         stack_visors = self.srvgui.get_widget('gtk_stack_visors')
-        stack_visors.set_no_show_all(False)
-        stack_visors.show_all()
         stack_visors.set_visible_child_name(stack_name)
         self.log.debug("Displaying visor %s", stack_name)
 
@@ -332,6 +324,7 @@ class GtkAppWindow(Gtk.ApplicationWindow):
         stack_child = self.setup_stack_system_log()
         stack_system.add_titled(stack_child, "log", "Event Viewer")
 
+        stack_system.show_all()
         return stack_system
 
 
