@@ -12,7 +12,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository.GdkPixbuf import Pixbuf
 
-from basico.widgets.cols import CollectionsMgtView
+from basico.widgets.cols import ColsMgtView
 from basico.widgets.sapimport import ImportWidget
 from basico.core.wdg import BasicoWidget
 

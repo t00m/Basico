@@ -28,7 +28,7 @@ from gi.repository import Pango
 from basico.core.wdg import BasicoWidget
 from basico.core.env import LPATH, ATYPES
 from basico.services.collections import COL_DOWNLOADED
-from basico.widgets.cols import CollectionsMgtView
+from basico.widgets.cols import ColsMgtView
 from basico.widgets.sapimport import ImportWidget
 from basico.widgets.menuview import MenuView
 from basico.widgets.visor_toolbar import VisorToolbar
@@ -84,8 +84,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         self.srvuif = self.get_service("UIF")
         self.srvutl = self.get_service("Utils")
         self.srvweb = self.get_service("Driver")
-        # ~ self.srvant = self.get_service('Annotation')
-        # ~ self.srvatc = self.get_service('Attachment')
+        self.srvclb = self.get_service("Callbacks")
 
 
     def sort_by_timestamp(self):
@@ -712,25 +711,15 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         else:
             # Popover button "Add an annotation"
             button = get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
-            button.show_all()
-            # ~ button.connect('clicked', self.clb_create_annotation, sid)
+            # ~ button.show_all()
+            self.srvgui.add_widget('gtk_button_annotation_add', button)
+            self.srvgui.add_signal('gtk_button_annotation_add', 'clicked', 'self.srvclb.gui_annotation_create', isid)
             box.pack_start(button, False, False, 0)
-
-            fbox = Gtk.VBox()
-            frame = Gtk.Frame()
-            frame.set_border_width(3)
-            label = Gtk.Label()
-            label.set_markup(' <b>Attachments</b> ')
-            frame.set_label_widget(label)
-            # Popover button "Add attachments"
-            button = get_popover_button("<b>Add</b> new to SAP Note %d" % isid, 'basico-attachment')
-            button.set_property('margin', 3)
-            button.show_all()
-            # ~ button.connect('clicked', self.srvclb.gui_attachment_add_to_sapnote, sid)
-            fbox.pack_start(button, False, False, 0)
 
             # Popover button "Open SAP Note"
             button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
+            self.srvgui.add_widget('gtk_button_sapnote_browse', button)
+            # ~ self.srvgui.add_signal('gtk_button_sapnote_browse', 'clicked', 'self.srvweb.browse_note', sid)
             button.connect('clicked', self.srvweb.browse_note, sid)
             box.pack_start(button, False, False, 0)
 
@@ -767,7 +756,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
             self.popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
             self.popcollections.set_position(Gtk.PositionType.RIGHT)
             button.connect('clicked', self.srvuif.popover_show, self.popcollections)
-            colmgt = CollectionsMgtView(self.app, sid, overwrite=True)
+            colmgt = ColsMgtView(self.app, sid, overwrite=True)
             self.popcollections.add(colmgt)
 
             # Separator

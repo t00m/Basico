@@ -22,10 +22,11 @@ from gi.repository import GObject
 from basico.core.srv import Service
 from basico.core.log import event_log, queue_log
 from basico.core.env import FILE, LPATH, ATYPES, APP
-from basico.widgets.cols import CollectionsMgtView
+from basico.widgets.cols import ColsMgtView
 from basico.widgets.settingsview import SettingsView
 from basico.services.uif import UIFuncs
 from basico.services.kb4it import KBStatus
+from basico.core.err import BasicoNotImplemented
 
 class Callback(Service):
     def initialize(self):
@@ -71,6 +72,7 @@ class Callback(Service):
         self.srvbkb = self.get_service('KB4IT')
         self.srvclb = self # Trick
         self.srvbkb.connect('kb-updated', self.kb_updated)
+        self.srvgui.connect('new-signal', self.connect_signal)
 
     def gui_started(self, *args):
         # Update statusbar and logviewer
@@ -83,8 +85,10 @@ class Callback(Service):
 
         # Connect signals
         self.connect_signals()
-        self.log.debug("Signals connected")
 
+        #
+        self.srvgui.set_running(True)
+        self.log.debug("Signals connected")
         self.log.debug("Basico ready!")
 
     def connect_signals(self):
@@ -93,6 +97,10 @@ class Callback(Service):
             for signal in wsdict[widget]:
                 callback, data = wsdict[widget][signal]
                 self.srvuif.connect_signal(widget, signal, callback, data)
+
+    def connect_signal(self, *args):
+        widget, signal, callback, data = args[1]
+        self.srvuif.connect_signal(widget, signal, callback, data)
 
     @UIFuncs.hide_popovers
     def display_visor_sapnotes(self, *args):
@@ -126,6 +134,7 @@ class Callback(Service):
         window = self.srvgui.get_widget('gtk_app_window_main')
         window.show_stack_system('help')
 
+    ## Menuview callabacks ##
     def gui_menuview_toggled(self, *args):
         button = self.srvgui.get_widget('gtk_togglebutton_toolbar_menuview')
         menuview_container = self.srvgui.get_widget('gtk_vbox_container_menu_view')
@@ -158,6 +167,11 @@ class Callback(Service):
         menuview = self.srvgui.get_widget('menuview')
         menuview.row_changed()
 
+    ## VISOR SAP NOTES ##
+    def gui_annotation_create(self, button, sid):
+        self.log.warning("Functionality not implemented yet: Creating annotation for SAP Note %s", sid)
+
+    ## STATUSBAR ##
     def gui_statusbar_update(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')
         alive = statusbar is not None

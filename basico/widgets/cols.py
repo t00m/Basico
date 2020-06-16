@@ -16,8 +16,8 @@ from basico.core.wdg import BasicoWidget
 from basico.services.collections import COL_DOWNLOADED
 
 
-class CollectionsMgtView(BasicoWidget, Gtk.VBox):
-    __gtype_name__ = 'CollectionsMgtView'
+class ColsMgtView(BasicoWidget, Gtk.VBox):
+    __gtype_name__ = 'ColsMgtView'
     """
     Missing class docstring (missing-docstring)
     """

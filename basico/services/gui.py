@@ -96,11 +96,13 @@ class GUI(Service):
     widgets = {} # Widget name : Object
     keys = {} # Key : Value; keys: doctype, property, values
     signals = {} # Signals dictionary for all widgets (widget::signal)
+    running = False
 
     def initialize(self):
         """
         Setup GUI Service
         """
+        GObject.signal_new('new-signal', self, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
 
     def run(self):
         """
@@ -176,8 +178,11 @@ class GUI(Service):
 
         self.signals[widget][signal] = (callback, data)
 
-        # ~ signal_name = "%s::%s" % (widget, signal)
-        # ~ self.signals[signal_name] = value
+        if self.is_running():
+            self.emit('new-signal', (widget, signal, callback, data))
+            self.log.debug("[NEW] Signal '%s' emitted for widget '%s'", signal, widget)
+        else:
+            self.log.debug("[HLD] Signal '%s' emitted for widget '%s'", signal, widget)
 
     def get_signals(self):
         """
@@ -221,3 +226,14 @@ class GUI(Service):
         Missing method docstring (missing-docstring)
         """
         return self.uiapp.get_window()
+
+    def set_running(self, running):
+        """
+        Let this service when the whole app is running.
+        In this way, some signals (like the one activated after the GUI
+        has already started up), can be connected
+        """
+        self.running = running
+
+    def is_running(self):
+        return self.running

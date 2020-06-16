@@ -23,7 +23,7 @@ from gi.repository import GObject
 from gi.repository.GdkPixbuf import Pixbuf
 
 
-from basico.widgets.cols import CollectionsMgtView
+from basico.widgets.cols import ColsMgtView
 from basico.core.wdg import BasicoWidget
 from basico.services.collections import COL_DOWNLOADED
 
@@ -305,7 +305,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         button = self.srvgui.get_widget('gtk_button_popover_manage_collections')
         popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
         popcollections.set_position(Gtk.PositionType.RIGHT)
-        popcollections.add(CollectionsMgtView(self.app, '0000000000'))
+        popcollections.add(ColsMgtView(self.app, '0000000000'))
         self.srvuif.popover_show(None, popcollections)
 
 
@@ -405,7 +405,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.popviewtocat = self.srvgui.add_widget('gtk_popover_button_assign_view_to_category', Gtk.Popover.new(button))
         self.popviewtocat.set_position(Gtk.PositionType.RIGHT)
         button.connect('clicked', self.srvuif.popover_show, self.popviewtocat)
-        colmgt = CollectionsMgtView(self.app, 'view', overwrite=False)
+        colmgt = ColsMgtView(self.app, 'view', overwrite=False)
         self.popviewtocat.add(colmgt)
 
         # Popover button "Bookmark all SAP Notes in this view"
