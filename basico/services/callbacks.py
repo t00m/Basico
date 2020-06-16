@@ -26,7 +26,7 @@ from basico.widgets.cols import ColsMgtView
 from basico.widgets.settingsview import SettingsView
 from basico.services.uif import UIFuncs
 from basico.services.kb4it import KBStatus
-from basico.core.err import BasicoNotImplemented
+
 
 class Callback(Service):
     def initialize(self):
