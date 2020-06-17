@@ -7,29 +7,24 @@
 # Description: UI and related callbacks service
 """
 
-import os
-import json
 import time
 import threading
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib
-from gi.repository import Gtk
-from gi.repository import Gdk
 from gi.repository import GObject
 
 from basico.core.srv import Service
-from basico.core.log import event_log, queue_log
-from basico.core.env import FILE, LPATH, ATYPES, APP
-from basico.widgets.cols import ColsMgtView
-from basico.widgets.settingsview import SettingsView
+from basico.core.log import queue_log
 from basico.services.uif import UIFuncs
 from basico.services.kb4it import KBStatus
 
 
 class Callback(Service):
+    """
+    Callbacks service is in charge of setup all the gui aspects once it
+    has started
+    """
     def initialize(self):
+        # Be aware about when the whole gui is started
         GObject.signal_new('gui-started', Callback, GObject.SignalFlags.RUN_LAST, None, () )
         self.connect('gui-started', self.gui_started)
         self.get_services()
@@ -90,6 +85,12 @@ class Callback(Service):
         self.srvgui.set_running(True)
         self.log.debug("Signals connected")
         self.log.debug("Basico ready!")
+
+        # Memento
+        self.memento()
+
+    def memento(self):
+        # Remember last window size
         try:
             appwindow = self.srvgui.get_widget('gtk_app_window')
             appwindow.connect('configure-event', self.gui_appwindow_changed)
@@ -100,6 +101,7 @@ class Callback(Service):
 
 
     def connect_signals(self):
+        """Auto connect all those signals registered for widgets"""
         wsdict = self.srvgui.get_signals()
         for widget in wsdict:
             for signal in wsdict[widget]:
@@ -107,20 +109,22 @@ class Callback(Service):
                 self.srvuif.connect_signal(widget, signal, callback, data)
 
     def connect_signal(self, *args):
+        """
+        Connect those signals emitted once the gui is started and after
+        the auto connect signlas has been fired
+        """
         widget, signal, callback, data = args[1]
         self.srvuif.connect_signal(widget, signal, callback, data)
 
     ## GTK APP WINDOW ##
     def gui_appwindow_changed(self, widget, e):
+        """
+        Save some gui aspects like w, h, x, y
+        FIXME: when the window is maximized and then back to normal, the
+               window can't be resized :/
+        """
         widget.set_config_value('size_pos', (e.width, e.height, e.x, e.y))
-
         return False
-
-    def gui_appwindow_quit(self, widget, e):
-        # ~ self.log.debug("QUIT: %dx%d", e.height, e.width)
-        self.log.debug("QUIT: %s", widget.get_size_request())
-        self.app.stop()
-        return True
 
     @UIFuncs.hide_popovers
     def display_visor_sapnotes(self, *args):
@@ -156,6 +160,7 @@ class Callback(Service):
 
     ## Menuview callabacks ##
     def gui_menuview_toggled(self, *args):
+        """Show/Hide menu views"""
         button = self.srvgui.get_widget('gtk_togglebutton_toolbar_menuview')
         menuview_container = self.srvgui.get_widget('gtk_vbox_container_menu_view')
         toggled = button.get_active()
@@ -167,6 +172,7 @@ class Callback(Service):
             menuview_container.set_no_show_all(True)
 
     def gui_menuview_update(self, *args):
+        """Update visor sapnotes when view changes"""
         view = args[1]
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         menuview = self.srvgui.get_widget('menuview')
@@ -184,6 +190,10 @@ class Callback(Service):
         visor_sapnotes.display()
 
     def gui_menuview_row_changed(self, *args):
+        """
+        Update visor sapnotes when user choose a different row in the
+        treeview associated to that view
+        """
         menuview = self.srvgui.get_widget('menuview')
         menuview.row_changed()
 
@@ -193,6 +203,7 @@ class Callback(Service):
 
     ## STATUSBAR ##
     def gui_statusbar_update(self, *args):
+        """Update statusbar by using intercepted logging"""
         statusbar = self.srvgui.get_widget('widget_statusbar')
         alive = statusbar is not None
         while alive:
@@ -203,4 +214,5 @@ class Callback(Service):
         time.sleep(0.1)
 
     def kb_updated(self, *args):
+        """Be aware when Basico KB is updated"""
         self.log.info("Basico KB updated")
