@@ -18,57 +18,55 @@ import json
 from basico.core.srv import Service
 from basico.core.env import FILE
 
-#COMMENT Default settings for SAP module
-#COMMENT LOGIN_PAGE_URL = "https://accounts.sap.com"
-#COMMENT LOGOUT_PAGE_URL = "https://accounts.sap.com/ui/logout"
-#COMMENT ODATA_NOTE_URL = "https://launchpad.support.sap.com/services/odata/svt/snogwscorr/TrunkSet(SapNotesNumber='%s',Version='0',Language='E')" #$expand=LongText" #?$expand=LongText,RefTo,RefBy"
-#COMMENT SAP_NOTE_URL = "https://launchpad.support.sap.com/#/notes/%s"
-#COMMENT SAP_NOTE_URL_PDF = "https://launchpad.support.sap.com/services/pdf/notes/%s/E"
-#COMMENT TIMEOUT = 5
-
-
 class Settings(Service):
+    """
+    Settings management service for Basico
+    TODO: do not save a setting if the same is already in the settings database
+    TODO: enqueue settings to be saved, so the service is not all the time accessing to disk
+    """
+    config = None
+
     def initialize(self):
         self.log.debug("Basico config file: %s" % FILE['CNF'])
-        config = self.load()
+        self.load()
 
-
-    def get_value(self, section, key):
-        config = self.load()
+    def load(self):
+        """Load settings database. If it doesn't exist, create it"""
         try:
-            return config[section][key]
+            with open(FILE['CNF'], 'r') as fp:
+                self.config = json.load(fp)
         except Exception as error:
-            self.log.error(error)
-            return None
+            self.log.debug("Config file not found. Creating a new one")
+            self.config = {}
+            self.save()
 
+    def save(self, config=None):
+        """Save settings database"""
+        with open(FILE['CNF'], 'w') as fp:
+            if config is not None:
+                self.config = config
+            json.dump(self.config, fp)
+
+    def get_config(self):
+        """Get database settings"""
+        if self.config is None:
+            self.load()
+        return self.config
 
     def set_value(self, section, key, value):
-        config = self.load()
+        """Set value for a key in a given section"""
         try:
-            config[section][key] = value
+            self.config[section][key] = value
             self.log.debug("[%s][%s] = %s" % (section, key, value))
-            self.save(config)
+            self.save()
         except:
             self.log.error("Setting not saved")
             self.log.error(self.get_traceback())
 
-
-    def load(self):
+    def get_value(self, section, key):
+        """Get value for a key in a given section"""
         try:
-            with open(FILE['CNF'], 'r') as fp:
-                config = json.load(fp)
+            return self.config[section][key]
         except Exception as error:
-            self.log.debug("Config file not found. Creating a new one")
-            config = {}
-            self.save(config)
-
-        return config
-
-
-    def save(self, config=None):
-        if config is None:
-            self.log.error("A dictionary with all settings must be provided")
-            return
-        with open(FILE['CNF'], 'w') as fp:
-            json.dump(config, fp)
-        # ~ self.log.debug("Settings saved successfully")
+            self.log.error(error)
+            return None

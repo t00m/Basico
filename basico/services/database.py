@@ -49,7 +49,7 @@ class Database(Service):
         # ~ GObject.signal_new('database-delete', Database, GObject.SignalFlags.RUN_LAST, None, () )
 
     def __init_config_section(self):
-        settings = self.srvstg.load()
+        settings = self.srvstg.get_config()
         settings[self.section]
         try:
             settings[self.section]['DBSAP']

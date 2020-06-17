@@ -97,7 +97,7 @@ class Service(GObject.GObject):
     def init_section(self, section):
         """Check if section exists in config. If not, create it"""
         self.srvstg = self.get_service('Settings')
-        config = self.srvstg.load()
+        config = self.srvstg.get_config()
         try:
             config[section]
         except:

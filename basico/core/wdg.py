@@ -43,8 +43,7 @@ class BasicoWidget(object):
     def __init_section(self, name):
         """Check if section exists in config. If not, create it"""
         self.section = 'Widget#%s' % name
-        config = self.srvstg.load()
-
+        config = self.srvstg.get_config()
         try:
             config[self.section]
         except:
