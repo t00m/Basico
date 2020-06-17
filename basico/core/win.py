@@ -96,7 +96,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         # ~ context = Gtk.StyleContext()
         # ~ context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        # ~ self.set_default_size(1024, 728)
+        self.set_default_size(1024, 728)
         self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         self.setup_headerbar()
 
