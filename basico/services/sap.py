@@ -60,7 +60,7 @@ class SAP(Service):
         self.srvweb.connect('request-complete', self.request_complete)
         self.srvweb.connect('request-canceled', self.request_canceled)
         self.srvweb.connect('download-canceled-user', self.donwload_canceled)
-        self.log.debug("Listening to Firefox Webdriver Service")
+        self.log.debug("Listening to Webdriver Service")
 
     def get_services(self):
         self.srvgui = self.get_service('GUI')

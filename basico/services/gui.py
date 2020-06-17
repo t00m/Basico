@@ -54,8 +54,9 @@ class UIApp(Gtk.Application):
             self.hold()
             self.my_app_settings = "Primary application instance."
             self.window = self.srvgui.add_widget('gtk_app_window_main', GtkAppWindow(self))
-            self.window.connect("delete-event", self.srvgui.quit)
-            self.window.connect("key-press-event",self.on_key_press_event)
+            self.srvgui.add_signal('gtk_app_window_main', 'delete_event', self.srvgui.quit)
+            # ~ self.srvgui.add_signal('gtk_app_window_main', 'key-press-event', self.srvgui.quit)
+            # ~ self.window.connect("key-press-event",self.on_key_press_event)
             self.log.debug("New Basico instance created")
         else:
             self.log.debug("Basico is already running!")
@@ -116,7 +117,7 @@ class GUI(Service):
     def get_uiapp(self):
         return self.uiapp
 
-    def quit(self, window, event):
+    def quit(self, *args):
         """
         GUI destroyed
         """

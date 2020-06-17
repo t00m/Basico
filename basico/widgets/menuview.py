@@ -116,7 +116,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         font_desc = Pango.FontDescription('Monospace 10')
         if font_desc:
             self.modify_font(font_desc)
-
+        self.srvgui.add_widget('menuview_treeview', self)
         self.prepare()
         self.show_all()
 
@@ -233,10 +233,11 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.set_hover_selection(False)
         self.set_grid_lines(Gtk.TreeViewGridLines.NONE)
         self.set_level_indentation(0)
-        self.srvgui.add_signal('menuview_selection', 'changed', 'self.srvclb.gui_menuview_row_changed')
-        signal = self.selection.connect('changed', self.row_changed)
-        self.srvgui.set_key_value('menuview-selection', self.selection)
-        self.srvgui.set_key_value('menuview-row-changed', signal)
+        # DOC: signal must be connected when widget is created so
+        #      Basico can display the view and row saved in settings
+        #      right after the startup
+        self.selection.connect('changed', self.row_changed)
+        # ~ self.srvgui.add_signal('menuview_treeview'
         self.connect('button_press_event', self.right_click)
 
         # Connect to other services signals
@@ -264,39 +265,38 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         selection = self.srvgui.get_widget('menuview_selection')
         try:
             model, ltreepath = selection.get_selected_rows()
-            treepath = ltreepath[0].to_string()
-            self.set_config_value('treepath', treepath)
+            path = ltreepath[0].to_string()
+            self.set_config_value('path', path)
         except:
             # No row is selected in treeview
             pass
-        if self.current_status is None:
-            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            try:
-                model, treeiter = selection.get_selected()
-                row = model[treeiter][0]
-                row_title = self.srvutl.clean_html(model[treeiter][1])
-                self.row_type, self.cid = row.split('@')
-                iter_has_child = model.iter_has_child(treeiter)
-                if self.row_type == 'collection':
-                    colname = self.srvclt.get_name_by_cid(self.cid)
-                    self.set_current_collection(self.cid)
-                    if not iter_has_child:
-                        matches = self.srvdtb.get_notes_by_node(self.row_type, self.cid)
-                        visor_sapnotes.populate(matches, self.cid)
-                    else:
-                        matches = set()
-                        cols = self.srvclt.get_collections_by_row_title(row_title)
-                        for col in cols:
-                            for sid in self.srvdtb.get_notes_by_node(self.row_type, col):
-                                matches.add(sid)
-                        visor_sapnotes.populate(list(matches))
-                else:
-                    self.set_current_collection(None)
+
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        try:
+            model, treeiter = selection.get_selected()
+            row = model[treeiter][0]
+            row_title = self.srvutl.clean_html(model[treeiter][1])
+            self.row_type, self.cid = row.split('@')
+            iter_has_child = model.iter_has_child(treeiter)
+            if self.row_type == 'collection':
+                colname = self.srvclt.get_name_by_cid(self.cid)
+                self.set_current_collection(self.cid)
+                if not iter_has_child:
                     matches = self.srvdtb.get_notes_by_node(self.row_type, self.cid)
                     visor_sapnotes.populate(matches, self.cid)
-                # ~ self.srvuif.statusbar_msg("View populated with %d SAP Notes" % (len(matches)))
-            except Exception as error:
-                pass
+                else:
+                    matches = set()
+                    cols = self.srvclt.get_collections_by_row_title(row_title)
+                    for col in cols:
+                        for sid in self.srvdtb.get_notes_by_node(self.row_type, col):
+                            matches.add(sid)
+                    visor_sapnotes.populate(list(matches))
+            else:
+                self.set_current_collection(None)
+                matches = self.srvdtb.get_notes_by_node(self.row_type, self.cid)
+                visor_sapnotes.populate(matches, self.cid)
+        except Exception as error:
+            pass
 
 
     def set_current_collection(self, cid=None):
@@ -484,7 +484,6 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
 
     def populate(self, sapnotes=[]):
-        self.current_status = "working"
         self.set_headers_visible(False) # Set
         completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         completion_model = completion.get_model()
@@ -524,9 +523,6 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         completion.set_model(completion_model)
         viewfilter.set_completion(completion)
-        # ~ self.srvclb.gui_stack_dashboard_show()
-        self.current_status = None
-
 
     def populate_by_bookmarks(self):
         matches = []
@@ -816,6 +812,8 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 treepids[key_day] = self.model.append(treepids[key_month], node)
 
     def select_row(self, path):
+        if path is None:
+            path = "0"
         menuview = self.srvgui.get_widget('menuview')
         selection = menuview.get_selection()
         treepath = Gtk.TreePath.new_from_string(path)

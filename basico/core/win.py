@@ -435,17 +435,18 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
     def run(self):
         menuview = self.srvgui.get_widget('menuview')
+        # Get from settings last view and row used from config
         try:
-            # Get from settings last view and row used from config
             view = menuview.get_config_value('view')
-            path = menuview.get_config_value('treepath')
-            self.log.debug("Displaying view: %s", view)
-        except Exception as error:
-            # Or use the ones hardcoded
-            self.log.debug("No view saved in settings")
+        except:
             view = None
+
+        try:
+            path = menuview.get_config_value('path')
+        except:
             path = 0
 
+        self.log.debug("Displaying path %s for view %s   ", path, view)
         menuview.set_view(view)
         menuview.select_row(path)
         self.show_stack_visors('visor-sapnotes')
