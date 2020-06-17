@@ -48,7 +48,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         self.size_pos = self.get_size_pos_from_config()
         if self.size_pos is None:
-            self.log.warning("No last size and position saved. First time execution?")
+            self.log.debug("No last size and position saved. First time execution?")
 
         self.log.debug("LAST WINDOW SIZE POS: %s", self.size_pos)
         self.get_services()
@@ -62,6 +62,9 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
     def get_last_size_pos(self):
         return self.size_pos
+
+    def set_last_size_pos(self, size_pos):
+        self.size_pos = size_pos
 
     def get_services(self):
         self.srvgui = self.controller.get_service("GUI")
@@ -97,7 +100,9 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         # ~ context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.set_default_size(1024, 728)
-        self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+        # Disable CENTER_ALWAYS as it doesn't allow to resize the window
+        # when it is de-maximized
+        # ~ self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         self.setup_headerbar()
 
         # ~ self.maximize ()

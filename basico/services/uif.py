@@ -578,7 +578,10 @@ class UIFuncs(Service):
 
     def connect_signal(self, widget_name, signal, callback, data=None):
         widget = self.srvgui.get_widget(widget_name)
-        widget.connect(signal, eval(callback), data)
+        if isinstance(callback, str):
+            widget.connect(signal, eval(callback), data)
+        else:
+            widget.connect(signal, callback, data)
         self.log.debug("Signal '%s' connected for widget '%s'", signal, widget_name)
 
     ### DECORATORS

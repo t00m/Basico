@@ -119,11 +119,14 @@ class Callback(Service):
     ## GTK APP WINDOW ##
     def gui_appwindow_changed(self, widget, e):
         """
-        Save some gui aspects like w, h, x, y
-        FIXME: when the window is maximized and then back to normal, the
-               window can't be resized :/
+        Save some gui aspects like width, height, x, y
+        Currently only width and height are taken into account
         """
-        widget.set_config_value('size_pos', (e.width, e.height, e.x, e.y))
+        cur_size_pos = widget.get_last_size_pos()
+        new_size_pos = (e.width, e.height, e.x, e.y)
+        if new_size_pos != cur_size_pos:
+            widget.set_last_size_pos(new_size_pos)
+            widget.set_config_value('size_pos', (e.width, e.height, e.x, e.y))
         return False
 
     @UIFuncs.hide_popovers

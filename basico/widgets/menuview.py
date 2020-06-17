@@ -838,6 +838,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
         model = menuview.get_model()
         model.foreach(gui_iterate_over_data)
+        self.log.debug("Filter '%s' applied: %d results", filter, len(model))
 
     def menu_expand(self, *args):
         menuview = self.srvgui.get_widget('menuview')

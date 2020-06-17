@@ -120,7 +120,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
 
         ### Popover menuviews
         popover = self.srvgui.add_widget('gtk_popover_button_menu_views', Gtk.Popover.new(menuviews))
-        menuviews.connect('clicked', self.srvuif.popover_show, popover)
+        self.srvgui.add_signal('gtk_button_menu_views', 'clicked', 'self.srvuif.popover_show', popover)
         box_views = Gtk.Box(spacing = 0, orientation="vertical")
         popover.add(box_views)
 
@@ -148,7 +148,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         menuview.set_vexpand(True)
         completion = self.srvgui.get_widget('gtk_entrycompletion_menuview')
         viewfilter.set_completion(completion)
-        viewfilter.connect('activate', menuview.filter)
+        self.srvgui.add_signal('gtk_entry_filter_view', 'activate', menuview.filter)
 
         icon = self.srvicm.get_pixbuf_icon('basico-refresh')
         viewfilter.set_icon_from_pixbuf(Gtk.EntryIconPosition.PRIMARY, icon)
@@ -338,7 +338,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         renderer.set_property('background', '#e4f1f1')
         # ~ widget = get_column_header_widget('Type', 'basico-type')
         # ~ column.set_widget(widget)
-        column.set_visible(True)
+        column.set_visible(False)
         column.set_expand(False)
         column.set_sizing(Gtk.TreeViewColumnSizing.AUTOSIZE)
         column.set_clickable(True)
@@ -695,81 +695,68 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
             button.add(hbox)
             return button
 
-        if component == 'Annotation':
-            # Popover button "Delete annotation"
-            button = get_popover_button("<b>Delete annotation</b>", 'basico-delete')
-            button.show_all()
-            # ~ button.connect('clicked', self.srvclb.action_annotation_delete)
-            box.pack_start(button, False, False, 0)
 
-            # Popover button "Duplicate annotation"
-            button = get_popover_button("<b>Duplicate annotation</b>", 'basico-duplicate')
-            button.show_all()
-            # ~ button.connect('clicked', self.srvclb.action_annotation_duplicate)
-            box.pack_start(button, False, False, 0)
+        # Popover button "Add an annotation"
+        button = get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
+        # ~ button.show_all()
+        self.srvgui.add_widget('gtk_button_annotation_add', button)
+        self.srvgui.add_signal('gtk_button_annotation_add', 'clicked', 'self.srvclb.gui_annotation_create', isid)
+        box.pack_start(button, False, False, 0)
 
-        else:
-            # Popover button "Add an annotation"
-            button = get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
-            # ~ button.show_all()
-            self.srvgui.add_widget('gtk_button_annotation_add', button)
-            self.srvgui.add_signal('gtk_button_annotation_add', 'clicked', 'self.srvclb.gui_annotation_create', isid)
-            box.pack_start(button, False, False, 0)
+        # Popover button "Open SAP Note"
+        button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
+        self.srvgui.add_widget('gtk_button_sapnote_browse', button)
+        # ~ self.srvgui.add_signal('gtk_button_sapnote_browse', 'clicked', 'self.srvweb.browse_note', sid)
+        button.connect('clicked', self.srvweb.browse_note, sid)
+        box.pack_start(button, False, False, 0)
 
-            # Popover button "Open SAP Note"
-            button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
-            self.srvgui.add_widget('gtk_button_sapnote_browse', button)
-            # ~ self.srvgui.add_signal('gtk_button_sapnote_browse', 'clicked', 'self.srvweb.browse_note', sid)
-            button.connect('clicked', self.srvweb.browse_note, sid)
-            box.pack_start(button, False, False, 0)
+        # Popover button "Download SAP Note in PDF"
+        button = get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse')
+        button.connect('clicked', self.srvweb.browse_pdf, sid)
+        box.pack_start(button, False, False, 0)
 
-            # Popover button "Download SAP Note in PDF"
-            button = get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse')
-            button.connect('clicked', self.srvweb.browse_pdf, sid)
-            box.pack_start(button, False, False, 0)
+        # Popover button "Bookmark"
+        button = get_popover_button("<b>(Un)bookmark</b> SAP Note %d" % isid, 'basico-bookmarks')
+        button.connect('clicked', self.srvsap.switch_bookmark, [sid], popover)
+        box.pack_start(button, False, False, 0)
 
-            # Popover button "Bookmark"
-            button = get_popover_button("<b>(Un)bookmark</b> SAP Note %d" % isid, 'basico-bookmarks')
-            button.connect('clicked', self.srvsap.switch_bookmark, [sid], popover)
-            box.pack_start(button, False, False, 0)
+        # Popover button "Copy to clipboard"
+        button = get_popover_button("<b>Copy</b> SAP Note %d details <b>to clipboard</b>" % isid, 'basico-clipboard')
+        button.connect('clicked', self.copy_to_clipboard, [sid], popover)
+        box.pack_start(button, False, False, 0)
 
-            # Popover button "Copy to clipboard"
-            button = get_popover_button("<b>Copy</b> SAP Note %d details <b>to clipboard</b>" % isid, 'basico-clipboard')
-            button.connect('clicked', self.copy_to_clipboard, [sid], popover)
-            box.pack_start(button, False, False, 0)
+        # Separator
+        separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)
+        box.pack_start(separator, True, True, 0)
 
-            # Separator
-            separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)
-            box.pack_start(separator, True, True, 0)
+        # Assing SAP Notes in current view to a category
+        # Only available in Donwloaded category
+        menuview = self.srvgui.get_widget('menuview')
+        current_menuview = menuview.get_view()
+        current_collection = menuview.get_current_collection()
+        view_is_collection = current_menuview == 'collection'
+        collection_is_downloaded = current_collection == COL_DOWNLOADED
 
-            # Assing SAP Notes in current view to a category
-            # Only available in Donwloaded category
-            menuview = self.srvgui.get_widget('menuview')
-            current_menuview = menuview.get_view()
-            current_collection = menuview.get_current_collection()
-            view_is_collection = current_menuview == 'collection'
-            collection_is_downloaded = current_collection == COL_DOWNLOADED
+        # Popover button Collection Management
+        button = get_popover_button("<b>Manage collections</b> for SAP Note %d" % isid, 'basico-collection')
+        box.pack_start(button, False, False, 0)
+        self.popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
+        self.popcollections.set_position(Gtk.PositionType.RIGHT)
+        button.connect('clicked', self.srvuif.popover_show, self.popcollections)
+        colmgt = ColsMgtView(self.app, sid, overwrite=True)
+        self.popcollections.add(colmgt)
 
-            # Popover button Collection Management
-            button = get_popover_button("<b>Manage collections</b> for SAP Note %d" % isid, 'basico-collection')
-            box.pack_start(button, False, False, 0)
-            self.popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
-            self.popcollections.set_position(Gtk.PositionType.RIGHT)
-            button.connect('clicked', self.srvuif.popover_show, self.popcollections)
-            colmgt = ColsMgtView(self.app, sid, overwrite=True)
-            self.popcollections.add(colmgt)
-
-            # Separator
-            separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)
-            box.pack_start(separator, True, True, 0)
+        # Separator
+        separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)
+        box.pack_start(separator, True, True, 0)
 
 
-            # Popover button "Delete SAP Note"
-            visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-            button = get_popover_button("<b>Delete</b> SAP Note %d" % isid, 'basico-delete')
-            button.connect('clicked', visor_sapnotes.delete, [sid])
-            button.set_tooltip_text("Checkbox must be activated in order to trigger the deletion")
-            box.pack_start(button, False, False, 0)
+        # Popover button "Delete SAP Note"
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        button = get_popover_button("<b>Delete</b> SAP Note %d" % isid, 'basico-delete')
+        button.connect('clicked', visor_sapnotes.delete, [sid])
+        button.set_tooltip_text("Checkbox must be activated in order to trigger the deletion")
+        box.pack_start(button, False, False, 0)
 
         return box
 
