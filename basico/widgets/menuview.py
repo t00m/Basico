@@ -262,7 +262,13 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
     def row_changed(self, *args):
         selection = self.srvgui.get_widget('menuview_selection')
-
+        try:
+            model, ltreepath = selection.get_selected_rows()
+            treepath = ltreepath[0].to_string()
+            self.set_config_value('treepath', treepath)
+        except:
+            # No row is selected in treeview
+            pass
         if self.current_status is None:
             visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
             try:
@@ -453,6 +459,8 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         # FIXME: Get last view visited from config
         if view is None:
             view = 'chronologic'
+        self.view = view
+        self.set_config_value('view', self.view)
 
         iconview = self.srvgui.get_widget('gtk_image_current_view')
         icon = self.srvicm.get_pixbuf_icon('basico-%s' % view, 24, 24)
@@ -807,10 +815,12 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 node = self.get_node_date_day(downloaded, key_day, str(count))
                 treepids[key_day] = self.model.append(treepids[key_month], node)
 
-    def select_first_entry(self):
+    def select_row(self, path):
         menuview = self.srvgui.get_widget('menuview')
         selection = menuview.get_selection()
-        selection.select_path("0")
+        treepath = Gtk.TreePath.new_from_string(path)
+        menuview.expand_to_path(treepath)
+        selection.select_path(treepath)
 
     def filter(self, *args):
         entry = self.srvgui.get_widget('gtk_entry_filter_view')
