@@ -36,7 +36,7 @@ from basico.widgets.splash import Splash
 
 
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)25s | %(asctime)s | %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)25s | %(asctime)s | %(message)s")
 
 #DOC: http://stackoverflow.com/questions/16410852/keyboard-interrupt-with-with-python-gtk
 signal.signal(signal.SIGINT, signal.SIG_DFL)

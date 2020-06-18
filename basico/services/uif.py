@@ -68,14 +68,14 @@ class UIFuncs(Service):
         return dialog
 
 
-    def statusbar_msg(self, message, important=False):
-        statusbar = self.srvgui.get_widget('widget_statusbar')
-        htimestamp = self.srvutl.get_human_date_from_timestamp()
-        msg = htimestamp + '\t-\t' + message
-        if statusbar is not None:
+    # ~ def statusbar_msg(self, message, important=False):
+        # ~ statusbar = self.srvgui.get_widget('widget_statusbar')
+        # ~ htimestamp = self.srvutl.get_human_date_from_timestamp()
+        # ~ msg = htimestamp + '\t-\t' + message
+        # ~ if statusbar is not None:
             # Maybe the widget hasn't been created yet
             # ~ Gdk.threads_enter()
-            statusbar.message(msg)
+            # ~ statusbar.message(msg)
             # ~ Gdk.threads_leave()
         # ~ if important:
             # ~ self.srvntf.show(htimestamp, message)
@@ -277,16 +277,13 @@ class UIFuncs(Service):
     def copy_text_to_clipboard(self, text):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text, -1)
-        self.log.info("Copied '%s' to clipboard", text)
-        self.statusbar_msg(msg)
-
+        self.log.debug("Copied '%s' to clipboard", text)
 
     def get_toolbar_separator(self, draw=False, expand=False):
         tool = Gtk.SeparatorToolItem.new()
         tool.set_draw(draw)
         tool.set_expand(expand)
         return tool
-
 
     def tree_path_to_row(self, path):
         """

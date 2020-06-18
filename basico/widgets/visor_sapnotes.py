@@ -76,15 +76,15 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         self.srvdtb.connect('database-updated', self.update)
 
     def get_services(self):
-        self.srvgui = self.get_service("GUI")
+        self.srvgui = self.get_service('GUI')
         self.srvsap = self.get_service('SAP')
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvuif = self.get_service("UIF")
-        self.srvutl = self.get_service("Utils")
-        self.srvweb = self.get_service("Driver")
-        self.srvclb = self.get_service("Callbacks")
+        self.srvuif = self.get_service('UIF')
+        self.srvutl = self.get_service('Utils')
+        self.srvweb = self.get_service('Driver')
+        self.srvclb = self.get_service('Callbacks')
 
 
     def sort_by_timestamp(self):
@@ -474,7 +474,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         if len(term) > 0:
             msg += " for term <b>%s</b>" % term
         self.log.info(msg)
-        # ~ self.srvuif.statusbar_msg(msg)
+        # ~ self.log.debug(msg)
 
 
     def row_changed(self, selection):

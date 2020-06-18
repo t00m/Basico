@@ -32,7 +32,9 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
     def get_services(self):
         """Load services to be used in this class
         """
-        self.srvgui = self.get_service("GUI")
+        self.srvutl = self.get_service('Utils')
+        self.srvgui = self.get_service('GUI')
+        self.srvuif = self.get_service('UIF')
         self.srvdtb = self.get_service('DB')
 
 
@@ -98,11 +100,21 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.SINGLE)
 
+        # Connect signals
+        self.treeview.connect('row-activated', self.double_click)
         # Assign model
         self.treeview.set_model(self.model)
         self.treeview.show_all()
         self.show_all()
 
+    def double_click(self, treeview, treepath, treecolumn):
+        model = treeview.get_model()
+        treeiter = model.get_iter(treepath)
+        pkey = model[treeiter][0]
+        key = model[treeiter][1]
+        value = model[treeiter][2]
+        self.srvuif.copy_text_to_clipboard(value)
+        self.log.info("Copied content of %s to clipboard", self.srvutl.clean_html(key))
 
     def update(self):
         self.log.debug("Updating settings stats")
@@ -119,19 +131,19 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
             if isinstance(value, list):
                 value = ('\n'.join(value))
             value = escape(value)
-            self.model.append(pid, ['APP-%s' % key, '<span color="blue">%s</span>' % key, value])
+            self.model.append(pid, ['APP-%s' % key, '<span>%s</span>' % key, value])
 
         pid = self.model.append(root, ['', '<b>LPATH</b>', ''])
         for key in LPATH:
-            self.model.append(pid, ['LPATH-%s' % key, '<span color="blue">%s</span>' % key, LPATH[key]])
+            self.model.append(pid, ['LPATH-%s' % key, '<span>%s</span>' % key, LPATH[key]])
 
         pid = self.model.append(root, ['', '<b>GPATH</b>', ''])
         for key in GPATH:
-            self.model.append(pid, ['GPATH-%s' % key, '<span color="blue">%s</span>' % key, GPATH[key]])
+            self.model.append(pid, ['GPATH-%s' % key, '<span>%s</span>' % key, GPATH[key]])
 
         pid = self.model.append(root, ['', '<b>FILE</b>', ''])
         for key in FILE:
-            self.model.append(pid, ['FILE-%s' % key, '<span color="blue">%s</span>' % key, FILE[key]])
+            self.model.append(pid, ['FILE-%s' % key, '<span>%s</span>' % key, FILE[key]])
 
         # SETTINGS NODE
         root = self.model.append(None, ['root', '<big><b>Settings</b></big>', ''])
@@ -149,7 +161,7 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
             for key in config[skey]:
                 value = str(config[skey][key])
                 pkey = '%s-%s-%s' % (skey, key, value)
-                self.model.append(pid, [pkey, '<span color="blue">%s</span>' % key, value])
+                self.model.append(pid, [pkey, '<span>%s</span>' % key, value])
 
         # WIDGETS NODE
         root = self.model.append(None, ['root', '<big><b>Runtime Objects</b></big>', ''])

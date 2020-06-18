@@ -476,7 +476,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         viewlabel.set_justify(Gtk.Justification.LEFT)
         viewlabel.show_all()
         self.populate([])
-        # ~ self.srvuif.statusbar_msg("Switching to <i>%s</i> view" % name)
+        # ~ self.log.debug("Switching to <i>%s</i> view" % name)
 
 
     def get_view(self):
@@ -534,7 +534,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.populate(matches)
-        # ~ self.srvuif.statusbar_msg("View <i>%s</i> populated with %d SAP Notes" % (self.row_type, len(matches)))
+        # ~ self.log.debug("View <i>%s</i> populated with %d SAP Notes" % (self.row_type, len(matches)))
 
 
     def populate_by_components(self, sapnotes, only_bookmarks=False):

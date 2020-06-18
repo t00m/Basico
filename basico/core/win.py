@@ -35,6 +35,7 @@ from basico.widgets.settingsview import SettingsView
 from basico.widgets.logviewer import LogViewer
 from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
+from basico.widgets.annotations import AnnotationWidget
 
 
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
@@ -376,26 +377,8 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         return box
 
     def setup_stack_visor_annotations(self):
-        box = Gtk.VBox()
-        box.set_hexpand(True)
-
-        ### Visor
-        scr = Gtk.ScrolledWindow()
-        scr.set_hexpand(True)
-        scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scr.set_shadow_type(Gtk.ShadowType.NONE)
-        vwp = Gtk.Viewport()
-        vwp.set_hexpand(True)
-        visor_annotations = self.srvgui.add_widget('visor_annotations', BasicoBrowser(self.controller))
-        visor_annotations.load_url("file://%s" % FILE['KB4IT_INDEX'])
-        visor_annotations.set_hexpand(True)
-        visor_annotations.set_vexpand(True)
-        vwp.add(visor_annotations)
-        scr.add(vwp)
-        box.pack_start(scr, True, True, 0)
-        visor_annotations.show_all()
-        box.show_all()
-        return box
+        ### Annotations Visor and Editor
+        return AnnotationWidget(self.controller)
 
     def setup_stack_system_about(self):
         box = Gtk.VBox()
