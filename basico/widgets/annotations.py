@@ -35,9 +35,22 @@ class AnnotationWidget(BasicoWidget, Gtk.Notebook):
         self.srvgui.add_widget('gtk_notebook_annotations', self)
         self.set_show_tabs(False)
         self.set_show_border(False)
+        self.append_page(AnnotationVisor(self.app), Gtk.Label("Visor"))
+        self.append_page(Gtk.Label("Not implemented"), Gtk.Label("Editor"))
 
-        page_visor = Gtk.VBox()
-        page_visor.set_hexpand(True)
+class AnnotationVisor(BasicoWidget, Gtk.VBox):
+    def __init__(self, app):
+        super().__init__(app, __class__.__name__)
+        Gtk.VBox.__init__(self)
+        self.get_services()
+        self.setup()
+
+    def get_services(self):
+        self.srvgui = self.get_service('GUI')
+
+    def setup(self):
+        self.srvgui.add_widget('gtk_vbox_annotations_visor', self)
+        self.set_hexpand(True)
         scr = Gtk.ScrolledWindow()
         scr.set_hexpand(True)
         scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -50,9 +63,5 @@ class AnnotationWidget(BasicoWidget, Gtk.Notebook):
         visor_annotations.set_vexpand(True)
         vwp.add(visor_annotations)
         scr.add(vwp)
-        page_visor.pack_start(scr, True, True, 0)
-        page_visor.show_all()
-
-
-        self.append_page(page_visor, Gtk.Label("Visor"))
-        self.append_page(Gtk.Label("Not implemented"), Gtk.Label("Editor"))
+        self.pack_start(scr, True, True, 0)
+        self.show_all()
