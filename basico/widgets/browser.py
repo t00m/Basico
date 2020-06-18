@@ -4,7 +4,10 @@
 # File: browser.py
 # Author: Tomás Vírseda
 # License: GPL v3
-# Description: Web browser module
+# Description: Web browser module based on
+# https://lazka.github.io/pgi-docs/WebKit2-4.0/classes/WebView.html
+# https://lazka.github.io/pgi-docs/WebKit2-4.0/classes/PolicyDecision.html#WebKit2.PolicyDecision
+# https://lazka.github.io/pgi-docs/WebKit2-4.0/enums.html#WebKit2.PolicyDecisionType
 """
 
 import gi
@@ -27,18 +30,23 @@ from basico.core.wdg import BasicoWidget
 
 
 class BasicoBrowser(BasicoWidget, Gtk.VBox):
-    def __init__(self, app):
-        super().__init__(app, __class__.__name__)
+    def __init__(self, app, name=None):
+        if name is not None:
+            self.name = name
+        else:
+            self.name = __class__.__name__
+        super().__init__(app, self.name)
         Gtk.VBox.__init__(self)
         self.app = app
         if WEBKIT_RELEASE == 4:
             self.log.debug("Using WebKit2 (4.0)")
         else:
             self.log.debug("Using WebKit (3.0)")
-
-        self.webview = WebKit.WebView()
+        self.srvgui = self.app.get_service('GUI')
+        self.webview = self.srvgui.add_widget('gtk_webkit_%s' % self.name, WebKit.WebView())
         self.webview.connect('context-menu', self.append_items)
-
+        self.webview.connect('decide-policy', self.decide_policy)
+        self.webview.connect('load-changed', self.load_changed)
         settings = self.webview.get_settings()
         if WEBKIT_RELEASE == 3:
 
@@ -76,13 +84,29 @@ class BasicoBrowser(BasicoWidget, Gtk.VBox):
 
     def append_items(self, webview, context_menu, hit_result_event, event):
         """Attach custom actions to browser context menu"""
-        action = Gtk.Action("help", "Basico Help", None, None)
-        action.connect("activate", self.display_help)
-        option = WebKit.ContextMenuItem().new(action)
-        context_menu.prepend(option)
+        pass
+        # ~ action = Gtk.Action("help", "Basico Help", None, None)
+        # ~ action.connect("activate", self.display_help)
+        # ~ option = WebKit.ContextMenuItem().new(action)
+        # ~ context_menu.prepend(option)
 
     def display_help(self, *args):
         self.load_url(FILE['HELP_INDEX'])
 
     def load_url(self, url):
+        self.log.debug("Loading url: %s", url)
         self.webview.load_uri(url)
+
+    def decide_policy(self, webview, policy, ntype):
+        return False
+        # ~ self.log.debug(args)
+        # ~ if policy == WebKit.PolicyDecisionType.RESPONSE:
+            # ~ self.log.debug("Current URL: %s", webview.get_uri())
+            # ~ self.log.debug("\t- policy: %s", policy)
+            # ~ self.log.debug("\t- type: %s", ntype)
+
+    def load_changed(self, *args):
+        pass
+        # ~ webview = self.srvgui.get_widget('gtk_webkit_%s' % self.name)
+        # ~ self.log.debug("Current URL: %s", webview.get_uri())
+
