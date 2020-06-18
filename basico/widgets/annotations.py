@@ -66,24 +66,20 @@ class AnnotationBrowser(BasicoWidget, WebKit.WebView):
 
     def load_changed(self, webview, event):
         # https://lazka.github.io/pgi-docs/WebKit2-4.0/enums.html#WebKit2.LoadEvent
-        # ~ webview = self.srvgui.get_widget('gtk_webkit_%s' % self.name)
-        # ~
-        # ~ print("Hola")
-        myurl = "file:///home/t00m/.basico/var/doc/html/index.html"
         url = self.get_uri()
         self.log.debug("Current URL: %s", url)
-        if event == WebKit.LoadEvent.STARTED:
-            self.log.debug("Load started")
-            if url == myurl:
-                self.stop_loading ()
-                self.log.debug("Url loading stopped. Execute callback")
-                return False
-        elif event == WebKit.LoadEvent.COMMITTED:
-            self.log.debug("Load commited")
-        elif event == WebKit.LoadEvent.FINISHED:
-            self.log.debug("Load finished")
-            if len(url) == 0:
-                self.log.debug("Good! Url not loaded")
+        # ~ if event == WebKit.LoadEvent.STARTED:
+            # ~ self.log.debug("Load started")
+            # ~ if url == myurl:
+                # ~ self.stop_loading ()
+                # ~ self.log.debug("Url loading stopped. Execute callback")
+                # ~ return False
+        # ~ elif event == WebKit.LoadEvent.COMMITTED:
+            # ~ self.log.debug("Load commited")
+        # ~ elif event == WebKit.LoadEvent.FINISHED:
+            # ~ self.log.debug("Load finished")
+            # ~ if len(url) == 0:
+                # ~ self.log.debug("Url not loaded")
 
 
 class AnnotationVisor(BasicoWidget, Gtk.VBox):
