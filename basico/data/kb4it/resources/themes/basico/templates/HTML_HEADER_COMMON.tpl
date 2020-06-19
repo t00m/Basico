@@ -16,12 +16,11 @@
     <script src="resources/common/uikit/js/uikit-icons.min.js"></script>
 </head>
 <body>
-<div>
-<div id="container-1" class="uk-container uk-container-center">
-    <div id="kb4it-menu" style="z-index: 980;" uk-sticky="show-on-up: true">
-        <nav class="uk-navbar-container uk-border-rounded uk-card-hover uk-margin" style="background-color: white;" uk-navbar>
-            <div class="uk-navbar-left noprint">
-                <ul class="uk-navbar-nav">
+<div id="container-1" class="uk-container uk-width-expand uk-child-width-expand">
+    <div class="uk-width-expand" id="kb4it-menu" uk-sticky="show-on-up: true">
+        <nav class="uk-navbar-container uk-border-rounded uk-card-hover" style="background-color: white;" uk-navbar>
+            <div class="uk-navbar-left noprint uk-width-expand">
+                <ul class="uk-navbar-nav uk-width-expand">
                     <li class="uk-link-toggle">
                         <a class="uk-logo uk-card uk-card-hover" href="index.html">
                             <img src="resources/themes/%s/images/logo.png" alt="">
