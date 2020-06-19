@@ -35,7 +35,7 @@ from basico.widgets.settingsview import SettingsView
 from basico.widgets.logviewer import LogViewer
 from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
-from basico.widgets.annotations import AnnotationWidget
+from basico.widgets.kb import KB4Basico
 
 
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
@@ -376,7 +376,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
     def setup_stack_visor_annotations(self):
         ### Annotations Visor and Editor
-        return AnnotationWidget(self.controller)
+        return KB4Basico(self.controller)
 
     def setup_stack_system_about(self):
         box = Gtk.VBox()

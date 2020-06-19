@@ -32,7 +32,6 @@ class COLUMN(IntEnum):
 
 class LogViewer(BasicoWidget, Gtk.Box):
     def __init__(self, app):
-        # ~ self.app = app
         super().__init__(app, __class__.__name__)
 
     def connect_signals(self, *args):

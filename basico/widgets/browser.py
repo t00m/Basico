@@ -34,19 +34,19 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
 
     def _setup_widget(self):
         # Webkit context
-        web_context = WebKit.WebContext.get_default()
-        web_context.set_cache_model(WebKit.CacheModel.DOCUMENT_VIEWER)
-        web_context.set_process_model(WebKit.ProcessModel.MULTIPLE_SECONDARY_PROCESSES)
-        web_context.register_uri_scheme('basico', self._on_basico_scheme)
+        self.web_context = WebKit.WebContext.get_default()
+        self.web_context.set_cache_model(WebKit.CacheModel.DOCUMENT_VIEWER)
+        self.web_context.set_process_model(WebKit.ProcessModel.MULTIPLE_SECONDARY_PROCESSES)
+        # ~ web_context.register_uri_scheme('basico', self._on_basico_scheme)
 
         # Webkit settings
-        web_settings = WebKit.Settings()
-        web_settings.set_enable_smooth_scrolling(True)
-        web_settings.set_enable_plugins(False)
+        self.web_settings = WebKit.Settings()
+        self.web_settings.set_enable_smooth_scrolling(True)
+        self.web_settings.set_enable_plugins(False)
 
         WebKit.WebView.__init__(self,
-                                 web_context=web_context,
-                                 settings=web_settings)
+                                 web_context=self.web_context,
+                                 settings=self.web_settings)
         self.srvgui.add_widget('browser_%s' % self.name, self)
         self.connect('context-menu', self._on_append_items)
         self.connect('decide-policy', self._on_decide_policy)
@@ -69,23 +69,23 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
 
         return [action, args]
 
-    def _on_basico_scheme(self, request):
-        """Get api callback for Basico scheme requests
-        Args:
-            request (WebKit2.URISchemeRequest)
-        """
-        uri = request.get_uri()
+    # ~ def _on_basico_scheme(self, request):
+        # ~ """Get api callback for Basico scheme requests
+        # ~ Args:
+            # ~ request (WebKit2.URISchemeRequest)
+        # ~ """
+        # ~ uri = request.get_uri()
 
-        try:
-            action, args = self._get_api(uri)
-        except Exception as e:
-            error_str = e.args[1]
-            request.finish_error(GLib.Error(error_str))
-            return
-        self.log.info("API => Action[%s] Arguments[%s]", action, ', '.join(args))
-        dialog = self.srvuif.message_dialog_info("Action: %s" % action, "Arguments: %s" % ', '.join(args))
-        dialog.run()
-        dialog.destroy()
+        # ~ try:
+            # ~ action, args = self._get_api(uri)
+        # ~ except Exception as e:
+            # ~ error_str = e.args[1]
+            # ~ request.finish_error(GLib.Error(error_str))
+            # ~ return
+        # ~ self.log.info("API => Action[%s] Arguments[%s]", action, ', '.join(args))
+        # ~ dialog = self.srvuif.message_dialog_info("Action: %s" % action, "Arguments: %s" % ', '.join(args))
+        # ~ dialog.run()
+        # ~ dialog.destroy()
 
     def _on_append_items(self, webview, context_menu, hit_result_event, event):
         """Attach custom actions to browser context menu"""

@@ -56,7 +56,6 @@ class UIFuncs(Service):
 
     def message_dialog_info(self, head, body):
         parent = self.get_window_parent()
-        self.log.debug("Parent window: %s", parent)
         dialog = Gtk.MessageDialog(parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "%s" % head)
         dialog.format_secondary_markup("%s" % body)
         return dialog

@@ -22,7 +22,6 @@ from basico.core.env import ROOT, USER_DIR, APP, LPATH, GPATH, FILE
 
 class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
     def __init__(self, app):
-        # ~ self.app = app
         super().__init__(app, __class__.__name__)
 
     def _setup_widget(self):

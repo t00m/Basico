@@ -18,14 +18,12 @@ from basico.services.collections import COL_DOWNLOADED
 
 class ColsMgtView(BasicoWidget, Gtk.VBox):
     __gtype_name__ = 'ColsMgtView'
-    # ~ app = None
     sid = None
     overwrite = None
     """
     Missing class docstring (missing-docstring)
     """
     def __init__(self, app, sid, overwrite=False):
-        # ~ self.app = app
         self.sid = sid
         self.overwrite = overwrite
         super().__init__(app, __class__.__name__)

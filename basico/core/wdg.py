@@ -30,12 +30,15 @@ class BasicoWidget(object):
         self.log.addHandler(self.app.intercepter)
         self.srvstg = self.get_service('Settings')
         self.__init_section(name)
-        self.log.debug("Loading widget: %s", name)
-        self._get_services() # services loaded by default
-        self.get_services() # services loaded on demand
+        self._get_services()
+        self.get_services()
         self._setup_widget()
+        self.log.debug("Widget '%s' initialized", name)
+        self.setup_widget()
+        self.log.debug("Widget '%s' configured", name)
 
     def _get_services(self):
+        """ Services loaded by default"""
         self.srvgui = self.app.get_service('GUI')
         self.srvuif = self.app.get_service('UIF')
 
@@ -51,9 +54,15 @@ class BasicoWidget(object):
             self.log.debug("Section '%s' initialized in config file" % name)
 
     def _setup_widget(self):
+        """Widget initialization"""
+        pass
+
+    def setup_widget(self):
+        """Widget post-initialization"""
         pass
 
     def get_services(self):
+        """ Services loaded on demand"""
         pass
 
     def get_traceback(self):

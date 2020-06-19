@@ -41,10 +41,10 @@ class UIApp(Gtk.Application):
         GLib.set_prgname('basico')
         self.log = logging.getLogger('UIApp')
         self.log.addHandler(self.app.intercepter)
-        self.get_services()
-        self.connect('startup', self.on_startup)
+        self._get_services()
+        self.connect('startup', self._on_startup)
 
-    def on_startup(self, *args):
+    def _on_startup(self, *args):
         self.log.debug("Gtk Application loaded")
 
     def do_activate(self):
@@ -56,19 +56,19 @@ class UIApp(Gtk.Application):
             self.window = self.srvgui.add_widget('gtk_app_window_main', GtkAppWindow(self))
             self.srvgui.add_signal('gtk_app_window_main', 'delete_event', self.srvgui.quit)
             # ~ self.srvgui.add_signal('gtk_app_window_main', 'key-press-event', self.srvgui.quit)
-            # ~ self.window.connect("key-press-event",self.on_key_press_event)
+            # ~ self.window.connect("key-press-event",self._on_key_press_event)
             self.log.debug("New Basico instance created")
         else:
             self.log.debug("Basico is already running!")
         splash = self.app.get_splash()
         splash.hide()
 
-    def on_key_press_event(self, widget, event):
-        if Gdk.keyval_name(event.keyval) == 'Escape':
-            # ~ self.srvclb.action_annotation_cancel()
-            pass
+    # ~ def _on_key_press_event(self, widget, event):
+        # ~ if Gdk.keyval_name(event.keyval) == 'Escape':
+            # ~ # self.srvclb.action_annotation_cancel()
+            # ~ pass
 
-    def get_services(self):
+    def _get_services(self):
         """
         Missing method docstring (missing-docstring)
         """

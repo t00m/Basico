@@ -39,7 +39,6 @@ class MenuView(BasicoWidget, Gtk.TreeView):
     current_collection = None
 
     def __init__(self, app):
-        # ~ self.app = app
         super().__init__(app, __class__.__name__)
 
     def _setup_widget(self):
