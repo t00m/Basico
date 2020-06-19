@@ -68,8 +68,6 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         self.size_pos = size_pos
 
     def get_services(self):
-        self.srvgui = self.controller.get_service("GUI")
-        self.srvuif = self.controller.get_service("UIF")
         self.srvicm = self.controller.get_service('IM')
         self.srvclb = self.controller.get_service('Callbacks')
 

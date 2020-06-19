@@ -30,35 +30,26 @@ class Tab(IntEnum):
 class AnnotationWidget(BasicoWidget, Gtk.Notebook):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
+
+    def _setup_widget(self):
         Gtk.Notebook.__init__(self)
-        self.get_services()
-        self.setup()
-
-    def get_services(self):
-        self.srvgui = self.get_service('GUI')
-
-    def setup(self):
         self.srvgui.add_widget('gtk_notebook_annotations', self)
         self.set_show_tabs(True)
         self.set_show_border(False)
         self.append_page(AnnotationVisor(self.app), Gtk.Label("Visor"))
         self.append_page(Gtk.Label("Not implemented"), Gtk.Label("Editor"))
 
+
 class AnnotationBrowser(BasicoBrowser):
     def __init__(self, app):
         super().__init__(app, 'AnnotBrowser')
-
 
 
 class AnnotationVisor(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
         Gtk.VBox.__init__(self)
-        self.get_services()
         self.setup()
-
-    def get_services(self):
-        self.srvgui = self.get_service('GUI')
 
     def setup(self):
         self.srvgui.add_widget('gtk_vbox_annotations_visor', self)

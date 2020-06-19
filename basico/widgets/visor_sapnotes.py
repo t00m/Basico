@@ -51,7 +51,9 @@ class COLUMN(IntEnum):
 class SAPNotesVisor(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
-        Gtk.VBox.__init__(self, app)
+
+    def _setup_widget(self):
+        Gtk.VBox.__init__(self, self.app)
         self.set_property('margin-left', 6)
         self.set_homogeneous(False)
         self.get_services()
@@ -76,12 +78,10 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         self.srvdtb.connect('database-updated', self.update)
 
     def get_services(self):
-        self.srvgui = self.get_service('GUI')
         self.srvsap = self.get_service('SAP')
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvuif = self.get_service('UIF')
         self.srvutl = self.get_service('Utils')
         self.srvweb = self.get_service('Driver')
         self.srvclb = self.get_service('Callbacks')

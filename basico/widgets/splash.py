@@ -20,7 +20,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
 
-
 class Splash():
     def __init__(self, title, width=400, height=250, font=36, font_weight='normal', font_color='000000', background_color='ffffff', background_image=None, app=None):
         self.app = app

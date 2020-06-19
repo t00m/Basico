@@ -18,36 +18,32 @@ from basico.services.collections import COL_DOWNLOADED
 
 class ColsMgtView(BasicoWidget, Gtk.VBox):
     __gtype_name__ = 'ColsMgtView'
+    # ~ app = None
+    sid = None
+    overwrite = None
     """
     Missing class docstring (missing-docstring)
     """
     def __init__(self, app, sid, overwrite=False):
-        super().__init__(app, __class__.__name__)
-        Gtk.VBox.__init__(self)
+        # ~ self.app = app
         self.sid = sid
-        self.current_cid = None
         self.overwrite = overwrite
-        # ~ self.log.debug("CollectionsMgtView widget overwrite mode is %s", overwrite)
-        self.get_services()
-        self.setup()
-        self.update()
-
+        super().__init__(app, __class__.__name__)
 
     def get_services(self):
         """
         Load services to be used in this class
         """
-        self.srvgui = self.get_service("GUI")
         self.srvicm = self.get_service("IM")
-        self.srvuif = self.get_service("UIF")
         self.srvclt = self.get_service('Collections')
         self.srvdtb = self.get_service('DB')
 
-
-    def setup(self):
+    def _setup_widget(self, *args):
         """
         Missing method docstring (missing-docstring)
         """
+        Gtk.VBox.__init__(self)
+
         # Setup Widget properties
         self.set_size_request(400, 680)
         self.set_property('margin', 3)
@@ -89,7 +85,7 @@ class ColsMgtView(BasicoWidget, Gtk.VBox):
         scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scr.set_shadow_type(Gtk.ShadowType.IN)
         viewport = Gtk.Viewport()
-        self.treeview = self.setup_treeview()
+        self.treeview = self._setup_treeview()
         viewport.add(self.treeview)
         scr.add(viewport)
         self.pack_start(scr, True, True, 6)
@@ -105,9 +101,9 @@ class ColsMgtView(BasicoWidget, Gtk.VBox):
             accept.connect('clicked', self.accept)
             footer.pack_start(accept, True, False, 0)
             self.pack_start(footer, False, False, 3)
+        self.update()
 
-
-    def setup_treeview(self):
+    def _setup_treeview(self):
         """
         Missing method docstring (missing-docstring)
         """

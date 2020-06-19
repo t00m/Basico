@@ -31,14 +31,8 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
         else:
             self.name = __class__.__name__
         super().__init__(app, self.name)
-        WebKit.WebView.__init__(self)
-        self.srvgui = self.app.get_service('GUI')
-        self.srvuif = self.app.get_service('UIF')
-        self.setup()
 
-    def setup(self):
-        self.srvgui.add_widget('browser_%s' % self.name, self)
-
+    def _setup_widget(self):
         # Webkit context
         web_context = WebKit.WebContext.get_default()
         web_context.set_cache_model(WebKit.CacheModel.DOCUMENT_VIEWER)
@@ -49,33 +43,14 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
         web_settings = WebKit.Settings()
         web_settings.set_enable_smooth_scrolling(True)
         web_settings.set_enable_plugins(False)
-        # ~ settings = self.get_settings()
-        # ~ settings.set_property('enable-smooth-scrolling', True)
-        # ~ settings.set_property('enable-plugins', False)
-        # ~ settings.set_property('enable-fullscreen', False)
-        # ~ settings.set_property('enable-html5-database', False)
-        # ~ settings.set_property('enable-html5-local-storage', False)
-        # ~ settings.set_property('enable-media-stream', False)
-        # ~ settings.set_property('enable-mediasource', False)
-        # ~ settings.set_property('enable-offline-web-application-cache', True)
-        # ~ settings.set_property('enable-page-cache', True)
-        # ~ settings.set_property('enable-webaudio', False)
-        # ~ settings.set_property('enable-webgl', False)
 
+        WebKit.WebView.__init__(self,
+                                 web_context=web_context,
+                                 settings=web_settings)
+        self.srvgui.add_widget('browser_%s' % self.name, self)
         self.connect('context-menu', self._on_append_items)
         self.connect('decide-policy', self._on_decide_policy)
         self.connect('load-changed', self.load_changed)
-
-
-
-        # ~ scrolled_window = Gtk.ScrolledWindow()
-        # ~ scrolled_window.add(self.webview)
-        # ~ scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        # ~ scrolled_window.set_shadow_type(Gtk.ShadowType.IN)
-        # ~ scrolled_window.set_hexpand(True)
-        # ~ scrolled_window.set_vexpand(True)
-        # ~ self.pack_start(scrolled_window, True, True, 0)
-
 
     def _get_api(self, uri):
         """Use Soup.URI to split uri
@@ -107,21 +82,20 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
             error_str = e.args[1]
             request.finish_error(GLib.Error(error_str))
             return
-        self.log.debug("API => Action[%s] Arguments[%s]", action, ', '.join(args))
+        self.log.info("API => Action[%s] Arguments[%s]", action, ', '.join(args))
         dialog = self.srvuif.message_dialog_info("Action: %s" % action, "Arguments: %s" % ', '.join(args))
         dialog.run()
         dialog.destroy()
 
     def _on_append_items(self, webview, context_menu, hit_result_event, event):
         """Attach custom actions to browser context menu"""
-        pass
+        # ~ # Example:
         # ~ action = Gtk.Action("help", "Basico Help", None, None)
         # ~ action.connect("activate", self.display_help)
         # ~ option = WebKit.ContextMenuItem().new(action)
         # ~ context_menu.prepend(option)
+        pass
 
-    # ~ def display_help(self, *args):
-        # ~ self.load_url(FILE['HELP_INDEX'])
 
     def load_url(self, url):
         self.log.debug("Loading url: %s", url)
@@ -143,7 +117,6 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
             uri = webview.get_uri()
             if click:
                 self.log.debug("User clicked in link: %s", uri)
-
 
     def load_changed(self, webview, event):
         uri = webview.get_uri()

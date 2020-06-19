@@ -22,23 +22,11 @@ from basico.core.env import ROOT, USER_DIR, APP, LPATH, GPATH, FILE
 
 class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
     def __init__(self, app):
+        # ~ self.app = app
         super().__init__(app, __class__.__name__)
+
+    def _setup_widget(self):
         Gtk.ScrolledWindow.__init__(self)
-        self.get_services()
-        self.setup()
-        self.update()
-        self.show_all()
-
-    def get_services(self):
-        """Load services to be used in this class
-        """
-        self.srvutl = self.get_service('Utils')
-        self.srvgui = self.get_service('GUI')
-        self.srvuif = self.get_service('UIF')
-        self.srvdtb = self.get_service('DB')
-
-
-    def setup(self):
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.set_shadow_type(Gtk.ShadowType.IN)
         self.set_hexpand(True)
@@ -106,6 +94,13 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
         self.treeview.set_model(self.model)
         self.treeview.show_all()
         self.show_all()
+        self.update()
+
+    def get_services(self):
+        """Load services to be used in this class
+        """
+        self.srvutl = self.get_service('Utils')
+        self.srvdtb = self.get_service('DB')
 
     def double_click(self, treeview, treepath, treecolumn):
         model = treeview.get_model()

@@ -32,22 +32,15 @@ class COLUMN(IntEnum):
 
 class LogViewer(BasicoWidget, Gtk.Box):
     def __init__(self, app):
+        # ~ self.app = app
         super().__init__(app, __class__.__name__)
-        Gtk.Box.__init__(self, app)
-        self.get_services()
-        self.setup()
-
-
-    def get_services(self):
-        """Load services to be used in this class
-        """
-        self.srvgui = self.get_service("GUI")
 
     def connect_signals(self, *args):
         statusbar = self.srvgui.get_widget('widget_statusbar')
         statusbar.connect('statusbar-updated', self.update)
 
-    def setup(self):
+    def _setup_widget(self):
+        Gtk.Box.__init__(self, self.app)
         visor = Gtk.VBox()
         scr = Gtk.ScrolledWindow()
         scr.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)

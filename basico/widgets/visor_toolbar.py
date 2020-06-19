@@ -19,9 +19,10 @@ from basico.core.wdg import BasicoWidget
 
 class VisorToolbar(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
-        Gtk.Box.__init__(self)
         super().__init__(app, __class__.__name__)
-        self.get_services()
+
+    def _setup_widget(self):
+        Gtk.Box.__init__(self)
         self.set_homogeneous(False)
 
         # Toolbar
@@ -253,18 +254,11 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         self.set_no_show_all(False)
         self.toolbar.set_hexpand(True)
 
-
-
     def get_services(self):
-        self.srvgui = self.get_service("GUI")
-        # ~ self.srvclb = self.get_service('Callbacks')
         self.srvsap = self.get_service('SAP')
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        self.srvuif = self.get_service("UIF")
-        # ~ self.srvant = self.get_service('Annotation')
-
 
     def completion_match_func(self, completion, key, iter):
         model = completion.get_model()
@@ -272,23 +266,6 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         if key.upper() in text.upper():
             return True
         return False
-
-
-    # ~ def clb_create_annotation(self, *args):
-        # ~ self.srvclb.action_annotation_create()
-
-
-    # ~ def clb_create_attachment(self, *args):
-        # ~ self.srvclb.gui_attachment_add()
-
-
-    # ~ def clb_template_changed(self, combobox):
-        # ~ treeiter = combobox.get_active_iter()
-        # ~ model = combobox.get_model()
-        # ~ aid = model[treeiter][1]
-        # ~ if len(aid) > 0:
-            # ~ self.srvclb.action_annotation_create_from_template(aid)
-
 
     def combobox_templates(self, *args):
         tpl_aids = self.srvant.get_annotations_by_type('Template')

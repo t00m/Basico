@@ -22,16 +22,14 @@ from basico.core.log import event_log
 class Statusbar(BasicoWidget, Gtk.HBox):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
-        Gtk.HBox.__init__(self)
-        GObject.signal_new('statusbar-updated', Statusbar, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
-        self.get_services()
-        self.setup()
 
     def alive(self, *args):
         logviewer = self.srvgui.get_widget('widget_logviewer')
         logviewer.connect_signals()
 
-    def setup(self):
+    def _setup_widget(self):
+        Gtk.HBox.__init__(self)
+        GObject.signal_new('statusbar-updated', Statusbar, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         vbox = Gtk.VBox()
         viewport = Gtk.Viewport()
         viewport.set_shadow_type(Gtk.ShadowType.NONE)
@@ -87,7 +85,6 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         self.add(vbox)
 
     def get_services(self):
-        self.srvgui = self.get_service("GUI")
         self.srvicm = self.get_service("IM")
         self.srvweb = self.get_service("Driver")
 

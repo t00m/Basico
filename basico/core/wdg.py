@@ -31,14 +31,13 @@ class BasicoWidget(object):
         self.srvstg = self.get_service('Settings')
         self.__init_section(name)
         self.log.debug("Loading widget: %s", name)
+        self._get_services() # services loaded by default
+        self.get_services() # services loaded on demand
+        self._setup_widget()
 
-    def get_traceback(self):
-        """Get traceback"""
-        return tb.format_exc()
-
-    def get_service(self, name):
-        """Get a service"""
-        return self.app.get_service(name)
+    def _get_services(self):
+        self.srvgui = self.app.get_service('GUI')
+        self.srvuif = self.app.get_service('UIF')
 
     def __init_section(self, name):
         """Check if section exists in config. If not, create it"""
@@ -50,6 +49,20 @@ class BasicoWidget(object):
             config[self.section] = {}
             self.srvstg.save(config)
             self.log.debug("Section '%s' initialized in config file" % name)
+
+    def _setup_widget(self):
+        pass
+
+    def get_services(self):
+        pass
+
+    def get_traceback(self):
+        """Get traceback"""
+        return tb.format_exc()
+
+    def get_service(self, name):
+        """Get a service"""
+        return self.app.get_service(name)
 
     def get_section_name(self):
         return self.name

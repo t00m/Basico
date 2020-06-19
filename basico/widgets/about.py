@@ -25,14 +25,8 @@ class About(BasicoWidget, Gtk.ScrolledWindow):
     """
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
-        self.get_services()
-        self.setup()
 
-    def get_services(self):
-        self.srvgui = self.app.get_service('GUI')
-        self.srvuif = self.app.get_service('UIF')
-
-    def setup(self):
+    def _setup_widget(self):
         Gtk.ScrolledWindow.__init__(self)
         self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.set_hexpand(True)

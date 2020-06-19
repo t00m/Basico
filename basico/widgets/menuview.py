@@ -39,7 +39,10 @@ class MenuView(BasicoWidget, Gtk.TreeView):
     current_collection = None
 
     def __init__(self, app):
+        # ~ self.app = app
         super().__init__(app, __class__.__name__)
+
+    def _setup_widget(self):
         Gtk.TreeView.__init__(self)
         self.row_type = None
         self.get_services()
@@ -122,13 +125,10 @@ class MenuView(BasicoWidget, Gtk.TreeView):
 
 
     def get_services(self):
-        self.srvgui = self.get_service("GUI")
         self.srvsap = self.get_service('SAP')
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
-        # ~ self.srvant = self.get_service('Annotation')
-        self.srvuif = self.get_service('UIF')
         self.srvclt = self.get_service('Collections')
         self.srvutl = self.get_service('Utils')
 
