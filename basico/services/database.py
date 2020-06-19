@@ -37,7 +37,6 @@ class Database(Service):
         self.stats['version'] = set()
         self.setup_signals()
         self.__init_config_section()
-        self.get_services()
         self.load_notes()
 
     def setup_signals(self):

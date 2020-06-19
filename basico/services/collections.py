@@ -23,7 +23,6 @@ class Collections(Service):
         '''
         Setup Collections Service
         '''
-        self.get_services()
         self.clts = {}
         self.load_collections()
 

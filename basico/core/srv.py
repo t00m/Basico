@@ -45,33 +45,28 @@ class Service(GObject.GObject):
     def print_traceback(self):
         self.log.error(tb.format_exc())
 
-    def start(self, app, logname, section_name):
-        """Start service.
-        Use initialize for writting a custom init method
-        @type app: basico
-        @param app: basico Class pointer.
-        @type logname: string
-        @param logname: name of associated logger. It is used aswell to
-        identify configuration section name
+    def start(self, app, name, section_name):
+        """
+        Configure and Start a service
+        Use 'initialize' for writinga custom init method
         """
         self.started = True
         self.app = app
         self.section = section_name
-        self.log = logging.getLogger(logname)
+        self.log = logging.getLogger(name)
         self.log.addHandler(self.app.intercepter)
         self.init_section(section_name)
-
+        self.get_services()
         try:
             self.initialize()
         except Exception as error:
             self.log.debug (self.get_traceback())
-
-        # ~ self.log.debug("Module %s started" , logname)
-
+        self.log.debug("Service '%s' started" , name)
 
     def end(self):
-        """End service
-        Use finalize for writting a custom end method
+        """
+        End service
+        Use 'finalize' for writting a custom end method
         """
         self.started = False
         try:
@@ -79,20 +74,17 @@ class Service(GObject.GObject):
         except Exception as error:
             self.log.debug (self.get_traceback())
 
-
     def initialize(self):
         """Initialize service.
-        All clases derived from Service class must implement this method
+        All clases derived from Service class can implement this method
         """
         pass
-
 
     def finalize(self):
         """Finalize service.
-        All clases derived from Service class must implement this method
+        All clases derived from Service class can implement this method
         """
         pass
-
 
     def init_section(self, section):
         """Check if section exists in config. If not, create it"""
@@ -105,22 +97,21 @@ class Service(GObject.GObject):
             self.srvstg.save(config)
             self.log.debug("Section '%s' initialized in config file" % section)
 
-
     def get_traceback(self):
         """
         get traceback
         """
         return tb.format_exc()
 
+    def get_services(self):
+        pass
 
     def get_service(self, name):
         return self.app.get_service(name)
 
-
     def get_config(self):
         self.srvstg = self.get_service('Settings')
         return self.srvstg.load()
-
 
     def get_splash(self):
         return self.app.get_splash()

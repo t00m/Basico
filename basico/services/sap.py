@@ -51,7 +51,6 @@ class SAP(Service):
         Setup AppLogic Service
         '''
         GObject.signal_new('sap-download-complete', SAP, GObject.SignalFlags.RUN_LAST, None, () )
-        self.get_services()
         self.__fix_collections()
         self.connect_signals()
 

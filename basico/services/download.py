@@ -64,7 +64,6 @@ class DownloadManager(Service):
         GObject.signal_new('download-canceled-user', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
         GObject.signal_new('download-canceled-system', DownloadManager, GObject.SignalFlags.RUN_LAST, None, () )
 
-        self.get_services()
         self.kill_gecko_processes()
         self.connect_signals()
         self.gdm = GeckoDriverManager(log_level=logging.ERROR)

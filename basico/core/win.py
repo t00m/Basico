@@ -47,13 +47,12 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         self.app = uiapp.get_controller()
         super().__init__(self.app, __class__.__name__)
 
+    def _setup_widget(self):
         self.size_pos = self.get_size_pos_from_config()
         if self.size_pos is None:
             self.log.debug("No last size and position saved. First time execution?")
 
-        self.log.debug("LAST WINDOW SIZE POS: %s", self.size_pos)
-        self.get_services()
-        self.setup_window(uiapp)
+        self.setup_window(self.uiapp)
         self.setup_widgets()
         self.srvgui.add_widget('gtk_app_window', self)
         self.run()
@@ -82,31 +81,18 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         Gtk.Window.__init__(self, title=APP['name'], application=uiapp)
         icon = self.srvicm.get_icon('basico-component', 48, 48)
         self.set_icon(icon)
-        # FIXME
-        # From docs: Don’t use this function. It sets the X xlib.Window
-        # System “class” and “name” hints for a window.
-        # But I have to do it or it doesn't shows the right title. ???
-        # ~ self.set_wmclass (APP['name'], APP['name'])
-        # ~ self.set_role(APP['name'])
-
         """
         Change Gtk+ Style
         """
-        # ~ screen = Gdk.Screen.get_default()
-        # ~ css_provider = Gtk.CssProvider()
+        screen = Gdk.Screen.get_default()
+        css_provider = Gtk.CssProvider()
         # ~ css_provider.load_from_path(FILE['CSS'])
-        # ~ context = Gtk.StyleContext()
-        # ~ context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+        context = Gtk.StyleContext()
+        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
         self.set_default_size(1024, 728)
-        # Disable CENTER_ALWAYS as it doesn't allow to resize the window
-        # when it is de-maximized
-        # ~ self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         self.setup_headerbar()
-
-        # ~ self.maximize ()
         self.show_all()
-
 
     def setup_headerbar(self):
         hb = self.srvgui.add_widget('gtk_headerbar_container', Gtk.HeaderBar())
@@ -227,40 +213,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         self.srvgui.add_signal('gtk_button_settings', 'clicked', 'self.srvclb.display_settings')
         box.pack_start(button, False, False, 0)
 
-        # ~ ### Backup
-        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        # ~ icon = self.srvicm.get_pixbuf_icon('basico-backup-restore', 48, 48)
-        # ~ image = Gtk.Image()
-        # ~ image.set_from_pixbuf(icon)
-        # ~ label = Gtk.Label("Backup/Restore")
-        # ~ hbox.pack_start(image, False, False, 3)
-        # ~ hbox.pack_start(label, False, False, 3)
-        # ~ button = Gtk.Button()
-        # ~ button.add(hbox)
-        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ box.pack_start(button, False, False, 0)
-
-        # ~ box_bnr = Gtk.VBox()
-        # ~ popover_bnr = Gtk.Popover.new(button)
-        # ~ popover_bnr.set_position(Gtk.PositionType.LEFT)
-        # ~ popover_bnr.add(box_bnr)
-        # ~ self.srvgui.add_widget('gtk_popover_button_menu_system', popover_bnr)
-        # ~ button.connect('clicked', self.srvuif.popover_show, popover_bnr)
-
-        # ~ hbox_backup = Gtk.VBox()
-        # ~ button_backup = self.srvuif.create_button('basico-backup', 48, 48, '<b>Backup database</b> ')
-        # ~ # # ~ button_backup.connect('clicked', self.srvclb.gui_database_backup)
-        # ~ box_bnr.pack_start(button_backup, False, False, 0)
-        # ~ button_restore = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from backup</b>')
-        # ~ # # ~ button_restore.connect('clicked', self.srvclb.gui_database_restore)
-        # ~ # # ~ button_cache = self.srvuif.create_button('basico-restore', 48, 48, '<b>Restore from cache</b>')
-        # ~ # # ~ button_cache.connect('clicked', self.srvbnr.restore_from_cache)
-
-        # ~ box_bnr.pack_start(button_restore, False, False, 0)
-        # ~ # # ~ box_bnr.pack_start(button_cache, False, False, 0)
-
         return rhbox
-
 
     def setup_widgets(self):
         # Main box

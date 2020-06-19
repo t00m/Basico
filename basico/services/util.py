@@ -30,12 +30,6 @@ class Utils(Service):
     """
     Missing class docstring (missing-docstring)
     """
-
-    def initialize(self):
-        """
-        Missing method docstring (missing-docstring)
-        """
-
     def download_webdriver_setup(self, *args):
         self.log.warning("Webdriver profile missing. Creating a new one from the scratch")
         cmd = "firefox --profile %s %s" % (LPATH['FIREFOX_PROFILE'], FILE['HELP_FIREFOX_PROFILE'])

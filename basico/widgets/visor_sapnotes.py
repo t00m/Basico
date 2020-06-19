@@ -56,7 +56,6 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         Gtk.VBox.__init__(self, self.app)
         self.set_property('margin-left', 6)
         self.set_homogeneous(False)
-        self.get_services()
         self.bag = []
         self.icons = {}
         self.icons['type'] = {}

@@ -44,7 +44,6 @@ class MenuView(BasicoWidget, Gtk.TreeView):
     def _setup_widget(self):
         Gtk.TreeView.__init__(self)
         self.row_type = None
-        self.get_services()
         self.toggled = 0
         self.selected = set()
         self.count = 0

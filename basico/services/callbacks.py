@@ -27,7 +27,6 @@ class Callback(Service):
         # Be aware about when the whole gui is started
         GObject.signal_new('gui-started', Callback, GObject.SignalFlags.RUN_LAST, None, () )
         self.connect('gui-started', self.gui_started)
-        self.get_services()
         self.th = threading.Thread(name='startup', target=self.on_startup)
         self.th.setDaemon(True)
         self.th.start()
