@@ -20,12 +20,24 @@ except:
     from gi.repository import WebKit
 
 from basico.core.env import FILE
+from basico.core.srv import Service
 from basico.core.wdg import BasicoWidget
 from basico.widgets.browser import BasicoBrowser
 
 class Tab(IntEnum):
     VISOR = 0
     EDITOR = 1
+
+class KBAPI(Service):
+    def execute(self, api, args=None):
+        fnc = 'self.%s(%s)' % (api, args)
+        try:
+            eval(fnc)
+        except:
+            self.log.warning("Callback not implemented for KB API '%s'" % api)
+
+    def settings(self, *args):
+        self.log.debug("Show settings dialog")
 
 class KB4Basico(BasicoWidget, Gtk.Notebook):
     def __init__(self, app):
@@ -49,6 +61,8 @@ class KBBrowser(BasicoBrowser):
         WebKit.WebView.__init__(self,
                                  web_context=self.web_context,
                                  settings=self.web_settings)
+        self.app.register_service('API', KBAPI())
+        self.srvapi = self.get_service('API')
 
     def _on_basico_scheme(self, request):
         """Get api callback for Basico scheme requests
@@ -63,10 +77,9 @@ class KBBrowser(BasicoBrowser):
             error_str = e.args[1]
             request.finish_error(GLib.Error(error_str))
             return
-        self.log.info("API => Action[%s] Arguments[%s]", action, ', '.join(args))
-        dialog = self.srvuif.message_dialog_info("Action: %s" % action, "Arguments: %s" % ', '.join(args))
-        dialog.run()
-        dialog.destroy()
+        self.log.debug("API => Action[%s] Arguments[%s]", action, ', '.join(args))
+        self.srvapi.execute(action, args)
+        return False
 
 class KBVisor(BasicoWidget, Gtk.VBox):
     def __init__(self, app):
