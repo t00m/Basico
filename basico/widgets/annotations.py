@@ -44,42 +44,10 @@ class AnnotationWidget(BasicoWidget, Gtk.Notebook):
         self.append_page(AnnotationVisor(self.app), Gtk.Label("Visor"))
         self.append_page(Gtk.Label("Not implemented"), Gtk.Label("Editor"))
 
-class AnnotationBrowser(BasicoWidget, WebKit.WebView):
-    __gtype_name__ = 'AnnotationBrowser'
-
+class AnnotationBrowser(BasicoBrowser):
     def __init__(self, app):
         super().__init__(app, 'AnnotBrowser')
-        WebKit.WebView.__init__(self)
-        self.connect('load-changed', self.load_changed)
-        self.get_services()
-        self.setup()
 
-    def get_services(self):
-        self.srvgui = self.get_service('GUI')
-
-    def setup(self):
-        self.srvgui.add_widget('annotations_browser', self)
-
-    def load_url(self, url):
-        self.log.debug("Loading url: %s", url)
-        self.load_uri(url)
-
-    def load_changed(self, webview, event):
-        # https://lazka.github.io/pgi-docs/WebKit2-4.0/enums.html#WebKit2.LoadEvent
-        url = self.get_uri()
-        self.log.debug("Current URL: %s", url)
-        # ~ if event == WebKit.LoadEvent.STARTED:
-            # ~ self.log.debug("Load started")
-            # ~ if url == myurl:
-                # ~ self.stop_loading ()
-                # ~ self.log.debug("Url loading stopped. Execute callback")
-                # ~ return False
-        # ~ elif event == WebKit.LoadEvent.COMMITTED:
-            # ~ self.log.debug("Load commited")
-        # ~ elif event == WebKit.LoadEvent.FINISHED:
-            # ~ self.log.debug("Load finished")
-            # ~ if len(url) == 0:
-                # ~ self.log.debug("Url not loaded")
 
 
 class AnnotationVisor(BasicoWidget, Gtk.VBox):

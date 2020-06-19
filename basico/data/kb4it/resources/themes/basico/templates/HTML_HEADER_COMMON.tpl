@@ -37,6 +37,9 @@
                                 <li class="uk-link-toggle">
                                     <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="stats.html"><span class="uk-padding-small">Stats</span></a>
                                 </li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="basico://add/freeform"><span class="uk-padding-small">New annotation</span></a>
+                                </li>
                             </ul>
                         </div>
                     </li>

@@ -197,6 +197,7 @@ class Callback(Service):
         Update visor sapnotes when user choose a different row in the
         treeview associated to that view
         """
+        self.srvuif.message_dialog_info("Head", "Body")
         menuview = self.srvgui.get_widget('menuview')
         menuview.row_changed()
 
