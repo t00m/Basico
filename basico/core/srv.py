@@ -115,3 +115,9 @@ class Service(GObject.GObject):
 
     def get_splash(self):
         return self.app.get_splash()
+
+    def set_config_value(self, key, value):
+        self.srvstg.set_value(self.section, key, value)
+
+    def get_config_value(self, key):
+        return self.srvstg.get_value(self.section, key)

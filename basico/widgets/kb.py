@@ -28,16 +28,60 @@ class Tab(IntEnum):
     VISOR = 0
     EDITOR = 1
 
+class DialogKBSettings(BasicoWidget, Gtk.Dialog):
+    def __init__(self, app):
+        super().__init__(app, __class__.__name__)
+
+    def get_services(self):
+        self.srvkbb = self.get_service('KB4IT')
+
+    def _setup_widget(self):
+        parent = self.srvuif.get_window_parent()
+        Gtk.Dialog.__init__(
+            self, "KB Basico Settings", parent, 0,
+            (
+                # ~ Gtk.STOCK_CANCEL,
+                # ~ Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OK,
+                Gtk.ResponseType.OK,
+            ),
+        )
+        box = self.get_content_area()
+        self.set_default_size(400, 300)
+
+        # Settings box
+        vbox = Gtk.VBox()
+        vbox.set_property('margin-left', 6)
+        vbox.set_property('margin-right', 6)
+
+        # Force compilation
+        force = self.srvkbb.get_config_value('force')
+        button = Gtk.ToggleButton("Force compilation")
+        button.set_active(force)
+        button.connect("toggled", self._on_force_compilation)
+        vbox.pack_start(button, False, False, 6)
+        box.add(vbox)
+        self.show_all()
+
+    def _on_force_compilation(self, button):
+        force = button.get_active()
+        self.srvkbb.set_config_value('force', force)
+
+
 class KBAPI(Service):
     def execute(self, api, args=None):
         fnc = 'self.%s(%s)' % (api, args)
         try:
             eval(fnc)
-        except:
+        except Exception as error:
+            self.log.error(error)
             self.log.warning("Callback not implemented for KB API '%s'" % api)
 
     def settings(self, *args):
         self.log.debug("Show settings dialog")
+        dialog = DialogKBSettings(self.app)
+        dialog.run()
+        dialog.destroy()
 
 class KB4Basico(BasicoWidget, Gtk.Notebook):
     def __init__(self, app):

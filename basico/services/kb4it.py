@@ -39,7 +39,9 @@ class KB4Basico(Service):
         self.log.debug("Basico is using %s" % KB4IT().get_version())
 
         # Make sure the last theme version is installed
-        self.params = Namespace(FORCE=False, LOGLEVEL='INFO', SORT_ATTRIBUTE=None, SOURCE_PATH=LPATH['DOC_SOURCE'], TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+        force = self.get_config_value('force') or False
+        self.log.debug("Compilation is set to: %s", force)
+        self.params = Namespace(FORCE=force, LOGLEVEL='INFO', SORT_ATTRIBUTE=None, SOURCE_PATH=LPATH['DOC_SOURCE'], TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
         self.install_theme()
 
         # Get KB4IT Basico theme properties
@@ -58,7 +60,7 @@ class KB4Basico(Service):
         self.th.setDaemon(True)
         self.th.start()
         self.log.debug("KB Basico Manager started")
-        self.request_update()
+        # ~ self.request_update()
 
     def install_theme(self):
         self.log.debug("Installing KB4IT Basico theme")
