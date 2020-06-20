@@ -20,7 +20,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 from basico.core.env import APP, LPATH, GPATH, FILE
-from basico.core.log import LogIntercepter, queue_log
+from basico.core.log import LogIntercepter, queue_log, get_logger
 from basico.services.kb4it import KB4Basico
 from basico.services.util import Utils
 from basico.services.gui import GUI
@@ -91,7 +91,8 @@ class Basico(object):
                 # ~ pass
 
         #Initialize logging
-        self.log = logging.getLogger(__class__.__name__)
+        # ~ self.log = logging.getLogger(__class__.__name__)
+        self.log = get_logger(__class__.__name__)
         self.log.addHandler(self.intercepter)
         self.log.info("Basico %s started", APP['version'])
 

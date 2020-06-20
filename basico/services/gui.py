@@ -20,6 +20,7 @@ from gi.repository import GObject
 from gi.repository import Gio
 
 from basico.core.srv import Service
+from basico.core.log import get_logger
 from basico.core.win import GtkAppWindow
 from basico.core.env import FILE
 
@@ -39,7 +40,8 @@ class UIApp(Gtk.Application):
         self.app = args[0]
         GLib.set_application_name("Basico")
         GLib.set_prgname('basico')
-        self.log = logging.getLogger('UIApp')
+        # ~ self.log = logging.getLogger('UIApp')
+        self.log = get_logger('UIApp')
         self.log.addHandler(self.app.intercepter)
         self._get_services()
         self.connect('startup', self._on_startup)

@@ -14,7 +14,7 @@ import traceback as tb
 from gi.repository import GObject
 
 from basico.core.env import FILE
-
+from basico.core.log import get_logger
 
 
 class Service(GObject.GObject):
@@ -53,7 +53,8 @@ class Service(GObject.GObject):
         self.started = True
         self.app = app
         self.section = section_name
-        self.log = logging.getLogger(name)
+        # ~ self.log = logging.getLogger(name)
+        self.log = get_logger(name)
         self.log.addHandler(self.app.intercepter)
         self.init_section(section_name)
         self.get_services()

@@ -14,6 +14,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from basico.core.log import get_logger
 
 class BasicoWidget(object):
     """Service class is the base class for Basico widgets"""
@@ -26,7 +27,8 @@ class BasicoWidget(object):
         """Initialize Service instance"""
         self.app = app
         self.name = name
-        self.log = logging.getLogger(name)
+        # ~ self.log = logging.getLogger(name)
+        self.log = get_logger(name)
         self.log.addHandler(self.app.intercepter)
         self.srvstg = self.get_service('Settings')
         self.__init_section(name)

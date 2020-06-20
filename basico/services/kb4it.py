@@ -69,9 +69,9 @@ class KB4Basico(Service):
         theme = kbapp.get_theme_properties()
         installed = theme['id'] == 'basico'
         if not installed:
-            self.log.error("\tKB4IT Theme for Basico not found. Using default theme :(")
+            self.log.error("KB4IT Theme for Basico not found. Using default theme :(")
         else:
-            self.log.info("\tBasico KB4IT Theme %s found", theme['version'])
+            self.log.info("Basico KB4IT Theme %s found", theme['version'])
 
         self.status = KBStatus.UPDATING
 

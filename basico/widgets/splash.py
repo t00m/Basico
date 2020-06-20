@@ -19,10 +19,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
+from basico.core.log import get_logger
+
 
 class Splash():
     def __init__(self, title, width=400, height=250, font=36, font_weight='normal', font_color='000000', background_color='ffffff', background_image=None, app=None):
         self.app = app
+        self.log = get_logger(__class__.__name__)
         self.log = logging.getLogger(__class__.__name__)
         self.log.addHandler(self.app.intercepter)
         self.title = title
