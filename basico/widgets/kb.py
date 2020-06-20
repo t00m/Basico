@@ -113,6 +113,8 @@ class KBBrowser(BasicoBrowser):
                                  settings=self.web_settings)
         self.app.register_service('API', KBAPI())
         self.srvapi = self.get_service('API')
+        self.srvkbb = self.get_service('KB4IT')
+        self.srvkbb.connect('kb-updated', self.reload_page)
 
     def _on_basico_scheme(self, request):
         """Get api callback for Basico scheme requests
@@ -130,6 +132,10 @@ class KBBrowser(BasicoBrowser):
         self.log.debug("API => Action[%s] Arguments[%s]", action, ', '.join(args))
         self.srvapi.execute(action, args)
         return False
+
+    def reload_page(self, *args):
+        self.log.debug("Reload page: %s", self.get_uri())
+        self.reload()
 
 class KBVisor(BasicoWidget, Gtk.VBox):
     def __init__(self, app):

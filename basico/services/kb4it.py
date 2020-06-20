@@ -81,8 +81,17 @@ class KB4Basico(Service):
         self.log.info("Basico KB update requested")
         self.queue.put('request')
 
+    def is_running(self):
+        try:
+            self.running = kb.is_running() or False
+        except:
+            self.running = False
+        self.log.debug("KB4IT is running? %s", self.running)
+        return self.running
+
     def update(self):
-        while self.status == KBStatus.UPTODATE:
+        running = self.is_running()
+        while not running:
             self.queue.get()
             kb = self.prepare()
             kb.run()
@@ -92,6 +101,8 @@ class KB4Basico(Service):
                 self.log.info("Basico KB up to date")
                 self.emit('kb-updated')
             time.sleep(1)
+            running = self.is_running()
+        time.sleep(1)
 
     def get_status(self):
         return self.status
