@@ -104,5 +104,5 @@ SAP_NOTE_URL = "https://launchpad.support.sap.com/#/notes/%s"
 SAP_NOTE_URL_PDF = "https://launchpad.support.sap.com/services/pdf/notes/%s/E"
 TIMEOUT = 10
 
-# Annotations
+# KB Basico
 ATYPES = ['Bookmark', 'Email', 'Fixme', 'Incident', 'Meeting', 'Note', 'Procedure', 'Snippet', 'Template', 'Todo']

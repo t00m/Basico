@@ -469,7 +469,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         total = self.srvdtb.get_total()
         count = len(visible_filter)
         lblnotescount.set_markup("<b>%d/<big>%d</big></b>" % (count, total))
-        msg = "View <b>%s</b> populated with <b>%d notes</b>" % (view, count)
+        msg = "View %s populated with %d notes" % (view, count)
         if len(term) > 0:
             msg += " for term <b>%s</b>" % term
         self.log.info(msg)

@@ -15,8 +15,6 @@ from gi.repository import GObject
 from basico.core.srv import Service
 from basico.core.log import queue_log
 from basico.services.uif import UIFuncs
-from basico.services.kb4it import KBStatus
-
 
 class Callback(Service):
     """
@@ -65,7 +63,6 @@ class Callback(Service):
         self.srvweb = self.get_service('Driver')
         self.srvbkb = self.get_service('KB4IT')
         self.srvclb = self # Trick
-        self.srvbkb.connect('kb-updated', self.kb_updated)
         self.srvgui.connect('new-signal', self.connect_signal)
 
     def gui_started(self, *args):
@@ -134,9 +131,9 @@ class Callback(Service):
         window.show_stack_visors('visor-sapnotes')
 
     @UIFuncs.hide_popovers
-    def display_visor_annotations(self, *args):
+    def display_visor_kb(self, *args):
         window = self.srvgui.get_widget('gtk_app_window_main')
-        window.show_stack_visors('visor-annotations')
+        window.show_stack_visors('visor-kb')
 
     @UIFuncs.hide_popovers
     def display_about(self, *args):
@@ -215,7 +212,3 @@ class Callback(Service):
             statusbar.message(record)
             queue_log.task_done()
         time.sleep(0.1)
-
-    def kb_updated(self, *args):
-        """Be aware when Basico KB is updated"""
-        self.log.info("Basico KB updated")

@@ -19,7 +19,7 @@ except:
     gi.require_version('WebKit', '3.0')
     from gi.repository import WebKit
 
-from basico.core.env import FILE
+from basico.core.env import FILE, LPATH
 from basico.core.srv import Service
 from basico.core.wdg import BasicoWidget
 from basico.widgets.browser import BasicoBrowser
@@ -56,16 +56,66 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
 
         # Force compilation
         force = self.srvkbb.get_config_value('force')
-        button = Gtk.ToggleButton("Force compilation")
+        hbox = Gtk.HBox()
+        tip = Gtk.Label()
+        tip.set_xalign(0.0)
+        tip.set_markup('<b>Force compilation?</b>')
+        hbox.pack_start(tip, True, True, 6)
+        button = Gtk.Switch()
         button.set_active(force)
-        button.connect("toggled", self._on_force_compilation)
-        vbox.pack_start(button, False, False, 6)
+        button.connect("notify::active", self._on_force_compilation)
+        hbox.pack_start(button, True, True, 6)
+        vbox.pack_start(hbox, False, False, 6)
+
+        # ~ # Auto update
+        # ~ auto = self.srvkbb.get_config_value('auto-update')
+        # ~ hbox = Gtk.HBox()
+        # ~ tip = Gtk.Label()
+        # ~ tip.set_xalign(0.0)
+        # ~ tip.set_markup('<b>Auto update Basico KB (monitor changes)</b>')
+        # ~ hbox.pack_start(tip, True, True, 6)
+        # ~ button = Gtk.Switch()
+        # ~ button.set_active(force)
+        # ~ button.connect("notify::active", self._on_auto_update)
+        # ~ hbox.pack_start(button, True, True, 6)
+        # ~ vbox.pack_start(hbox, False, False, 6)
+
+
+        # Source directory
+        sources = self.srvkbb.get_config_value('sources')
+        if sources is None:
+            sources = LPATH['DOC_SOURCE']
+        hbox = Gtk.HBox()
+        tip = Gtk.Label()
+        tip.set_xalign(0.0)
+        tip.set_markup('<b>Sources directory</b>')
+        hbox.pack_start(tip, True, True, 6)
+        button = Gtk.FileChooserButton(Gtk.FileChooserAction.CREATE_FOLDER)
+        button.set_filename(sources)
+        button.set_create_folders(True)
+        button.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+        button.connect("file-set",self._on_update_select_folder)
+        hbox.pack_start(button, True, True, 6)
+        vbox.pack_start(hbox, False, False, 6)
+
         box.add(vbox)
         self.show_all()
 
-    def _on_force_compilation(self, button):
+    def _on_force_compilation(self, button, gparam):
         force = button.get_active()
         self.srvkbb.set_config_value('force', force)
+        self.log.info("Force compilation set to: %s", force)
+
+    def _on_auto_update(self, button, gparam):
+        auto = button.get_active()
+        self.srvkbb.set_config_value('auto-update', auto)
+        self.log.info("Auto update Basico KB set to: %s", auto)
+
+    def _on_update_select_folder(self, chooser):
+        folder = chooser.get_filename()
+        self.srvkbb.set_config_value('sources', folder)
+        self.log.info("Sources directory for Basico KB set to: %s", folder)
+
 
 
 class KBAPI(Service):
@@ -79,6 +129,7 @@ class KBAPI(Service):
         except Exception as error:
             self.log.error(error)
             self.log.warning("Callback not implemented for KB API '%s'" % api)
+            raise
 
     def settings(self, *args):
         self.log.debug("Show settings dialog")
@@ -89,7 +140,7 @@ class KBAPI(Service):
     def update(self, *args):
         self.srvkbb.request_update()
 
-class KB4Basico(BasicoWidget, Gtk.Notebook):
+class KBWidget(BasicoWidget, Gtk.Notebook):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
 

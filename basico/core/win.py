@@ -35,7 +35,7 @@ from basico.widgets.settingsview import SettingsView
 from basico.widgets.logviewer import LogViewer
 from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
-from basico.widgets.kb import KB4Basico
+from basico.widgets.kb import KBWidget
 
 
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
@@ -120,15 +120,15 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         self.srvgui.add_signal('gtk_button_visor_sapnotes', 'clicked', 'self.srvclb.display_visor_sapnotes')
         lhbox.pack_start(button, False, False, 0)
 
-        ## Visor Annotations
+        ## Visor KB
         button = Gtk.Button()
         icon = self.srvicm.get_pixbuf_icon('basico-annotation', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         button.set_image(image)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        self.srvgui.add_widget('gtk_button_visor_annotations', button)
-        self.srvgui.add_signal('gtk_button_visor_annotations', 'clicked', 'self.srvclb.display_visor_annotations')
+        self.srvgui.add_widget('gtk_button_visor_kb', button)
+        self.srvgui.add_signal('gtk_button_visor_kb', 'clicked', 'self.srvclb.display_visor_kb')
         lhbox.pack_start(button, False, False, 0)
 
         return lhbox
@@ -228,11 +228,10 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         page_system = self.setup_stack_system()
         notebook.append_page(page_visors, Gtk.Label("Visors"))
         notebook.append_page(page_system, Gtk.Label("System"))
+        mainbox.pack_start(notebook, True, True, 0)
 
         # Statusbar
         statusbar = self.srvgui.add_widget('widget_statusbar', Statusbar(self.controller))
-
-        mainbox.pack_start(notebook, True, True, 0)
         mainbox.pack_start(statusbar, False, False, 0)
 
         self.add(mainbox)
@@ -299,9 +298,9 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         stack_visors.add_titled(stack_child, "visor-sapnotes", "SAP Notes")
         stack_visors.child_set_property (stack_child, "icon-name", "basico-sapnote")
 
-        #### Stack for Visor Annotations
-        stack_child = self.setup_stack_visor_annotations()
-        stack_visors.add_titled(stack_child, "visor-annotations", "My notes")
+        #### Stack for Visor KB
+        stack_child = self.setup_stack_visor_kb()
+        stack_visors.add_titled(stack_child, "visor-kb", "Basico KB")
         stack_visors.child_set_property (stack_child, "icon-name", "basico-annotation")
 
         return box
@@ -327,9 +326,9 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         box.show_all()
         return box
 
-    def setup_stack_visor_annotations(self):
-        ### Annotations Visor and Editor
-        return KB4Basico(self.controller)
+    def setup_stack_visor_kb(self):
+        ### KB Visor and Editor
+        return KBWidget(self.controller)
 
     def setup_stack_system_about(self):
         box = Gtk.VBox()

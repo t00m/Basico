@@ -7,6 +7,8 @@
 # Description: KB4IT Service
 """
 
+import os
+import glob
 import time
 import queue
 import threading
@@ -22,16 +24,11 @@ from basico.core.env import LPATH, GPATH, FILE
 from basico.core.srv import Service
 from basico.core.log import levels
 
-class KBStatus(IntEnum):
-    UPTODATE = 0 # Basico KB updated
-    UPDATING = 1 # Basico KB is being updated
-
 class KB4Basico(Service):
     kb = None
     th = None
     queue = None
     params = None
-    status = KBStatus.UPTODATE
 
     def initialize(self):
         # Install "KB Updated" signal
@@ -50,8 +47,9 @@ class KB4Basico(Service):
     def prepare(self):
         self.log.debug("Preparing request")
 
+        # Force compilation
         force = self.get_config_value('force') or False
-        self.log.debug("\tCompilation is set to: %s", force)
+        self.log.debug("\tForce compilation is set to: %s", force)
 
         # FIXME: Get all settings
         loglevel = levels[self.app.log.getEffectiveLevel()]
@@ -72,8 +70,6 @@ class KB4Basico(Service):
             self.log.error("KB4IT Theme for Basico not found. Using default theme :(")
         else:
             self.log.info("Basico KB4IT Theme %s found", theme['version'])
-
-        self.status = KBStatus.UPDATING
 
         return kb
 
@@ -97,13 +93,8 @@ class KB4Basico(Service):
             kb.run()
             self.queue.task_done()
             if self.queue.empty():
-                self.status = KBStatus.UPTODATE
                 self.log.info("Basico KB up to date")
                 self.emit('kb-updated')
             time.sleep(1)
             running = self.is_running()
         time.sleep(1)
-
-    def get_status(self):
-        return self.status
-

@@ -174,26 +174,8 @@ class Database(Service):
             #FIXME self.stats[''].add(version)
             self.emit('database-indexed')
 
-
-    # ~ def add(self, sapnote, overwrite=True):
-        # ~ sid = sapnote['id']
-
-        # ~ if self.exists(sid):
-            # ~ if overwrite:
-                # ~ self.sapnotes[sid] = sapnote
-                # ~ self.log.info("SAP Note %s updated", sid, overwrite)
-                # ~ return True
-            # ~ else:
-                # ~ self.log.info("SAP Note %s locked", sid, overwrite)
-                # ~ return False
-        # ~ else:
-            # ~ self.sapnotes[sid] = sapnote
-            # ~ self.log.info("SAP Note %s added", sid)
-            # ~ return True
-
-
     def add(self, sapnotes, overwrite=True):
-        self.log.info("Adding %d SAP Notes to database (overwrite mode is %s)", len(sapnotes), overwrite)
+        self.log.debug("Adding %d SAP Notes to database (overwrite mode is %s)", len(sapnotes), overwrite)
         n = 1
         for sapnote in sapnotes:
             sid = sapnote['id']
@@ -202,12 +184,15 @@ class Database(Service):
                 if overwrite:
                     updated = True
                     self.sapnotes[sid] = sapnote
+                    self.log.info("SAP Note %s added", sid)
                 else:
                     updated = False
+                    self.log.info("SAP Note %s NOT added", sid)
             else:
                 updated = True
                 self.sapnotes[sid] = sapnote
-            self.log.info("[%d/%d] SAP Note %s added? %s", n, len(sapnotes), sid, updated)
+                self.log.info("SAP Note %s added", sid)
+
             n += 1
 
         self.save_notes()

@@ -30,6 +30,9 @@ class Statusbar(BasicoWidget, Gtk.HBox):
     def _setup_widget(self):
         Gtk.HBox.__init__(self)
         GObject.signal_new('statusbar-updated', Statusbar, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        self.set_property('margin-top', 3)
+        self.set_property('margin-bottom', 3)
+
         vbox = Gtk.VBox()
         viewport = Gtk.Viewport()
         viewport.set_shadow_type(Gtk.ShadowType.NONE)
@@ -44,11 +47,14 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         label_priority.set_property('margin-left', 6)
         label_priority.set_property('margin-right', 6)
         label_priority.set_property('margin-top', 0)
-        label_priority.set_property('margin-bottom', 6)
+        label_priority.set_property('margin-bottom', 3)
         label_priority.set_width_chars(8)
         label_priority.set_xalign(0.0)
         label_priority.modify_font(Pango.FontDescription('Monospace 10'))
-        hbox.pack_start(label_priority, False, False, 3)
+        container = Gtk.Viewport()
+        container.set_shadow_type(Gtk.ShadowType.OUT)
+        container.add(label_priority)
+        hbox.pack_start(container, False, False, 3)
 
         # MESSAGE
         label_message = self.srvgui.add_widget('statusbar_label_message', Gtk.Label())
@@ -57,14 +63,16 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         label_message.set_property('margin-left', 6)
         label_message.set_property('margin-right', 6)
         label_message.set_property('margin-top', 0)
-        label_message.set_property('margin-bottom', 6)
         label_message.set_xalign(0.0)
         label_message.modify_font(Pango.FontDescription('Monospace 10'))
-        hbox.pack_start(label_message, True, True, 3)
+        container = Gtk.Viewport()
+        container.set_shadow_type(Gtk.ShadowType.OUT)
+        container.add(label_message)
+        hbox.pack_start(container, True, True, 3)
 
         # CANCEL BUTTON
         button = Gtk.Button()
-        icon = self.srvicm.get_pixbuf_icon('basico-check-cancel', 24, 24)
+        icon = self.srvicm.get_pixbuf_icon('basico-check-cancel', 18, 18)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         button.set_image(image)
@@ -73,7 +81,7 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         self.srvgui.add_signal('statusbar_button_cancel', 'clicked', 'self.srvweb.cancel_by_user')
         hbox.pack_end(button, False, False, 0)
         button.set_property('margin-right', 6)
-        button.set_property('margin-bottom', 6)
+        # ~ button.set_property('margin-bottom', 3)
 
         # SPINNER
         spinner = self.srvgui.add_widget('statusbar_spinner', Gtk.Spinner())
