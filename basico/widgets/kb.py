@@ -69,6 +69,9 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
 
 
 class KBAPI(Service):
+    def get_services(self):
+        self.srvkbb = self.get_service('KB4IT')
+
     def execute(self, api, args=None):
         fnc = 'self.%s(%s)' % (api, args)
         try:
@@ -82,6 +85,9 @@ class KBAPI(Service):
         dialog = DialogKBSettings(self.app)
         dialog.run()
         dialog.destroy()
+
+    def update(self, *args):
+        self.srvkbb.request_update()
 
 class KB4Basico(BasicoWidget, Gtk.Notebook):
     def __init__(self, app):

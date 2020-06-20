@@ -51,8 +51,8 @@ class Basico(object):
         Basico class
         """
 
-        self.setup_environment()
         self.setup_logging()
+        self.setup_environment()
         self.setup_services()
         self.setup_splash()
         self.setup_post()
@@ -71,28 +71,32 @@ class Basico(object):
         Setup Basico environment
         """
         # Create local paths if they do not exist
+        self.log.debug("Checking directories for Basico")
         for entry in LPATH:
             if not os.path.exists(LPATH[entry]):
                 os.makedirs(LPATH[entry])
+                self.log.debug("Directory %s created", LPATH[entry])
+        self.log.debug("Basico directory structure ok")
 
+        # ~ self.log.debug("Global path: %s", GPATH['ROOT'])
+        # ~ self.log.debug("Local path: %s", LPATH['ROOT'])
 
     def setup_logging(self):
         """
         Setup Basico logging
         """
         # Truncate existing log file
-        if os.path.exists(FILE['LOG']):
-            with open(FILE['LOG'], 'w') as flog:
-                pass
+        # ~ if os.path.exists(FILE['LOG']):
+            # ~ with open(FILE['LOG'], 'w') as flog:
+                # ~ pass
 
         #Initialize logging
         self.log = logging.getLogger(__class__.__name__)
         self.log.addHandler(self.intercepter)
         self.log.info("Basico %s started", APP['version'])
-        self.log.debug("Global path: %s", GPATH['ROOT'])
-        self.log.debug("Local path: %s", LPATH['ROOT'])
-        self.log.debug("Logging all messages to file: %s", FILE['LOG'])
-        self.log.debug("Logging only events: %s", FILE['EVENTS'])
+
+        # ~ self.log.debug("Logging all messages to file: %s", FILE['LOG'])
+        # ~ self.log.debug("Logging only events: %s", FILE['EVENTS'])
 
 
     def setup_services(self):
