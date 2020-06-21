@@ -255,7 +255,7 @@ class Database(Service):
         try:
             with open(FILE['DBSAP'], 'r') as fp:
                 self.sapnotes = json.load(fp)
-                self.log.info("SAP Notes Database found at: %s", FILE['DBSAP'])
+                self.log.debug("SAP Notes Database found at: %s", FILE['DBSAP'])
                 self.log.info("Loaded %d notes from SAP Notes database" % len(self.sapnotes))
         except Exception as error:
             self.save_notes()

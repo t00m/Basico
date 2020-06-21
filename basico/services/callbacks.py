@@ -7,9 +7,14 @@
 # Description: UI and related callbacks service
 """
 
+import os
 import time
+import shutil
 import threading
 
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from gi.repository import GObject
 
 from basico.core.srv import Service
@@ -208,7 +213,40 @@ class Callback(Service):
         alive = statusbar is not None
         while alive:
             record = queue_log.get()
-            time.sleep(0.25)
+            time.sleep(0.1)
             statusbar.message(record)
             queue_log.task_done()
         time.sleep(0.1)
+
+    ## KB API
+    def kb_import_from_files(self):
+        parent = self.srvuif.get_window_parent()
+        dialog = Gtk.FileChooserDialog(
+            "Please choose a file",
+            parent,
+            Gtk.FileChooserAction.OPEN,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK,
+            ),
+        )
+        dialog.set_default_size(800, 400)
+        dialog.set_select_multiple(True)
+        filter_adoc = Gtk.FileFilter()
+        filter_adoc.set_name("Asciidoctor sources")
+        filter_adoc.add_pattern("*.adoc")
+        dialog.add_filter(filter_adoc)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            selected_files = dialog.get_filenames()
+            target = self.srvbkb.get_config_value('sources') or LPATH['DOC_SOURCE']
+            for source_file in selected_files:
+                shutil.copy(source_file, target)
+                self.log.debug("%s copied to %s", os.path.basename(source_file), target)
+            self.log.info("Copied %d documents to KB4IT sources directory", len(selected_files))
+            self.srvbkb.request_update()
+        elif response == Gtk.ResponseType.CANCEL:
+            self.log.warning("Action canceled by user")
+        dialog.destroy()

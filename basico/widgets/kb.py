@@ -117,10 +117,53 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
         self.log.info("Sources directory for Basico KB set to: %s", folder)
 
 
+class FileChooserWindow(Gtk.FileChooserDialog):
+    def __init__(self, param):
+        FileChooserWindow.__init__(self, title="Add documents")
+        if param == 'files':
+            dialog = Gtk.FileChooserDialog(
+                "Please choose a file",
+                self,
+                Gtk.FileChooserAction.OPEN,
+                (
+                    Gtk.STOCK_CANCEL,
+                    Gtk.ResponseType.CANCEL,
+                    Gtk.STOCK_OPEN,
+                    Gtk.ResponseType.OK,
+                ),
+            )
+
+            self.add_filters(dialog)
+        elif param == 'directory':
+            button = Gtk.Button("Choose a folder")
+            button.connect("clicked", self.on_folder_clicked)
+            box.add(button)
+        self.show_all()
+
+
+    def on_folder_clicked(self, widget):
+        dialog = Gtk.FileChooserDialog(
+            "Please choose a folder",
+            self,
+            Gtk.FileChooserAction.SELECT_FOLDER,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK),
+        )
+        dialog.set_default_size(800, 400)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            print("Select clicked")
+            print("Folder selected: " + dialog.get_filename())
+        elif response == Gtk.ResponseType.CANCEL:
+            print("Cancel clicked")
+
+
+
 
 class KBAPI(Service):
     def get_services(self):
         self.srvkbb = self.get_service('KB4IT')
+        self.srvclb = self.get_service('Callbacks')
 
     def execute(self, api, args=None):
         fnc = 'self.%s(%s)' % (api, args)
@@ -130,6 +173,15 @@ class KBAPI(Service):
             self.log.error(error)
             self.log.warning("Callback not implemented for KB API '%s'" % api)
             raise
+
+    def add(self, params):
+        source = params[0]
+        if source == 'files':
+            self.srvclb.kb_import_from_files()
+        elif source == 'directory':
+            self.srvclb.kb_import_from_directory()
+        elif source == 'template':
+            self.srvclb.kb_import_from_template(source)
 
     def settings(self, *args):
         self.log.debug("Show settings dialog")

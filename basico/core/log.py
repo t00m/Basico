@@ -37,7 +37,7 @@ def get_logger(name):
     """
     logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
     log = logging.getLogger(name)
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)
 
     # ~ formatter = logging.Formatter("%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
     # ~ fh = logging.FileHandler(FILE['LOG'])

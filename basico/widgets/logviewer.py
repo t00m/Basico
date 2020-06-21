@@ -167,13 +167,14 @@ class LogViewer(BasicoWidget, Gtk.Box):
 
         def insert(record):
             levelno = record.levelno
-            levelname = record.levelname
-            module = record.module
-            tss = record.created
-            tsh = record.asctime
-            message = record.getMessage()
-            riter = model.insert(0, (levelno, levelname, module, tss, tsh, message))
-            selection.select_iter(riter)
-            treeview.scroll_to_cell(0, self.column_message)
+            if levelno > 10:
+                levelname = record.levelname
+                module = record.module
+                tss = record.created
+                tsh = record.asctime
+                message = record.getMessage()
+                riter = model.insert(0, (levelno, levelname, module, tss, tsh, message))
+                selection.select_iter(riter)
+                treeview.scroll_to_cell(0, self.column_message)
 
         GLib.idle_add(insert, record)

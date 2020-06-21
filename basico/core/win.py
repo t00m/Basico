@@ -79,7 +79,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
     def setup_window(self, uiapp):
         Gtk.Window.__init__(self, title=APP['name'], application=uiapp)
-        icon = self.srvicm.get_icon('basico-component', 48, 48)
+        icon = self.srvicm.get_icon('basico-component', 36, 36)
         self.set_icon(icon)
         """
         Change Gtk+ Style
@@ -155,7 +155,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ### About
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-about', 48, 48)
+        icon = self.srvicm.get_pixbuf_icon('basico-about', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         label = Gtk.Label("About")
@@ -170,7 +170,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ### Help
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-help', 48, 48)
+        icon = self.srvicm.get_pixbuf_icon('basico-help', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         label = Gtk.Label("Help")
@@ -185,7 +185,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ### Log viewer
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-logviewer', 48, 48)
+        icon = self.srvicm.get_pixbuf_icon('basico-logviewer', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         label = Gtk.Label("Event viewer")
@@ -200,7 +200,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ### Settings
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-settings', 48, 48)
+        icon = self.srvicm.get_pixbuf_icon('basico-settings', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         label = Gtk.Label("Settings")
