@@ -8,6 +8,7 @@
 """
 
 import os
+import glob
 import time
 import shutil
 import threading
@@ -17,6 +18,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 
+from basico.core.env import LPATH
 from basico.core.srv import Service
 from basico.core.log import queue_log
 from basico.services.uif import UIFuncs
@@ -220,6 +222,7 @@ class Callback(Service):
 
     ## KB API
     def kb_import_from_files(self):
+        visor_kb = self.srvgui.get_widget('visor_kb')
         parent = self.srvuif.get_window_parent()
         dialog = Gtk.FileChooserDialog(
             "Please choose a file",
@@ -247,6 +250,40 @@ class Callback(Service):
                 self.log.debug("%s copied to %s", os.path.basename(source_file), target)
             self.log.info("Copied %d documents to KB4IT sources directory", len(selected_files))
             self.srvbkb.request_update()
+            visor_kb.reload_page()
+        elif response == Gtk.ResponseType.CANCEL:
+            self.log.warning("Action canceled by user")
+        dialog.destroy()
+
+    def kb_import_from_directory(self):
+        visor_kb = self.srvgui.get_widget('visor_kb')
+        parent = self.srvuif.get_window_parent()
+        dialog = Gtk.FileChooserDialog(
+            "Please choose a directory",
+            parent,
+            Gtk.FileChooserAction.CREATE_FOLDER,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK,
+            ),
+        )
+        dialog.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+        dialog.set_default_size(800, 400)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            selected_folder = dialog.get_filename()
+            self.log.debug("Importing asciidoctor sources from: %s", selected_folder)
+            selected_files = glob.glob(os.path.join(selected_folder, '*.adoc'))
+            self.log.debug("Found %d asciidoctor files", len(selected_files))
+            target = self.srvbkb.get_config_value('sources') or LPATH['DOC_SOURCE']
+            for source_file in selected_files:
+                shutil.copy(source_file, target)
+                self.log.debug("%s copied to %s", os.path.basename(source_file), target)
+            self.log.info("Copied %d documents to KB4IT sources directory", len(selected_files))
+            self.srvbkb.request_update()
+            visor_kb.reload_page()
         elif response == Gtk.ResponseType.CANCEL:
             self.log.warning("Action canceled by user")
         dialog.destroy()

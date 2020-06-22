@@ -6,6 +6,12 @@
             <div class="uk-navbar-right noprint">
                 <ul class="uk-navbar-nav">
                     <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="basico://update"><span uk-icon="refresh"></span></a>
+                    </li>
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="basico://settings"><span uk-icon="cog"></span></a>
+                    </li>
+                    <li>
                         <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">About</a>
                         <div class="uk-navbar-dropdown">
                             <ul class="uk-nav uk-navbar-dropdown-nav">

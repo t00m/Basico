@@ -35,8 +35,9 @@ class LogViewer(BasicoWidget, Gtk.Box):
         super().__init__(app, __class__.__name__)
 
     def connect_signals(self, *args):
-        statusbar = self.srvgui.get_widget('widget_statusbar')
-        statusbar.connect('statusbar-updated', self.update)
+        pass
+        # ~ statusbar = self.srvgui.get_widget('widget_statusbar')
+        # ~ statusbar.connect('statusbar-updated', self.update)
 
     def _setup_widget(self):
         Gtk.Box.__init__(self, self.app)

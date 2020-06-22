@@ -106,10 +106,10 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
         self.srvkbb.set_config_value('force', force)
         self.log.info("Force compilation set to: %s", force)
 
-    def _on_auto_update(self, button, gparam):
-        auto = button.get_active()
-        self.srvkbb.set_config_value('auto-update', auto)
-        self.log.info("Auto update Basico KB set to: %s", auto)
+    # ~ def _on_auto_update(self, button, gparam):
+        # ~ auto = button.get_active()
+        # ~ self.srvkbb.set_config_value('auto-update', auto)
+        # ~ self.log.info("Auto update Basico KB set to: %s", auto)
 
     def _on_update_select_folder(self, chooser):
         folder = chooser.get_filename()
@@ -117,51 +117,9 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
         self.log.info("Sources directory for Basico KB set to: %s", folder)
 
 
-class FileChooserWindow(Gtk.FileChooserDialog):
-    def __init__(self, param):
-        FileChooserWindow.__init__(self, title="Add documents")
-        if param == 'files':
-            dialog = Gtk.FileChooserDialog(
-                "Please choose a file",
-                self,
-                Gtk.FileChooserAction.OPEN,
-                (
-                    Gtk.STOCK_CANCEL,
-                    Gtk.ResponseType.CANCEL,
-                    Gtk.STOCK_OPEN,
-                    Gtk.ResponseType.OK,
-                ),
-            )
-
-            self.add_filters(dialog)
-        elif param == 'directory':
-            button = Gtk.Button("Choose a folder")
-            button.connect("clicked", self.on_folder_clicked)
-            box.add(button)
-        self.show_all()
-
-
-    def on_folder_clicked(self, widget):
-        dialog = Gtk.FileChooserDialog(
-            "Please choose a folder",
-            self,
-            Gtk.FileChooserAction.SELECT_FOLDER,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK),
-        )
-        dialog.set_default_size(800, 400)
-
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("Select clicked")
-            print("Folder selected: " + dialog.get_filename())
-        elif response == Gtk.ResponseType.CANCEL:
-            print("Cancel clicked")
-
-
-
-
 class KBAPI(Service):
     def get_services(self):
+        self.srvgui = self.get_service('GUI')
         self.srvkbb = self.get_service('KB4IT')
         self.srvclb = self.get_service('Callbacks')
 
@@ -174,6 +132,7 @@ class KBAPI(Service):
             self.log.warning("Callback not implemented for KB API '%s'" % api)
             raise
 
+
     def add(self, params):
         source = params[0]
         if source == 'files':
@@ -182,6 +141,11 @@ class KBAPI(Service):
             self.srvclb.kb_import_from_directory()
         elif source == 'template':
             self.srvclb.kb_import_from_template(source)
+
+    def delete(self, url):
+        visor_kb = self.srvgui.get_widget('visor_kb')
+        uri = visor_kb.get_uri()
+        self.log.debug(uri)
 
     def settings(self, *args):
         self.log.debug("Show settings dialog")
@@ -219,6 +183,13 @@ class KBBrowser(BasicoBrowser):
         self.srvkbb = self.get_service('KB4IT')
         self.srvkbb.connect('kb-updated', self.reload_page)
 
+    def _on_append_items(self, webview, context_menu, hit_result_event, event):
+        """Attach custom actions to browser context menu"""
+        action = Gtk.Action("rebuild", "Force a database rebuild", None, None)
+        action.connect("activate", self.rebuild_database)
+        option = WebKit.ContextMenuItem().new(action)
+        context_menu.append(option)
+
     def _on_basico_scheme(self, request):
         """Get api callback for Basico scheme requests
         Args:
@@ -232,13 +203,24 @@ class KBBrowser(BasicoBrowser):
             error_str = e.args[1]
             request.finish_error(GLib.Error(error_str))
             return
+        # ~ self.stop_loading ()
         self.log.debug("API => Action[%s] Arguments[%s]", action, ', '.join(args))
         self.srvapi.execute(action, args)
-        return False
+        self.reload_page()
+
+    def _on_load_failed(self, webview, load_event, failing_uri, error):
+        if failing_uri.startswith('basico://'):
+            return
+        self.log.warning("%s failed to load. Loading home page", failing_uri)
+        self.load_url("file://%s" % FILE['KB4IT_INDEX'])
 
     def reload_page(self, *args):
         self.log.debug("Reload page: %s", self.get_uri())
         self.reload()
+
+    def rebuild_database(self, *args):
+        # ~ self.stop_loading()
+        self.load_url('basico://update')
 
 class KBVisor(BasicoWidget, Gtk.VBox):
     def __init__(self, app):

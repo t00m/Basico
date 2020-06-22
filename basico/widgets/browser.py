@@ -50,7 +50,8 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
         self.srvgui.add_widget('browser_%s' % self.name, self)
         self.connect('context-menu', self._on_append_items)
         self.connect('decide-policy', self._on_decide_policy)
-        self.connect('load-changed', self.load_changed)
+        self.connect('load-changed', self._on_load_changed)
+        self.connect('load-failed',self._on_load_failed)
 
     def _get_api(self, uri):
         """Use Soup.URI to split uri
@@ -118,7 +119,7 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
             if click:
                 self.log.debug("User clicked in link: %s", uri)
 
-    def load_changed(self, webview, event):
+    def _on_load_changed(self, webview, event):
         uri = webview.get_uri()
         if event == WebKit.LoadEvent.STARTED:
             self.log.debug("Load started for url: %s", uri)
@@ -128,3 +129,6 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
             self.log.debug("Load finished for url: %s", uri)
             if len(uri) == 0:
                 self.log.debug("Url not loaded")
+
+    def _on_load_failed(self, webview, load_event, failing_uri, error):
+        pass

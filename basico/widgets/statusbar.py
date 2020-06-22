@@ -24,8 +24,9 @@ class Statusbar(BasicoWidget, Gtk.HBox):
         super().__init__(app, __class__.__name__)
 
     def alive(self, *args):
-        logviewer = self.srvgui.get_widget('widget_logviewer')
-        logviewer.connect_signals()
+        pass
+        # ~ logviewer = self.srvgui.get_widget('widget_logviewer')
+        # ~ logviewer.connect_signals()
 
     def _setup_widget(self):
         Gtk.HBox.__init__(self)

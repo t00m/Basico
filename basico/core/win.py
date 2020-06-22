@@ -184,19 +184,20 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         box.pack_end(button, False, False, 0)
 
         ### Log viewer
-        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-logviewer', 24, 24)
-        image = Gtk.Image()
-        image.set_from_pixbuf(icon)
-        label = Gtk.Label("Event viewer")
-        hbox.pack_start(image, False, False, 3)
-        hbox.pack_start(label, False, False, 3)
-        button = Gtk.Button()
-        button.add(hbox)
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        box.pack_end(button, False, False, 0)
-        self.srvgui.add_widget('gtk_button_logviewer', button)
-        self.srvgui.add_signal('gtk_button_logviewer', 'clicked', 'self.srvclb.display_log')
+        # ~ # Disabled temporary
+        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        # ~ icon = self.srvicm.get_pixbuf_icon('basico-logviewer', 24, 24)
+        # ~ image = Gtk.Image()
+        # ~ image.set_from_pixbuf(icon)
+        # ~ label = Gtk.Label("Event viewer")
+        # ~ hbox.pack_start(image, False, False, 3)
+        # ~ hbox.pack_start(label, False, False, 3)
+        # ~ button = Gtk.Button()
+        # ~ button.add(hbox)
+        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
+        # ~ box.pack_end(button, False, False, 0)
+        # ~ self.srvgui.add_widget('gtk_button_logviewer', button)
+        # ~ self.srvgui.add_signal('gtk_button_logviewer', 'clicked', 'self.srvclb.display_log')
 
         ### Settings
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")

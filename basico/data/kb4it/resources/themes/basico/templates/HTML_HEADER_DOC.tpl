@@ -4,10 +4,22 @@
                     <li>
                        <a href="#"><span class="uk-text-bolder uk-text-truncate">%s</span></a>
                         <div class="uk-navbar-dropdown">
-                            <ul class="uk-nav uk-navbar-dropdown-nav">
-                                <li>
+                            <ul class="uk-nav uk-navbar">
+                                <li uk-tooltip="title: Bookmark document">
+                                    <a class="uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading uk-padding" href="basico://bookmark">
+                                        <span class="" uk-icon="icon: bookmark; ratio: 2"></span>
+                                    </a>
+                                </li>
+                                <li uk-tooltip="title: Delete document">
+                                    <a class="uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading uk-padding" href="basico://delete">
+                                        <span class="" uk-icon="icon: ban; ratio: 2"></span>
+                                    </a>
+                                </li>
+                                <li uk-tooltip="title: View metadata">
                                     <!-- View Metadata Button :: START -->
-                                    <a class="uk-button uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading" href="#modal-full-metadata" uk-toggle><span class="">Metadata</span></a>
+                                    <a class="uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading uk-padding" href="#modal-full-metadata" uk-toggle>
+                                        <span class="" uk-icon="icon: tag; ratio: 2"></span>
+                                    </a>
                                     <div id="modal-full-metadata" class="uk-modal-full" uk-modal>
                                         <div class="uk-modal-dialog">
                                             <button class="uk-modal-close-full uk-close-large uk-background-muted" type="button" uk-close></button>
@@ -23,9 +35,11 @@
                                     </div>
                                     <!-- View Metadata Button :: END -->
                                 </li>
-                                <li>
+                                <li uk-tooltip="title: View source">
                                     <!-- View Asciidoc Source Button :: START -->
-                                    <a class="uk-button uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading" href="#modal-full-source" uk-toggle><span class="">Source</span></a>
+                                    <a class="uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading uk-padding" href="#modal-full-source" uk-toggle>
+                                        <span class="" uk-icon="icon: file-text; ratio: 2"></span>
+                                    </a>
                                     <div id="modal-full-source" class="uk-modal-full" uk-modal>
                                         <div class="uk-modal-dialog">
                                             <button class="uk-modal-close-full uk-close-large uk-background-muted" type="button" uk-close></button>
@@ -33,7 +47,9 @@
                                                 <div class="uk-padding-large uk-background-muted">
                                                     <div class="uk-text-lead uk-text-center uk-text-danger">Source</div>
                                                     <div class="uk-text-lead">%s&nbsp;<a onclick="copyToClipboard()" class="uk-icon-link uk-margin-small-right" uk-icon="copy"></a></div>
-                                                    <textarea id="source-code" class="uk-width-1-1 uk-height-viewport">%s</textarea>
+                                                    <textarea id="source-code" class="uk-width-1-1 uk-height-viewport" style="font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;">
+%s
+                                                    </textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -47,6 +63,12 @@
             </div>
             <div class="uk-navbar-right noprint">
                 <ul class="uk-navbar-nav">
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="basico://update"><span uk-icon="refresh"></span></a>
+                    </li>
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="basico://settings"><span uk-icon="cog"></span></a>
+                    </li>
                     <li>
                         <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">About</a>
                         <div class="uk-navbar-dropdown">

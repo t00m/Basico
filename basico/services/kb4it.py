@@ -52,7 +52,7 @@ class KB4Basico(Service):
         self.log.debug("\tForce compilation is set to: %s", force)
 
         # FIXME: Get all settings
-        loglevel = levels[self.app.log.getEffectiveLevel()]
+        loglevel = levels[self.log.getEffectiveLevel()]
         self.log.debug("\tFIXME: Log level for KB4IT: %s", loglevel)
         params = Namespace(FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=LPATH['DOC_SOURCE'], TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
 
