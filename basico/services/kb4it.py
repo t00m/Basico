@@ -54,11 +54,17 @@ class KB4Basico(Service):
         # FIXME: Get all settings
         loglevel = levels[self.log.getEffectiveLevel()]
         self.log.debug("\tFIXME: Log level for KB4IT: %s", loglevel)
-        params = Namespace(FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=LPATH['DOC_SOURCE'], TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+
+        # Get sources directory
+        source_path = self.get_config_value('sources') or LPATH['DOC_SOURCE']
+        self.log.debug("\tSources path set to: %s", source_path)
+
+        # Build KB4IT params
+        params = Namespace(FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
 
         # Make sure the last theme version is installed
         self.log.debug("\tInstalling KB4IT Basico theme")
-        copydir(GPATH['KB4IT'], LPATH['DOC_SOURCE'])
+        copydir(GPATH['KB4IT'], source_path)
 
         # Get KB4IT Basico theme properties
         kb = KB4IT(params)

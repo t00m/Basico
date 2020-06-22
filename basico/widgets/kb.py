@@ -132,7 +132,6 @@ class KBAPI(Service):
             self.log.warning("Callback not implemented for KB API '%s'" % api)
             raise
 
-
     def add(self, params):
         source = params[0]
         if source == 'files':
@@ -211,8 +210,11 @@ class KBBrowser(BasicoBrowser):
     def _on_load_failed(self, webview, load_event, failing_uri, error):
         if failing_uri.startswith('basico://'):
             return
-        self.log.warning("%s failed to load. Loading home page", failing_uri)
-        self.load_url("file://%s" % FILE['KB4IT_INDEX'])
+        if failing_uri == FILE['KB4IT_INDEX']:
+            self.rebuild_database()
+        else:
+            self.log.warning("%s failed to load. Loading home page", failing_uri)
+            self.load_url("file://%s" % FILE['KB4IT_INDEX'])
 
     def reload_page(self, *args):
         self.log.debug("Reload page: %s", self.get_uri())
