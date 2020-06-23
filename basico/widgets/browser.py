@@ -35,7 +35,7 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
     def _setup_widget(self):
         # Webkit context
         self.web_context = WebKit.WebContext.get_default()
-        self.web_context.set_cache_model(WebKit.CacheModel.DOCUMENT_VIEWER)
+        # ~ self.web_context.set_cache_model(WebKit.CacheModel.DOCUMENT_VIEWER)
         self.web_context.set_process_model(WebKit.ProcessModel.MULTIPLE_SECONDARY_PROCESSES)
         # ~ web_context.register_uri_scheme('basico', self._on_basico_scheme)
 
@@ -50,7 +50,7 @@ class BasicoBrowser(BasicoWidget, WebKit.WebView):
         self.srvgui.add_widget('browser_%s' % self.name, self)
         self.connect('context-menu', self._on_append_items)
         self.connect('decide-policy', self._on_decide_policy)
-        self.connect('load-changed', self._on_load_changed)
+        # ~ self.connect('load-changed', self._on_load_changed)
         self.connect('load-failed',self._on_load_failed)
 
     def _get_api(self, uri):

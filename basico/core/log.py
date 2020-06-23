@@ -29,13 +29,13 @@ class LogIntercepter(logging.Handler):
         queue_log.put(record)
         event_log.append(record)
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-15s | %(asctime)s | %(message)s")
 
 def get_logger(name):
     """Returns a new logger with personalized.
     @param name: logger name
     """
-    logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)-25s | %(asctime)s | %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)-15s | %(asctime)s | %(message)s")
     log = logging.getLogger(name)
     log.setLevel(logging.DEBUG)
 

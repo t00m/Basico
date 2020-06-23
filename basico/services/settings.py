@@ -68,5 +68,5 @@ class Settings(Service):
         try:
             return self.config[section][key]
         except Exception as error:
-            self.log.error(error)
+            self.log.warning("[%s][%s] Value not found!" % (section, key))
             return None

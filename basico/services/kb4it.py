@@ -11,8 +11,10 @@ import os
 import glob
 import time
 import queue
+import shutil
 import threading
 from enum import IntEnum
+from pathlib import Path
 from argparse import Namespace
 
 from gi.repository import GObject
@@ -37,12 +39,36 @@ class KB4Basico(Service):
         # Get KB4IT version
         self.log.debug("Basico is using %s" % KB4IT().get_version())
 
+        # Clean KB4IT temporary folder
+        shutil.rmtree(LPATH['TMP'])
+        os.makedirs(LPATH['TMP'])
+        self.log.debug("KB4IT temporary directory recreated")
+
+        # Check settings / Initialize
+        source_path = self.get_config_value('source_dir')
+        if source_path is None:
+            self.set_config_value('source_dir', LPATH['DOC_SOURCE'])
+
+        target_path = self.get_config_value('target_dir')
+        if target_path is None:
+            self.set_config_value('target_dir', LPATH['DOC_TARGET'])
+
+        force = self.get_config_value('force')
+        if force is None:
+            self.set_config_value('force', False)
+
         # Start listening to requests
         self.queue = queue.Queue()
         self.th = threading.Thread(name='update', target=self.update)
         self.th.setDaemon(True)
         self.th.start()
         self.log.debug("KB Basico Manager started")
+
+    def finalize(self):
+        # Clean KB4IT temporary folder
+        shutil.rmtree(LPATH['TMP'])
+        # ~ os.makedirs(LPATH['TMP'])
+        self.log.debug("KB4IT temporary directory deleted")
 
     def prepare(self):
         self.log.debug("Preparing request")
@@ -56,7 +82,7 @@ class KB4Basico(Service):
         self.log.debug("\tFIXME: Log level for KB4IT: %s", loglevel)
 
         # Get sources directory
-        source_path = self.get_config_value('sources') or LPATH['DOC_SOURCE']
+        source_path = self.get_config_value('source_dir') or LPATH['DOC_SOURCE']
         self.log.debug("\tSources path set to: %s", source_path)
 
         # Build KB4IT params
@@ -104,3 +130,10 @@ class KB4Basico(Service):
             time.sleep(1)
             running = self.is_running()
         time.sleep(1)
+
+    def delete_document(self, adocs):
+        kb = self.prepare()
+        kbapp = kb.get_service('App')
+        for adoc in adocs:
+            kbapp.delete_document(adoc)
+        self.request_update()

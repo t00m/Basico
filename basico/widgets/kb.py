@@ -7,6 +7,7 @@
 # Description: Set of widgets for working with KB4IT
 """
 
+import os
 from enum import IntEnum
 
 import gi
@@ -28,7 +29,7 @@ class Tab(IntEnum):
     VISOR = 0
     EDITOR = 1
 
-class DialogKBSettings(BasicoWidget, Gtk.Dialog):
+class KBUISettings(BasicoWidget, Gtk.Dialog):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
 
@@ -82,9 +83,7 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
 
 
         # Source directory
-        sources = self.srvkbb.get_config_value('sources')
-        if sources is None:
-            sources = LPATH['DOC_SOURCE']
+        sources = self.srvkbb.get_config_value('source_dir') or  LPATH['DOC_SOURCE']
         hbox = Gtk.HBox()
         tip = Gtk.Label()
         tip.set_xalign(0.0)
@@ -113,11 +112,11 @@ class DialogKBSettings(BasicoWidget, Gtk.Dialog):
 
     def _on_update_select_folder(self, chooser):
         folder = chooser.get_filename()
-        self.srvkbb.set_config_value('sources', folder)
+        self.srvkbb.set_config_value('source_dir', folder)
         self.log.info("Sources directory for Basico KB set to: %s", folder)
 
 
-class KBAPI(Service):
+class KBUIAPI(Service):
     def get_services(self):
         self.srvgui = self.get_service('GUI')
         self.srvkbb = self.get_service('KB4IT')
@@ -141,21 +140,23 @@ class KBAPI(Service):
         elif source == 'template':
             self.srvclb.kb_import_from_template(source)
 
-    def delete(self, url):
+    def delete(self, adoc):
         visor_kb = self.srvgui.get_widget('visor_kb')
         uri = visor_kb.get_uri()
-        self.log.debug(uri)
+        basename = os.path.basename(uri)
+        adoc = basename.replace('.html', '')
+        self.srvkbb.delete_document([adoc])
 
     def settings(self, *args):
         self.log.debug("Show settings dialog")
-        dialog = DialogKBSettings(self.app)
+        dialog = KBUISettings(self.app)
         dialog.run()
         dialog.destroy()
 
     def update(self, *args):
         self.srvkbb.request_update()
 
-class KBWidget(BasicoWidget, Gtk.Notebook):
+class KBUI(BasicoWidget, Gtk.Notebook):
     def __init__(self, app):
         super().__init__(app, __class__.__name__)
 
@@ -168,7 +169,7 @@ class KBWidget(BasicoWidget, Gtk.Notebook):
         self.append_page(Gtk.Label("Not implemented"), Gtk.Label("Editor"))
 
 
-class KBBrowser(BasicoBrowser):
+class KBUIBrowser(BasicoBrowser):
     def __init__(self, app):
         super().__init__(app,  __class__.__name__)
 
@@ -177,7 +178,7 @@ class KBBrowser(BasicoBrowser):
         WebKit.WebView.__init__(self,
                                  web_context=self.web_context,
                                  settings=self.web_settings)
-        self.app.register_service('API', KBAPI())
+        self.app.register_service('API', KBUIAPI())
         self.srvapi = self.get_service('API')
         self.srvkbb = self.get_service('KB4IT')
         self.srvkbb.connect('kb-updated', self.reload_page)
@@ -202,26 +203,52 @@ class KBBrowser(BasicoBrowser):
             error_str = e.args[1]
             request.finish_error(GLib.Error(error_str))
             return
-        # ~ self.stop_loading ()
+
         self.log.debug("API => Action[%s] Arguments[%s]", action, ', '.join(args))
         self.srvapi.execute(action, args)
-        self.reload_page()
+        if action != 'delete':
+            self.reload_page()
+        else:
+            target_dir = self.srvkbb.get_config_value('target_dir') or  LPATH['DOC_TARGET']
+            homepage = "file://%s" % os.path.join(target_dir, 'index.html')
+            self.load_url(homepage)
 
     def _on_load_failed(self, webview, load_event, failing_uri, error):
+        self.log.error("Failing URI: %s", failing_uri)
         if failing_uri.startswith('basico://'):
             return
-        if failing_uri == FILE['KB4IT_INDEX']:
+
+        target_dir = self.srvkbb.get_config_value('target_dir') or  LPATH['DOC_TARGET']
+        homepage = "file://%s" % os.path.join(target_dir, 'index.html')
+        self.log.debug("Home page: %s", homepage)
+        if failing_uri == homepage:
+            self.log.debug("Home page doesn't exist. Rebuilding KB")
             self.rebuild_database()
         else:
             self.log.warning("%s failed to load. Loading home page", failing_uri)
-            self.load_url("file://%s" % FILE['KB4IT_INDEX'])
+            self.stop_loading()
+            self.load_url(homepage)
+            self.load_url(homepage)
+
+    def load_url(self, uri):
+        self.log.debug("Clear browser cache")
+        self.web_context.clear_cache()
+        url = uri.replace('file://', '')
+        # ~ self.log.debug("KB URI: %s", url)
+        if not os.path.exists(url):
+            # ~ self.log.warning("Page doesn't exist")
+            target_dir = self.srvkbb.get_config_value('target_dir') or  LPATH['DOC_TARGET']
+            homepage = "file://%s" % os.path.join(target_dir, 'index.html')
+            self.load_uri(homepage)
+            self.log.info("KB index page loaded")
+        else:
+            self.load_uri(uri)
 
     def reload_page(self, *args):
         self.log.debug("Reload page: %s", self.get_uri())
         self.reload()
 
     def rebuild_database(self, *args):
-        # ~ self.stop_loading()
         self.load_url('basico://update')
 
 class KBVisor(BasicoWidget, Gtk.VBox):
@@ -239,7 +266,7 @@ class KBVisor(BasicoWidget, Gtk.VBox):
         scr.set_shadow_type(Gtk.ShadowType.NONE)
         vwp = Gtk.Viewport()
         vwp.set_hexpand(True)
-        visor_kb = self.srvgui.add_widget('visor_kb', KBBrowser(self.app))
+        visor_kb = self.srvgui.add_widget('visor_kb', KBUIBrowser(self.app))
         visor_kb.load_url("file://%s" % FILE['KB4IT_INDEX'])
         visor_kb.set_hexpand(True)
         visor_kb.set_vexpand(True)

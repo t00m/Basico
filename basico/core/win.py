@@ -35,7 +35,7 @@ from basico.widgets.settingsview import SettingsView
 from basico.widgets.logviewer import LogViewer
 from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
-from basico.widgets.kb import KBWidget
+from basico.widgets.kb import KBUI
 
 
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
@@ -329,7 +329,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
     def setup_stack_visor_kb(self):
         ### KB Visor and Editor
-        return KBWidget(self.controller)
+        return KBUI(self.controller)
 
     def setup_stack_system_about(self):
         box = Gtk.VBox()
