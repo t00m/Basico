@@ -54,6 +54,10 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         vbox = Gtk.VBox()
         vbox.set_property('margin-left', 6)
         vbox.set_property('margin-right', 6)
+        vboxup = Gtk.VBox()
+        vboxdw = Gtk.VBox()
+        vbox.pack_start(vboxup, True, True, 6)
+        vbox.pack_start(vboxdw, False, False, 0)
 
         # Force compilation
         force = self.srvkbb.get_config_value('force')
@@ -65,10 +69,10 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         button = Gtk.Switch()
         button.set_active(force)
         button.connect("notify::active", self._on_force_compilation)
-        hbox.pack_start(button, True, True, 6)
-        vbox.pack_start(hbox, False, False, 6)
+        hbox.pack_start(button, False, False, 6)
+        vboxup.pack_start(hbox, True, True, 6)
 
-        # ~ # Auto update
+        # ~ # Initialize KB
         # ~ auto = self.srvkbb.get_config_value('auto-update')
         # ~ hbox = Gtk.HBox()
         # ~ tip = Gtk.Label()
@@ -87,15 +91,33 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         hbox = Gtk.HBox()
         tip = Gtk.Label()
         tip.set_xalign(0.0)
-        tip.set_markup('<b>Sources directory</b>')
+        tip.set_markup('<b>Source directory</b>')
         hbox.pack_start(tip, True, True, 6)
         button = Gtk.FileChooserButton(Gtk.FileChooserAction.CREATE_FOLDER)
         button.set_filename(sources)
         button.set_create_folders(True)
         button.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
-        button.connect("file-set",self._on_update_select_folder)
+        button.connect("file-set",self._on_update_select_source_folder)
         hbox.pack_start(button, True, True, 6)
-        vbox.pack_start(hbox, False, False, 6)
+        vboxup.pack_start(hbox, False, False, 6)
+
+        # Source directory
+        sources = self.srvkbb.get_config_value('target_dir') or  LPATH['DOC_TARGET']
+        hbox = Gtk.HBox()
+        tip = Gtk.Label()
+        tip.set_xalign(0.0)
+        tip.set_markup('<b>Target directory</b>')
+        hbox.pack_start(tip, True, True, 6)
+        button = Gtk.FileChooserButton(Gtk.FileChooserAction.CREATE_FOLDER)
+        button.set_filename(sources)
+        button.set_create_folders(True)
+        button.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+        button.connect("file-set",self._on_update_select_target_folder)
+        hbox.pack_start(button, True, True, 6)
+        vboxup.pack_start(hbox, False, False, 6)
+
+        sep = Gtk.HSeparator()
+        vboxdw.pack_start(sep, False, False, 6)
 
         box.add(vbox)
         self.show_all()
@@ -110,11 +132,16 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         # ~ self.srvkbb.set_config_value('auto-update', auto)
         # ~ self.log.info("Auto update Basico KB set to: %s", auto)
 
-    def _on_update_select_folder(self, chooser):
+    def _on_update_select_source_folder(self, chooser):
         folder = chooser.get_filename()
         self.srvkbb.set_config_value('source_dir', folder)
-        self.log.info("Sources directory for Basico KB set to: %s", folder)
+        self.log.info("Source directory for Basico KB set to: %s", folder)
 
+
+    def _on_update_select_target_folder(self, chooser):
+        folder = chooser.get_filename()
+        self.srvkbb.set_config_value('target_dir', folder)
+        self.log.info("Target directory for Basico KB set to: %s", folder)
 
 class KBUIAPI(Service):
     def get_services(self):
