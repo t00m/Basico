@@ -72,20 +72,6 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         hbox.pack_start(button, False, False, 6)
         vboxup.pack_start(hbox, True, True, 6)
 
-        # ~ # Initialize KB
-        # ~ auto = self.srvkbb.get_config_value('auto-update')
-        # ~ hbox = Gtk.HBox()
-        # ~ tip = Gtk.Label()
-        # ~ tip.set_xalign(0.0)
-        # ~ tip.set_markup('<b>Auto update Basico KB (monitor changes)</b>')
-        # ~ hbox.pack_start(tip, True, True, 6)
-        # ~ button = Gtk.Switch()
-        # ~ button.set_active(force)
-        # ~ button.connect("notify::active", self._on_auto_update)
-        # ~ hbox.pack_start(button, True, True, 6)
-        # ~ vbox.pack_start(hbox, False, False, 6)
-
-
         # Source directory
         sources = self.srvkbb.get_config_value('source_dir') or  LPATH['DOC_SOURCE']
         hbox = Gtk.HBox()
@@ -101,7 +87,7 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         hbox.pack_start(button, True, True, 6)
         vboxup.pack_start(hbox, False, False, 6)
 
-        # Source directory
+        # Target directory
         sources = self.srvkbb.get_config_value('target_dir') or  LPATH['DOC_TARGET']
         hbox = Gtk.HBox()
         tip = Gtk.Label()
@@ -118,6 +104,30 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
 
         sep = Gtk.HSeparator()
         vboxdw.pack_start(sep, False, False, 6)
+
+        # Initialize KB
+        hbox = Gtk.HBox()
+        tip = Gtk.Label()
+        tip.set_xalign(0.0)
+        tip.set_markup('<b>Initialize KB</b>')
+        hbox.pack_start(tip, True, True, 6)
+        button = Gtk.Button('Initialize')
+        button.connect("clicked", self._on_initialize_kb)
+        hbox.pack_start(button, False, False, 6)
+        vboxdw.pack_start(hbox, False, False, 6)
+
+        # ~ # Auto-update KB
+        # ~ auto = self.srvkbb.get_config_value('auto-update')
+        # ~ hbox = Gtk.HBox()
+        # ~ tip = Gtk.Label()
+        # ~ tip.set_xalign(0.0)
+        # ~ tip.set_markup('<b>Auto update Basico KB (monitor changes)</b>')
+        # ~ hbox.pack_start(tip, True, True, 6)
+        # ~ button = Gtk.Switch()
+        # ~ button.set_active(force)
+        # ~ button.connect("notify::active", self._on_auto_update)
+        # ~ hbox.pack_start(button, True, True, 6)
+        # ~ vbox.pack_start(hbox, False, False, 6)
 
         box.add(vbox)
         self.show_all()
@@ -137,11 +147,13 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         self.srvkbb.set_config_value('source_dir', folder)
         self.log.info("Source directory for Basico KB set to: %s", folder)
 
-
     def _on_update_select_target_folder(self, chooser):
         folder = chooser.get_filename()
         self.srvkbb.set_config_value('target_dir', folder)
         self.log.info("Target directory for Basico KB set to: %s", folder)
+
+    def _on_initialize_kb(self, button):
+        self.log.info("Initializing KB")
 
 class KBUIAPI(Service):
     def get_services(self):
