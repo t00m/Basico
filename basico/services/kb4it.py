@@ -31,6 +31,7 @@ class KB4Basico(Service):
     th = None
     queue = None
     params = None
+    forced = False
 
     def initialize(self):
         # Install "KB Updated" signal
@@ -75,40 +76,33 @@ class KB4Basico(Service):
         # NO RESET ALLOWED HERE
         reset = False
 
-        # Force compilation
+        # Force compilation?
         force = self.get_config_value('force') or False
-        self.log.debug("\tForce compilation is set to: %s", force)
+        self.log.debug("Force compilation is set to: %s", force)
 
-        # FIXME: Get all settings
+        # Log level as plain text
         loglevel = levels[self.log.getEffectiveLevel()]
-        self.log.debug("\tFIXME: Log level for KB4IT: %s", loglevel)
 
-        # Get sources directory
+        # Get source directory
         source_path = self.get_config_value('source_dir') or LPATH['DOC_SOURCE']
-        self.log.debug("\tSources path set to: %s", source_path)
+        self.log.debug("[KB] Source path set to: %s", source_path)
+
+        # Get target directory
+        target_path = self.get_config_value('target_dir') or LPATH['DOC_TARGET']
+        self.log.debug("[KB] Target path set to: %s", target_path)
 
         # Build KB4IT params
-        params = Namespace(RESET=reset, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+        params = Namespace(RESET=reset, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=target_path, THEME=None)
 
         # Make sure the last theme version is installed
-        self.log.debug("\tInstalling KB4IT Basico theme")
+        self.log.debug("[KB] Installing KB4IT Basico theme")
         copydir(GPATH['KB4IT'], source_path)
 
-        # Get KB4IT Basico theme properties
-        kb = KB4IT(params)
-        kbapp = kb.get_service('App')
-        kbapp.load_theme()
-        theme = kbapp.get_theme_properties()
-        installed = theme['id'] == 'basico'
-        if not installed:
-            self.log.error("KB4IT Theme for Basico not found. Using default theme :(")
-        else:
-            self.log.info("Basico KB4IT Theme %s found", theme['version'])
+        return params
 
-        return kb
 
-    def request_update(self):
-        self.log.info("Basico KB update requested")
+    def request_update(self, forced=False):
+        self.log.info("[KB] Update requested")
         self.queue.put('request')
 
     def is_running(self):
@@ -116,54 +110,66 @@ class KB4Basico(Service):
             self.running = kb.is_running() or False
         except:
             self.running = False
-        self.log.debug("KB4IT is running? %s", self.running)
         return self.running
 
     def update(self):
         running = self.is_running()
         while not running:
             self.queue.get()
-            kb = self.prepare()
+            self.log.info("[KB] Executing update")
+            # Get params
+            params = self.prepare()
+
+            # Get KB4IT instance
+            kb = KB4IT(params)
+            kbapp = kb.get_service('App')
+
+            # Get KB4IT Basico theme properties
+            kbapp.load_theme()
+            theme = kbapp.get_theme_properties()
+            installed = theme['id'] == 'basico'
+            if not installed:
+                self.log.error("[KB] KB4IT Theme for Basico not found. Using default theme :(")
+            else:
+                self.log.info("[KB] Basico KB4IT Theme %s found", theme['version'])
+
             kb.run()
             self.queue.task_done()
             if self.queue.empty():
-                self.log.info("Basico KB up to date")
+                self.log.info("[KB] KB up to date")
                 self.emit('kb-updated')
             time.sleep(1)
             running = self.is_running()
         time.sleep(1)
 
     def delete_document(self, adocs):
-        kb = self.prepare()
+        params = self.prepare()
+        kb = KB4IT(params)
         kbapp = kb.get_service('App')
         for adoc in adocs:
             kbapp.delete_document(adoc)
         self.request_update()
 
     def reset(self):
-        self.log.debug("Preparing request to reset your Basico KB")
-
-        # RESET KB environment
-        reset = True
-
-        # Force operation
-        force = True
-
+        self.log.debug("[KB] Executing reset")
         # Log level
-        loglevel = 'INFO'
+        loglevel = levels[self.log.getEffectiveLevel()]
 
         # Get sources directory
         source_path = self.get_config_value('source_dir') or LPATH['DOC_SOURCE']
-        self.log.debug("Source path set to: %s", source_path)
+        self.log.debug("[KB] Source path set to: %s", source_path)
 
         # Get sources directory
         target_path = self.get_config_value('target_dir') or LPATH['DOC_TARGET']
-        self.log.debug("Target path set to: %s", target_path)
-
-        # Build KB4IT params
-        params = Namespace(RESET=True, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+        self.log.debug("[KB] Target path set to: %s", target_path)
 
         # Execute KB reset operation
+        params = Namespace(RESET=True, FORCE=True, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=target_path, THEME=None)
         kb = KB4IT(params)
+        kbapp = kb.get_service('App')
         kb.run()
+
+        # Then, KB diff update
         self.request_update()
+
+        self.log.info("[KB] Reset finished")

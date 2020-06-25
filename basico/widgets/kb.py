@@ -167,6 +167,7 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
         SURE = AreYouSure(parent, "Your KB will be destroyed and initialized")
         if SURE:
             self.srvkbb.reset()
+        self.destroy()
 
 
 class KBUIAPI(Service):
@@ -267,7 +268,6 @@ class KBUIBrowser(BasicoBrowser):
             self.load_url(homepage)
 
     def _on_load_failed(self, webview, load_event, failing_uri, error):
-        self.log.error("Failing URI: %s", failing_uri)
         if failing_uri.startswith('basico://'):
             return
 

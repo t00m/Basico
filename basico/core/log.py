@@ -31,6 +31,7 @@ class LogIntercepter(logging.Handler):
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)7s | %(lineno)4d  |%(name)-15s | %(asctime)s | %(message)s")
 
+
 def get_logger(name):
     """Returns a new logger with personalized.
     @param name: logger name
