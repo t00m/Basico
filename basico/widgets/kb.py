@@ -25,6 +25,14 @@ from basico.core.srv import Service
 from basico.core.wdg import BasicoWidget
 from basico.widgets.browser import BasicoBrowser
 
+def AreYouSure(parent, title):
+    dialog = Gtk.MessageDialog(parent, 0, Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 'Are You Sure?')
+    dialog.format_secondary_text(title)
+    dialog.set_transient_for(parent)
+    response = dialog.run()
+    dialog.destroy()
+    return response == Gtk.ResponseType.YES
+
 class Tab(IntEnum):
     VISOR = 0
     EDITOR = 1
@@ -35,6 +43,7 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
 
     def get_services(self):
         self.srvkbb = self.get_service('KB4IT')
+        self.srvclb = self.get_service('Callbacks')
 
     def _setup_widget(self):
         parent = self.srvuif.get_window_parent()
@@ -154,6 +163,11 @@ class KBUISettings(BasicoWidget, Gtk.Dialog):
 
     def _on_initialize_kb(self, button):
         self.log.info("Initializing KB")
+        parent = self.srvuif.get_window_parent()
+        SURE = AreYouSure(parent, "Your KB will be destroyed and initialized")
+        if SURE:
+            self.srvkbb.reset()
+
 
 class KBUIAPI(Service):
     def get_services(self):
@@ -258,9 +272,9 @@ class KBUIBrowser(BasicoBrowser):
             return
 
         target_dir = self.srvkbb.get_config_value('target_dir') or  LPATH['DOC_TARGET']
-        homepage = "file://%s" % os.path.join(target_dir, 'index.html')
+        homepage = "%s" % os.path.join(target_dir, 'index.html')
         self.log.debug("Home page: %s", homepage)
-        if failing_uri == homepage:
+        if failing_uri.replace('file://', '') == homepage:
             self.log.debug("Home page doesn't exist. Rebuilding KB")
             self.rebuild_database()
         else:
@@ -288,6 +302,7 @@ class KBUIBrowser(BasicoBrowser):
         self.reload()
 
     def rebuild_database(self, *args):
+        self.srvkbb.request_update()
         self.load_url('basico://update')
 
 class KBVisor(BasicoWidget, Gtk.VBox):

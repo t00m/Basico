@@ -72,6 +72,8 @@ class KB4Basico(Service):
 
     def prepare(self):
         self.log.debug("Preparing request")
+        # NO RESET ALLOWED HERE
+        reset = False
 
         # Force compilation
         force = self.get_config_value('force') or False
@@ -86,7 +88,7 @@ class KB4Basico(Service):
         self.log.debug("\tSources path set to: %s", source_path)
 
         # Build KB4IT params
-        params = Namespace(FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+        params = Namespace(RESET=reset, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
 
         # Make sure the last theme version is installed
         self.log.debug("\tInstalling KB4IT Basico theme")
@@ -136,4 +138,32 @@ class KB4Basico(Service):
         kbapp = kb.get_service('App')
         for adoc in adocs:
             kbapp.delete_document(adoc)
+        self.request_update()
+
+    def reset(self):
+        self.log.debug("Preparing request to reset your Basico KB")
+
+        # RESET KB environment
+        reset = True
+
+        # Force operation
+        force = True
+
+        # Log level
+        loglevel = 'INFO'
+
+        # Get sources directory
+        source_path = self.get_config_value('source_dir') or LPATH['DOC_SOURCE']
+        self.log.debug("Source path set to: %s", source_path)
+
+        # Get sources directory
+        target_path = self.get_config_value('target_dir') or LPATH['DOC_TARGET']
+        self.log.debug("Target path set to: %s", target_path)
+
+        # Build KB4IT params
+        params = Namespace(RESET=True, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=LPATH['DOC_TARGET'], THEME=None)
+
+        # Execute KB reset operation
+        kb = KB4IT(params)
+        kb.run()
         self.request_update()
