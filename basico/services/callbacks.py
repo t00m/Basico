@@ -90,7 +90,8 @@ class Callback(Service):
         self.log.debug("Basico ready!")
 
         # Memento
-        self.memento()
+        # Working but disabled. Remember size and position.
+        # ~ self.memento()
 
     def memento(self):
         # Remember last window size

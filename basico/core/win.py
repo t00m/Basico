@@ -54,6 +54,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         self.setup_window(self.uiapp)
         self.setup_widgets()
+        self.maximize ()
         self.srvgui.add_widget('gtk_app_window', self)
         self.run()
 
