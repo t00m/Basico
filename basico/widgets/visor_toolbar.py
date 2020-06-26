@@ -135,12 +135,6 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         tool.add(hbox)
         self.toolbar.insert(tool, -1)
 
-        ## Separator
-        tool = Gtk.SeparatorToolItem.new()
-        tool.set_draw(False)
-        tool.set_expand(False)
-        self.toolbar.insert(tool, -1)
-
         # ~ ## Visor Stack Switcher
         # ~ tool = Gtk.ToolItem()
         # ~ tool.set_expand(False)
@@ -248,6 +242,20 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         # ~ widget_import = self.srvgui.add_widget('widget_import', ImportWidget(self.app))
         # ~ boxan.pack_start(widget_import, False, False, 3)
 
+        ## Bookmarks
+        tool = Gtk.ToolItem()
+        tool.set_expand(False)
+        icon = self.srvicm.get_new_image_icon('basico-inbox', 24, 24)
+        box = Gtk.Box()
+        box.pack_start(icon, False, False, 0)
+        button = self.srvgui.add_widget('gtk_togglebutton_bookmarks', Gtk.ToggleButton())
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        sigid = button.connect('toggled', self.srvclb.gui_visor_sapnotes_show_bookmarks)
+        self.srvgui.set_key_value('gtk_togglebutton_bookmarks_signal', sigid)
+        button.add(box)
+        tool.add(button)
+        tool.set_tooltip_markup('<b>Show bookmarks</b>')
+        self.toolbar.insert(tool, -1)
 
         # Toolbar initial settings
         self.set_visible(True)
@@ -259,6 +267,10 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         self.srvicm = self.get_service('IM')
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
+        self.srvclb = self.get_service('Callbacks')
+
+    def _on_show_bookmarks(self, *args):
+        self.log.debug("Hola")
 
     def completion_match_func(self, completion, key, iter):
         model = completion.get_model()

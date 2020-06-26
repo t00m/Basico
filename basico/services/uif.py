@@ -163,6 +163,19 @@ class UIFuncs(Service):
         for treeiter in model:
             self.log.debug (model[treeiter][0])
 
+    def get_popover_button(self, text, icon_name):
+        button = Gtk.Button()
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        hbox = Gtk.HBox()
+        icon = self.srvicm.get_new_image_icon(icon_name, 24, 24)
+        lbltext = Gtk.Label()
+        lbltext.set_xalign(0.0)
+        lbltext.set_markup('%s' % text)
+        hbox.pack_start(icon, False, False, 3)
+        hbox.pack_start(lbltext, True, True, 3)
+        button.add(hbox)
+        return button
+
     def get_textview_text(self, textview):
         textbuffer = textview.get_buffer()
         istart, iend = textbuffer.get_bounds()

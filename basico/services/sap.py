@@ -153,7 +153,10 @@ class SAP(Service):
         content = driver.page_source
         eval("self.dispatch_%s(data, content)" % data['url_typ'])
 
-        self.bag_download.remove(data['url_sid'])
+        try:
+            self.bag_download.remove(data['url_sid'])
+        except KeyError:
+            self.log.warning("Request already completed for SAP Note %s", data['url_sid'])
         bag_empty = len(self.bag_download) == 0
         self.log.debug("SAP Download basket: %s (Empty=%s)", len(self.bag_download), bag_empty)
         if bag_empty:
@@ -169,8 +172,8 @@ class SAP(Service):
         self.srvuif.activity(False)
 
     def download_complete(self, *args):
-        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        visor_sapnotes.update()
+        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        # ~ visor_sapnotes.update()
         self.srvuif.activity(False)
         self.log.info("SAP Notes downloaded")
 
@@ -229,7 +232,7 @@ class SAP(Service):
         visor_sapnotes.populate(bag)
         self.log.info("%d SAP Notes (un)bookmarked", len(bag))
 
-    def switch_bookmark(self, button, lsid, popover):
+    def switch_bookmark(self, button, lsid):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         try:
             for sid in lsid:
@@ -241,7 +244,6 @@ class SAP(Service):
                 else:
                     self.bookmark([sid])
                     self.log.info("SAP Notes bookmarked")
-            popover.hide()
         except:
             self.log.error("Could not bookmark SAP Note %s" % sid)
             self.log.error(self.get_traceback())

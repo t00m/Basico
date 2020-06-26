@@ -128,7 +128,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         box_views.pack_start(separator, False, False, 0)
         box_views.pack_start(self.srvuif.create_menuview_button('component'), False, False, 0)
         box_views.pack_start(self.srvuif.create_menuview_button('description'), False, False, 0)
-        box_views.pack_start(self.srvuif.create_menuview_button('bookmarks'), False, False, 0)
+        # ~ box_views.pack_start(self.srvuif.create_menuview_button('bookmarks'), False, False, 0)
         box_views.pack_start(self.srvuif.create_menuview_button('category'), False, False, 0)
         box_views.pack_start(self.srvuif.create_menuview_button('chronologic'), False, False, 0)
         box_views.pack_start(self.srvuif.create_menuview_button('priority'), False, False, 0)
@@ -386,7 +386,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         treeview.append_column(column)
 
         # Treeview properties
-        treeview.set_can_focus(False)
+        treeview.set_can_focus(True)
         treeview.set_enable_tree_lines(True)
         treeview.set_headers_visible(True)
         treeview.set_enable_search(True)
@@ -412,13 +412,14 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         self.srvgui.add_widget('visor_sapnotes_sorted_model', sorted_model)
         sorted_model.set_sort_func(0, self.sort_function, None)
 
-        # Selection
-        selection = treeview.get_selection()
-        selection.set_mode(Gtk.SelectionMode.SINGLE)
-        selection.connect('changed', self.row_changed)
-
         # Set model (filtered and sorted)
         treeview.set_model(sorted_model)
+
+        # Selection
+        selection = treeview.get_selection()
+        self.srvgui.add_widget('visor_sapnotes_treeview_selection', selection)
+        selection.set_mode(Gtk.SelectionMode.MULTIPLE)
+        selection.connect('changed', self.row_changed)
 
         self.show_all()
         return visor
@@ -555,31 +556,31 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
                 title = escape(metadata['title'])
                 sid = str(int(metadata['id']))
 
-                has_annotations = [] #self.srvant.get_by_sid(sid)
-                has_attachments = [] #self.srvatc.get_by_sid(sid)
-                if bookmark:
-                    icon = icon_bookmark
-                    title = "<b>%s</b>" % title
-                    sid = "<b>%s</b>" % sid
-                else:
-                    if len(has_annotations) > 0 and len(has_attachments) > 0:
-                        icon = self.srvicm.get_pixbuf_icon('basico-annotation-attachment', 32, 32)
-                    elif len(has_annotations) > 0 and len(has_attachments) == 0:
-                        icon = self.srvicm.get_pixbuf_icon('basico-annotation', 32, 32)
-                    elif len(has_annotations) == 0 and len(has_attachments) > 0:
-                        icon = self.srvicm.get_pixbuf_icon('basico-attachment', 32, 32)
-                    else:
-                        icon = icon_sapnote
+                # ~ has_annotations = [] #self.srvant.get_by_sid(sid)
+                # ~ has_attachments = [] #self.srvatc.get_by_sid(sid)
+                # ~ if bookmark:
+                    # ~ icon = icon_bookmark
+                    # ~ title = "<b>%s</b>" % title
+                    # ~ sid = "<b>%s</b>" % sid
+                # ~ else:
+                    # ~ if len(has_annotations) > 0 and len(has_attachments) > 0:
+                        # ~ icon = self.srvicm.get_pixbuf_icon('basico-annotation-attachment', 32, 32)
+                    # ~ elif len(has_annotations) > 0 and len(has_attachments) == 0:
+                        # ~ icon = self.srvicm.get_pixbuf_icon('basico-annotation', 32, 32)
+                    # ~ elif len(has_annotations) == 0 and len(has_attachments) > 0:
+                        # ~ icon = self.srvicm.get_pixbuf_icon('basico-attachment', 32, 32)
+                    # ~ else:
+                        # ~ icon = icon_sapnote
 
                 timestamp = metadata['releasedon']
                 timestamp = timestamp.replace('-', '')
                 timestamp = timestamp.replace(':', '')
                 timestamp = timestamp.replace('T', '_')
                 stype = escape(metadata['type'].lower())
-                icon_name = 'basico-%s' % stype.replace(' ', '-')
-                icon = self.srvicm.get_pixbuf_icon(icon_name, 36, 36)
+                # ~ icon_name = 'basico-%s' % stype.replace(' ', '-')
+                # ~ icon = self.srvicm.get_pixbuf_icon(icon_name, 36, 36)
                 node = self.get_node(   int(metadata['id']),
-                                        icon,
+                                        None, # Icon
                                         False,
                                         '<b>%s</b>' % sid,
                                         title,
@@ -593,29 +594,29 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
                 pid = model.append(None, node)
 
                 # Load annotations
-                files = [] #self.srvant.get_by_sid(metadata['id'])
-                for fname in files:
-                    with open(fname, 'r') as fa:
-                        annotation = json.load(fa)
-                        atype = annotation['Type']
-                        try:
-                            icon = self.icons['type']['%s' % atype.lower()]
-                        except:
-                            icon = None
-                        node = self.get_node(   0,
-                                                icon,
-                                                False,
-                                                '',
-                                                annotation['Title'],
-                                                annotation['Component'],
-                                                '',
-                                                annotation['Type'],
-                                                '',
-                                                self.srvutl.fuzzy_date_from_timestamp(annotation['Timestamp']),
-                                                # ~ annotation['AID'],
-                                                annotation['Timestamp']
-                                            )
-                        model.append(pid, node)
+                # ~ files = [] #self.srvant.get_by_sid(metadata['id'])
+                # ~ for fname in files:
+                    # ~ with open(fname, 'r') as fa:
+                        # ~ annotation = json.load(fa)
+                        # ~ atype = annotation['Type']
+                        # ~ try:
+                            # ~ icon = self.icons['type']['%s' % atype.lower()]
+                        # ~ except:
+                            # ~ icon = None
+                        # ~ node = self.get_node(   0,
+                                                # ~ icon,
+                                                # ~ False,
+                                                # ~ '',
+                                                # ~ annotation['Title'],
+                                                # ~ annotation['Component'],
+                                                # ~ '',
+                                                # ~ annotation['Type'],
+                                                # ~ '',
+                                                # ~ self.srvutl.fuzzy_date_from_timestamp(annotation['Timestamp']),
+                                                # ~ # annotation['AID'],
+                                                # ~ annotation['Timestamp']
+                                            # ~ )
+                        # ~ model.append(pid, node)
 
                 # Load attachments
                 # ~ files = self.srvatc.get_by_sid(metadata['id'])
@@ -641,6 +642,12 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         treeview.set_model(sorted_model)
         self.update_total_sapnotes_count()
         self.show_widgets()
+
+        selection = self.srvgui.get_widget('visor_sapnotes_treeview_selection')
+        selection.set_mode(Gtk.SelectionMode.MULTIPLE)
+        selection.connect('changed', self.row_changed)
+        selection.select_path("0")
+
         # ~ self.srvclb.gui_stack_dashboard_show()
 
 
@@ -650,6 +657,15 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
 
     def right_click(self, treeview, event, data=None):
         treeview = self.srvgui.get_widget('visor_sapnotes_treeview')
+        selection = treeview.get_selection()
+        model, rows = selection.get_selected_rows()
+        try:
+            start = rows[0]
+        except:
+            return
+        end = rows[-1]
+        ns = len(rows)
+
         if event.button == 3:
             rect = Gdk.Rectangle()
             rect.x = x = int(event.x)
@@ -657,29 +673,35 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
             pthinfo = treeview.get_path_at_pos(x,y)
             if pthinfo is not None:
                 path,col,cellx,celly = pthinfo
-                model = treeview.get_model()
-                treeiter = model.get_iter(path)
-                component = model[treeiter][COLUMN.COMPONENT]
-                sid = model[treeiter][COLUMN.KEY]
-                if sid == 0:
-                    return
-                sid = "0"*(10 - len(str(sid))) + str(sid)
-                # ~ toolbar = self.srvgui.get_widget('visortoolbar')
                 popover = self.srvgui.add_widget('gtk_popover_visor_row', Gtk.Popover.new(treeview))
                 popover.set_position(Gtk.PositionType.TOP)
                 popover.set_pointing_to(rect)
-                box = self.build_popover(sid, popover, component)
+                if ns == 1:
+                    treeiter = model.get_iter(start.to_string())
+                    component = model[treeiter][COLUMN.COMPONENT]
+                    sid = model[treeiter][COLUMN.KEY]
+                    sid = "0"*(10 - len(str(sid))) + str(sid)
+                    box = self.build_popover_single(sid, component)
+                    box.show_all()
+                elif ns > 1:
+                    sids = []
+                    for row in rows:
+                        treeiter = model.get_iter(row.to_string())
+                        sid = model[treeiter][COLUMN.KEY]
+                        sids.append(sid)
+                    box = self.build_popover_multiple(sids)
+                    box.show_all()
                 popover.add(box)
                 self.srvuif.popover_show(None, popover)
+                return True
 
 
     # ~ def clb_create_annotation(self, button, sid):
         # ~ self.srvclb.action_annotation_create_for_sapnote(sid)
 
-
-    def build_popover(self, sid, popover, component):
+    def build_popover_multiple(self, sids):
+        self.log.debug(sids)
         box = Gtk.Box(spacing = 3, orientation="vertical")
-        isid = int(sid)
 
         def get_popover_button(text, icon_name):
             button = Gtk.Button()
@@ -696,32 +718,52 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
 
 
         # Popover button "Add an annotation"
-        button = get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
+        button = get_popover_button("<b>Add to collection</b>", 'basico-collection')
+        self.srvgui.add_widget('gtk_button_visor_sapnotes_selection_multiple_add_to_collection', button)
+        # ~ self.srvgui.add_signal('gtk_button_visor_sapnotes_selection_multiple_add_to_collection', 'clicked', 'self.srvclb.gui_annotation_create', isid)
+        box.pack_start(button, False, False, 0)
+        return box
+
+    def build_popover_single(self, sid, component):
+        box = Gtk.Box(spacing = 3, orientation="vertical")
+        isid = int(sid)
+
+        # Popover button "Add an annotation"
+        button = self.srvuif.get_popover_button("<b>Add an annotation</b> to SAP Note %d" % isid, 'basico-annotation')
         # ~ button.show_all()
         self.srvgui.add_widget('gtk_button_annotation_add', button)
         self.srvgui.add_signal('gtk_button_annotation_add', 'clicked', 'self.srvclb.gui_annotation_create', isid)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Open SAP Note"
-        button = get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
+        button = self.srvuif.get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
         self.srvgui.add_widget('gtk_button_sapnote_browse', button)
         # ~ self.srvgui.add_signal('gtk_button_sapnote_browse', 'clicked', 'self.srvweb.browse_note', sid)
         button.connect('clicked', self.srvweb.browse_note, sid)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Download SAP Note in PDF"
-        button = get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse')
+        button = self.srvuif.get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse')
         button.connect('clicked', self.srvweb.browse_pdf, sid)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Bookmark"
-        button = get_popover_button("<b>(Un)bookmark</b> SAP Note %d" % isid, 'basico-bookmarks')
-        button.connect('clicked', self.srvsap.switch_bookmark, [sid], popover)
+        button = self.srvuif.get_popover_button("<b>(Un)bookmark</b> SAP Note %d" % isid, 'basico-bookmarks')
+        button.connect('clicked', self.srvsap.switch_bookmark, [sid])
         box.pack_start(button, False, False, 0)
 
         # Popover button "Copy to clipboard"
-        button = get_popover_button("<b>Copy</b> SAP Note %d details <b>to clipboard</b>" % isid, 'basico-clipboard')
-        button.connect('clicked', self.copy_to_clipboard, [sid], popover)
+        button = self.srvuif.get_popover_button("<b>Copy</b> SAP Note %d details <b>to clipboard</b>" % isid, 'basico-clipboard')
+        button.connect('clicked', self.copy_to_clipboard, [sid])
+        box.pack_start(button, False, False, 0)
+
+        # Separator
+        separator = Gtk.Separator(orientation = Gtk.Orientation.HORIZONTAL)
+        box.pack_start(separator, True, True, 0)
+
+        # Popover button "Update SAP Note"
+        button = self.srvuif.get_popover_button("<b>Update</b> SAP Note %d" % isid, 'basico-refresh')
+        button.connect('clicked', self.update_sapnote, [sid])
         box.pack_start(button, False, False, 0)
 
         # Separator
@@ -737,7 +779,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         collection_is_downloaded = current_collection == COL_DOWNLOADED
 
         # Popover button Collection Management
-        button = get_popover_button("<b>Manage collections</b> for SAP Note %d" % isid, 'basico-collection')
+        button = self.srvuif.get_popover_button("<b>Manage collections</b> for SAP Note %d" % isid, 'basico-collection')
         box.pack_start(button, False, False, 0)
         self.popcollections = self.srvgui.add_widget('gtk_popover_button_manage_collections_single_note', Gtk.Popover.new(button))
         self.popcollections.set_position(Gtk.PositionType.RIGHT)
@@ -752,7 +794,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
 
         # Popover button "Delete SAP Note"
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        button = get_popover_button("<b>Delete</b> SAP Note %d" % isid, 'basico-delete')
+        button = self.srvuif.get_popover_button("<b>Delete</b> SAP Note %d" % isid, 'basico-delete')
         button.connect('clicked', visor_sapnotes.delete, [sid])
         button.set_tooltip_text("Checkbox must be activated in order to trigger the deletion")
         box.pack_start(button, False, False, 0)
@@ -783,6 +825,9 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         visible_filter.refilter()
         self.update_total_sapnotes_count()
 
+    def update_sapnote(self, button, sid):
+        self.srvclb.gui_visor_sapnotes_update_sapnotes(sid)
+
     def delete(self, *args):
         try:
             bag = args[1]
@@ -798,14 +843,11 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         else:
             self.log.info("Action canceled by user. Nothing deleted!")
 
-    def copy_to_clipboard(self, widget, lsid, popover):
+    def copy_to_clipboard(self, widget, lsid):
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         text = ''
         for sid in lsid:
             metadata = self.srvdtb.get_sapnote_metadata(sid)
             text += "SAP Note %10s: %s - Component: %s\n" % (sid, metadata['title'], metadata['componentkey'])
         clipboard.set_text(text, -1)
-        if popover is not None:
-            popover.hide()
-            self.srvuif.grab_focus()
         self.log.info("%d SAP Notes copied to clipboard", len(lsid))

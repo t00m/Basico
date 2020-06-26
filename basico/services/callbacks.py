@@ -165,6 +165,20 @@ class Callback(Service):
         window = self.srvgui.get_widget('gtk_app_window_main')
         window.show_stack_system('help')
 
+    ## SAP Notes Visor callbacks ##
+    def gui_visor_sapnotes_show_bookmarks(self, *args):
+        visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
+        menuview = self.srvgui.get_widget('menuview')
+        button = self.srvgui.get_widget('gtk_togglebutton_bookmarks')
+
+        active = button.get_active()
+        if active:
+            menuview.populate_by_bookmarks()
+            button.set_active(False)
+
+    def gui_visor_sapnotes_update_sapnotes(self, bag):
+        self.srvsap.download(bag)
+
     ## Menuview callabacks ##
     def gui_menuview_toggled(self, *args):
         """Show/Hide menu views"""
@@ -201,7 +215,6 @@ class Callback(Service):
         Update visor sapnotes when user choose a different row in the
         treeview associated to that view
         """
-        self.srvuif.message_dialog_info("Head", "Body")
         menuview = self.srvgui.get_widget('menuview')
         menuview.row_changed()
 

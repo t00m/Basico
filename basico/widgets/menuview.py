@@ -128,6 +128,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')
+        self.srvclb = self.get_service('Callbacks')
         self.srvutl = self.get_service('Utils')
 
 
@@ -295,7 +296,6 @@ class MenuView(BasicoWidget, Gtk.TreeView):
                 visor_sapnotes.populate(matches, self.cid)
         except Exception as error:
             pass
-
 
     def set_current_collection(self, cid=None):
         self.current_collection = cid
