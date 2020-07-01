@@ -2,7 +2,7 @@
                 <!-- DOCUMENT TITLE :: START -->
                 <ul class="uk-navbar-nav">
                     <li>
-                       <a href="#"><span class="uk-text-bolder uk-text-truncate">%s</span></a>
+                       <a href="#"><span class="uk-text-bolder uk-text-truncate">%s</span></a><!-- %s -->
                         <div class="uk-navbar-dropdown">
                             <ul class="uk-nav uk-navbar">
                                 <li uk-tooltip="title: Bookmark document">
