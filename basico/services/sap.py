@@ -23,7 +23,7 @@ from basico.services.collections import COL_DOWNLOADED
 LOGIN_PAGE_URL = "https://accounts.sap.com"
 LOGOUT_PAGE_URL = "https://accounts.sap.com/ui/logout"
 ODATA_NOTE_URL = "https://launchpad.support.sap.com/services/odata/svt/snogwscorr/TrunkSet(SapNotesNumber='%s',Version='0',Language='E')"
-ODATA_NOTE_URL_LONGTEXT = "https://launchpad.support.sap.com/services/odata/svt/snogwscorr/TrunkSet(SapNotesNumber='%s',Version='0',Language='E')?$expand=LongText"
+ODATA_NOTE_URL_LONGTEXT = "https://launchpad.support.sap.com/services/odata/svt/snogwscorr/TrunkSet(SapNotesNumber='%s',Version='0',Language='E')?$expand=LongText,RefBy"
 SAP_NOTE_URL = "https://launchpad.support.sap.com/#/notes/%s"
 SAP_NOTE_URL_PDF = "https://launchpad.support.sap.com/services/pdf/notes/%s/E"
 TIMEOUT = 10
@@ -124,6 +124,55 @@ class SAP(Service):
             sapnote['version'] = f.entries[0].d_version_detail['value']
             sapnote['feedupdate'] = f.entries[0].updated
             sapnote['bookmark'] = False
+            sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
+            self.log.debug ("[%s] SAP Note %s analyzed successfully", rid, sid)
+        except Exception as error:
+            self.log.warning("[%s] Content has no valid metadata. Skip.", rid)
+
+        return sapnote
+
+    def analyze_sapnote_new(self, rid, content):
+        '''
+        Get metadata details from SAP Note by using the new url:
+        ODATA_NOTE_URL_LONGTEXT
+
+        FIXME: Favorite field convert to True or False
+        FIXME: Get rest of the fields (RefBy and RefTo)
+        '''
+
+        def get_properties(html):
+            ts = "<m:properties>"
+            te = "</m:properties>"
+            ps = html.rfind(ts) + len(ts)
+            pe = html.rfind(te)
+            return html[ps:pe]
+
+        def get_property(properties, node):
+            ts = "<d:%s>" % node
+            te = "</d:%s>" % node
+            ps = properties.find(ts)+ len(ts)
+            pe = properties.find(te)
+            return properties[ps:pe]
+
+        sapnote = {}
+        try:
+            f = self.srvutl.feedparser_parse(content)
+            properties = get_properties(content)
+            sapnote['id'] = get_property(properties, 'SapNotesNumber')
+            sapnote['componentkey'] = get_property(properties, 'ComponentKey')
+            ct = get_property(properties, 'ComponentText')
+            if ct == "Please use note 1433157 for finding the right component":
+                ct = ""
+            sapnote['componenttxt'] = ct
+            sapnote['category'] = get_property(properties, 'Category')
+            sapnote['language'] = get_property(properties, 'Language')
+            sapnote['title'] = get_property(properties, 'Title')
+            sapnote['priority'] = get_property(properties, 'Priority')
+            sapnote['releasedon'] = get_property(properties, 'ReleasedOn')
+            sapnote['type'] = get_property(properties, 'Type')
+            sapnote['version'] = get_property(properties, 'Version')
+            sapnote['downloaded'] = ""
+            sapnote['bookmark'] = get_property(properties, 'Favorite')
             sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
             self.log.debug ("[%s] SAP Note %s analyzed successfully", rid, sid)
         except Exception as error:
