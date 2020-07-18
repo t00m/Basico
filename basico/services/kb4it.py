@@ -60,7 +60,7 @@ class KB4Basico(Service):
 
         # Start listening to requests
         self.queue = queue.Queue()
-        self.th = threading.Thread(name='update', target=self.update)
+        self.th = threading.Thread(name='update', target=self.update_kb)
         self.th.setDaemon(True)
         self.th.start()
         self.log.debug("KB Basico Manager started")
@@ -92,7 +92,7 @@ class KB4Basico(Service):
         self.log.debug("[KB] Target path set to: %s", target_path)
 
         # Build KB4IT params
-        params = Namespace(RESET=reset, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE=None, SOURCE_PATH=source_path, TARGET_PATH=target_path, THEME=None)
+        params = Namespace(RESET=reset, FORCE=force, LOGLEVEL=loglevel, SORT_ATTRIBUTE='releasedon', SOURCE_PATH=source_path, TARGET_PATH=target_path, THEME=None)
 
         # Make sure the last theme version is installed
         self.log.debug("[KB] Installing KB4IT Basico theme")
@@ -112,7 +112,7 @@ class KB4Basico(Service):
             self.running = False
         return self.running
 
-    def update(self):
+    def update_kb(self):
         running = self.is_running()
         while not running:
             self.queue.get()
@@ -133,6 +133,9 @@ class KB4Basico(Service):
             else:
                 self.log.info("[KB] Basico KB4IT Theme %s found", theme['version'])
 
+            # Update sources
+            self.update_sources()
+
             kb.run()
             self.queue.task_done()
             if self.queue.empty():
@@ -141,6 +144,19 @@ class KB4Basico(Service):
             time.sleep(1)
             running = self.is_running()
         time.sleep(1)
+
+    def update_sources(self):
+        srvdtb = self.get_service('DB')
+        source_path = self.get_config_value('source_dir')
+        db = srvdtb.get_notes()
+        for sid in db:
+            filename = os.path.join(source_path, '%s.adoc' % sid)
+            with open(filename, 'w') as fadoc:
+                fadoc.write("= %s\n\n" % db[sid]['title'])
+                for p in db[sid]:
+                    if p != 'id':
+                        fadoc.write(":%s: %s\n" % (p, db[sid][p]))
+                fadoc.write("\n// END-OF-HEADER. DO NOT MODIFY OR DELETE THIS LINE\n")
 
     def delete_document(self, adocs):
         params = self.prepare()
