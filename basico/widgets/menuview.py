@@ -348,7 +348,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         # ~ box.pack_start(button, False, False, 0)
 
         # Popover button "export to Basico format"
-        button = get_popover_button("Export to <b>Basico format</b>", 'basico-component')
+        button = get_popover_button("Export to <b>Basico format</b>", 'basico-backup-basico-format')
         self.srvgui.add_widget("gtk_button_popover_manage_collections", button)
         # ~ button.connect('clicked', self.srvbnr.action_collection_export_basico)
         box.pack_start(button, False, False, 0)
@@ -379,7 +379,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
             return button
 
         # Popover button Manage collections
-        button = get_popover_button("<b>Manage collections</b>", 'basico-category')
+        button = get_popover_button("<b>Manage collections</b>", 'basico-collection')
         self.srvgui.add_widget("gtk_button_popover_manage_collections", button)
         button.connect('clicked', self.show_popover_manage_collections)
         box.pack_start(button, False, False, 0)
@@ -404,7 +404,7 @@ class MenuView(BasicoWidget, Gtk.TreeView):
         popover.add(self.build_popover_export(colname))
 
         # Popover button "Link SAP Notes  in view to collection(s)"
-        button = get_popover_button("<b>Link to collection(s)</b> %d SAP Notes" % count, 'basico-collection')
+        button = get_popover_button("<b>Link to collection(s)</b> %d SAP Notes" % count, 'basico-collection-link')
         box.pack_start(button, False, False, 0)
         self.popviewtocat = self.srvgui.add_widget('gtk_popover_button_assign_view_to_category', Gtk.Popover.new(button))
         self.popviewtocat.set_position(Gtk.PositionType.RIGHT)

@@ -60,12 +60,12 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         self.icons = {}
         self.icons['type'] = {}
         toolbar = self.setup_toolbar()
-        panel = self.setup_panel()
-        visor = self.setup_visor()
+        views = self.setup_panel_menuview()
+        visor = self.setup_panel_visor()
         paned = Gtk.HPaned()
-        paned.add1(panel)
-        paned.add2(visor)
-        paned.set_position(400)
+        paned.add1(visor)
+        paned.add2(views)
+        paned.set_position(800)
         paned.show_all()
         self.pack_start(toolbar, False, False, 0)
         self.pack_start(paned, True, True, 0)
@@ -93,7 +93,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
     def setup_toolbar(self):
         return self.srvgui.add_widget('visor_sapnotes_toolbar', VisorToolbar(self.app))
 
-    def setup_panel(self):
+    def setup_panel_menuview(self):
         ## Left view - SAP Notes Menu view
         box = self.srvgui.add_widget('gtk_vbox_container_menu_view', Gtk.VBox())
         box.set_property('margin-left', 6)
@@ -149,7 +149,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         viewfilter.set_completion(completion)
         self.srvgui.add_signal('gtk_entry_filter_view', 'activate', menuview.filter)
 
-        icon = self.srvicm.get_pixbuf_icon('basico-refresh')
+        icon = self.srvicm.get_pixbuf_icon('basico-update')
         viewfilter.set_icon_from_pixbuf(Gtk.EntryIconPosition.PRIMARY, icon)
         viewfilter.set_icon_sensitive(Gtk.EntryIconPosition.PRIMARY, True)
         viewfilter.set_icon_tooltip_markup (Gtk.EntryIconPosition.PRIMARY, "Refresh and collapse")
@@ -194,7 +194,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         box.pack_start(box_trv, True, True, 0)
         return box
 
-    def setup_visor(self):
+    def setup_panel_visor(self):
         visor = Gtk.VBox()
         # ~ visor.set_property('margin-left', 3)
         visor.set_property('margin-right', 6)
@@ -736,14 +736,14 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         box.pack_start(button, False, False, 0)
 
         # Popover button "Open SAP Note"
-        button = self.srvuif.get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-preview')
+        button = self.srvuif.get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-browse-web')
         self.srvgui.add_widget('gtk_button_sapnote_browse', button)
         # ~ self.srvgui.add_signal('gtk_button_sapnote_browse', 'clicked', 'self.srvweb.browse_note', sid)
         button.connect('clicked', self.srvweb.browse_note, sid)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Download SAP Note in PDF"
-        button = self.srvuif.get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse')
+        button = self.srvuif.get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse-pdf')
         button.connect('clicked', self.srvweb.browse_pdf, sid)
         box.pack_start(button, False, False, 0)
 

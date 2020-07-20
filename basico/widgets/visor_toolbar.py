@@ -61,22 +61,6 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         # ~ tool.connect('clicked', self.srvclb.gui_attachment_add)
         # ~ self.toolbar.insert(tool, -1)
 
-        ## Show/Hide Menuviews
-        tool = Gtk.ToolItem()
-        tool.set_expand(False)
-        icon = self.srvicm.get_new_image_icon('basico-component', 24, 24)
-        box = Gtk.Box()
-        box.pack_start(icon, False, False, 3)
-        button = Gtk.ToggleButton()
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        button.set_active(False)
-        self.srvgui.add_widget('gtk_togglebutton_toolbar_menuview', button)
-        self.srvgui.add_signal('gtk_togglebutton_toolbar_menuview', 'toggled', 'self.srvclb.gui_menuview_toggled')
-        button.add(box)
-        tool.add(button)
-        tool.set_tooltip_markup('<b>Show/Hide views</b>')
-        self.toolbar.insert(tool, -1)
-
         ## Filter entry
 
         ### Completion
@@ -180,7 +164,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         button = Gtk.Button()
         button.set_relief(Gtk.ReliefStyle.NONE)
         hbox = Gtk.HBox()
-        icon = self.srvicm.get_image_icon('basico-sapnote')
+        icon = self.srvicm.get_image_icon('basico-sapnote', 24, 24)
         label = Gtk.Label()
         label.set_markup('<b>New SAP Note(s)</b>')
         label.set_xalign(0.0)
@@ -203,7 +187,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         button.set_relief(Gtk.ReliefStyle.NONE)
         # ~ button.connect('clicked', self.clb_create_annotation)
         hbox = Gtk.HBox()
-        icon = self.srvicm.get_image_icon('basico-annotation')
+        icon = self.srvicm.get_image_icon('basico-annotation', 24, 24)
         label = Gtk.Label()
         label.set_markup('<b>New annotation</b>')
         label.set_xalign(0.0)
@@ -245,7 +229,7 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         ## Bookmarks
         tool = Gtk.ToolItem()
         tool.set_expand(False)
-        icon = self.srvicm.get_new_image_icon('basico-inbox', 24, 24)
+        icon = self.srvicm.get_new_image_icon('basico-bookmarks', 24, 24)
         box = Gtk.Box()
         box.pack_start(icon, False, False, 0)
         button = self.srvgui.add_widget('gtk_togglebutton_bookmarks', Gtk.ToggleButton())
@@ -255,6 +239,22 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         button.add(box)
         tool.add(button)
         tool.set_tooltip_markup('<b>Show bookmarks</b>')
+        self.toolbar.insert(tool, -1)
+
+        ## Show/Hide Menuviews
+        tool = Gtk.ToolItem()
+        tool.set_expand(False)
+        icon = self.srvicm.get_new_image_icon('basico-collection', 18, 18)
+        box = Gtk.Box()
+        box.pack_start(icon, False, False, 3)
+        button = Gtk.ToggleButton()
+        button.set_relief(Gtk.ReliefStyle.NONE)
+        button.set_active(False)
+        self.srvgui.add_widget('gtk_togglebutton_toolbar_menuview', button)
+        self.srvgui.add_signal('gtk_togglebutton_toolbar_menuview', 'toggled', 'self.srvclb.gui_menuview_toggled')
+        button.add(box)
+        tool.add(button)
+        tool.set_tooltip_markup('<b>Show/Hide views</b>')
         self.toolbar.insert(tool, -1)
 
         # Toolbar initial settings
