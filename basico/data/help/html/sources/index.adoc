@@ -1,0 +1,28 @@
+= Basico Help Center
+
+
+== What is Basico
+
+*SAP Notes Manager for SAP Consultants*
+
+Basico helps you to track those SAP Notes that you use as SAP Consultant.
+
+== Features
+
+* Download SAP Notes
+* Import SAP Notes from other people
+* Export your SAP Notes to several formats
+* Bookmark SAP Notes really interesting.
+* Browse SAP Notes in Launchpad
+* Search and filtering based on SAP Notes metadata
+* Build collections (by grouping SAP Notes on one topic)
+* Make annotations (linked to SAP Notes or independent)
+
+
+== Installation
+
+Please, follow <<install#, instructions>>.
+
+
+== Usage
+
