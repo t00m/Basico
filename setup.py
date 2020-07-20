@@ -50,10 +50,10 @@ def add_data_from_dir(root_data):
     for root, dirs, files in os.walk(root_data):
         resdirs.add(os.path.realpath(root))
 
-    resdirs.remove(os.path.realpath(root_data))
+    # ~ resdirs.remove(os.path.realpath(root_data))
 
     for directory in resdirs:
-        files = glob.glob(directory+'/*')
+        files = glob.glob(os.path.join(directory, '*'))
         relfiles = []
         for thisfile in files:
             if not os.path.isdir(thisfile):
@@ -94,91 +94,6 @@ def add_data_basico():
                     'basico/data/res/sap/products.txt',
                 ]),
             ('basico/data/tpl', ['basico/data/tpl/report.html']),
-            ('basico/data/icons',
-                [
-                    'basico/data/icons/basico.svg',
-                    'basico/data/icons/basico-about.svg',
-                    'basico/data/icons/basico-add.svg',
-                    'basico/data/icons/basico-annotation.svg',
-                    'basico/data/icons/basico-annotation-type-bookmark.svg',
-                    'basico/data/icons/basico-edit.svg',
-                    'basico/data/icons/basico-annotation-type-note.svg',
-                    'basico/data/icons/basico-annotation-type-fixme.svg',
-                    'basico/data/icons/basico-annotation-type-incident.svg',
-                    'basico/data/icons/basico-annotation-type-procedure.svg',
-                    'basico/data/icons/basico-annotation-type-snippet.svg',
-                    'basico/data/icons/basico-annotation-type-template.svg',
-                    'basico/data/icons/basico-annotation-type-todo.svg',
-                    'basico/data/icons/basico-annotation-type-email.svg',
-                    'basico/data/icons/basico-annotation-type-meeting.svg',
-                    'basico/data/icons/basico-arrow-up.svg',
-                    'basico/data/icons/basico-arrow-down.svg',
-                    'basico/data/icons/basico-archived.svg',
-                    'basico/data/icons/basico-attachment.svg',
-                    'basico/data/icons/basico-backup.svg',
-                    'basico/data/icons/basico-backup-text-generic.svg',
-                    'basico/data/icons/basico-backup-text-csv.svg',
-                    'basico/data/icons/basico-backup-ms-excel.svg',
-                    'basico/data/icons/basico-backup-restore.svg',
-                    'basico/data/icons/basico-bookmark-off.svg',
-                    'basico/data/icons/basico-bookmark-on.svg',
-                    'basico/data/icons/basico-bookmarks.svg',
-                    'basico/data/icons/basico-browse.svg',
-                    'basico/data/icons/basico-category.svg',
-                    'basico/data/icons/basico-chart.svg',
-                    'basico/data/icons/basico-check-all.svg',
-                    'basico/data/icons/basico-check-none.svg',
-                    'basico/data/icons/basico-check-invert.svg',
-                    'basico/data/icons/basico-check-accept.svg',
-                    'basico/data/icons/basico-check-cancel.svg',
-                    'basico/data/icons/basico-chronologic.svg',
-                    'basico/data/icons/basico-clipboard.svg',
-                    'basico/data/icons/basico-comments.svg',
-                    'basico/data/icons/basico-component.svg',
-                    'basico/data/icons/basico-copy-paste.svg',
-                    'basico/data/icons/basico-dashboard.svg',
-                    'basico/data/icons/basico-drafts.svg',
-                    'basico/data/icons/basico-delete.svg',
-                    'basico/data/icons/basico-description.svg',
-                    'basico/data/icons/basico-dialog-error.svg',
-                    'basico/data/icons/basico-dialog-information.svg',
-                    'basico/data/icons/basico-dialog-ok.svg',
-                    'basico/data/icons/basico-dialog-question.svg',
-                    'basico/data/icons/basico-dialog-warning.svg',
-                    'basico/data/icons/basico-duplicate.svg',
-                    'basico/data/icons/basico-empty.svg',
-                    'basico/data/icons/basico-filter.svg',
-                    'basico/data/icons/basico-find.svg',
-                    'basico/data/icons/basico-fullscreen.svg',
-                    'basico/data/icons/basico-help.svg',
-                    'basico/data/icons/basico-inbox.svg',
-                    'basico/data/icons/basico-info.svg',
-                    'basico/data/icons/basico-jump-sapnote.svg',
-                    'basico/data/icons/basico-logviewer.svg',
-                    'basico/data/icons/basico-menu-system.svg',
-                    'basico/data/icons/basico-preview.svg',
-                    'basico/data/icons/basico-priority.svg',
-                    'basico/data/icons/basico-annotation-priority-high.svg',
-                    'basico/data/icons/basico-annotation-priority-normal.svg',
-                    'basico/data/icons/basico-annotation-priority-low.svg',
-                    'basico/data/icons/basico-refresh.svg',
-                    'basico/data/icons/basico-restore.svg',
-                    'basico/data/icons/basico-sapnote.svg',
-                    'basico/data/icons/basico-sap-knowledge-base-article.svg',
-                    'basico/data/icons/basico-sap-note.svg',
-                    'basico/data/icons/basico-sap-security-note.svg',
-                    'basico/data/icons/basico-sap-standard-note.svg',
-                    'basico/data/icons/basico-scope.svg',
-                    'basico/data/icons/basico-select.svg',
-                    'basico/data/icons/basico-settings.svg',
-                    'basico/data/icons/basico-sid.svg',
-                    'basico/data/icons/basico-stats.svg',
-                    'basico/data/icons/basico-tag.svg',
-                    'basico/data/icons/basico-tags.svg',
-                    'basico/data/icons/basico-collection.svg',
-                    'basico/data/icons/basico-type.svg',
-                    'basico/data/icons/basico-unfullscreen.svg',
-                ]),
             ('basico/data/share', []),
             ("basico/data/share/docs",
                     [
@@ -198,6 +113,7 @@ data_files = []
 data_files += add_data_basico()
 data_files += add_data_from_dir('basico/data/help')
 data_files += add_data_from_dir('basico/data/kb4it')
+data_files += add_data_from_dir('basico/data/icons')
 
 def main():
     setup(

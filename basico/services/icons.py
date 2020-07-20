@@ -61,7 +61,7 @@ class IconManager(Service):
             icon = None
             if name in self.theme.list_icons():
                 icon = self.theme.load_icon(name, width, Gtk.IconLookupFlags.GENERIC_FALLBACK)
-            self.icondict[key] = icon
+                self.icondict[key] = icon
 
         return icon
 

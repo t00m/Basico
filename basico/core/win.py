@@ -112,7 +112,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ## Visor SAP Notes
         button = Gtk.Button()
-        icon = self.srvicm.get_pixbuf_icon('basico-dashboard', 24, 24)
+        icon = self.srvicm.get_pixbuf_icon('basico-home', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         button.set_image(image)
@@ -123,7 +123,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ## Visor KB
         button = Gtk.Button()
-        icon = self.srvicm.get_pixbuf_icon('basico-annotation', 24, 24)
+        icon = self.srvicm.get_pixbuf_icon('basico-school', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         button.set_image(image)
@@ -202,7 +202,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         ### Settings
         hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-settings', 24, 24)
+        icon = self.srvicm.get_pixbuf_icon('basico-menu-system', 24, 24)
         image = Gtk.Image()
         image.set_from_pixbuf(icon)
         label = Gtk.Label("Settings")
