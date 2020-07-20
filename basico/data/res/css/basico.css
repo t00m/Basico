@@ -1,0 +1,39 @@
+progress, trough { min-height: 20px; }
+
+toolbar {
+    border-bottom: 3px transparent;
+    margin-bottom: 3px;
+    }
+
+stack {
+    border: 0px transparent;
+    }
+
+paned {
+    border: 0px transparent;
+    }
+
+/*
+treeview {
+    border: 0px transparent;
+    }
+
+viewport {
+    border: 1px solid transparent;
+    }
+
+scrolledwindow {
+    border: 1px solid silver;
+}
+*/
+/*
+textview {
+    border: 1px solid black;
+    }
+*/
+
+/*
+box * {
+  font: 20px Sans;
+}
+*/

@@ -1,0 +1,46 @@
+/**
+ * Print Stylesheet fuer Deinewebsite.de
+* @version         1.0
+* @lastmodified    16.06.2016
+*/
+
+@media print {
+
+    @page {
+      size: A4 portrait;
+      display: !noimportant;
+    }
+
+    #uk-grid {
+        display: !important;
+    }
+
+    #kb4it-doc-metadata {
+        display: none;
+    }
+
+/*
+    #kb4it-menu {
+        display: none;
+    }
+*/
+
+    h1, h2, h3, h4, h5 {
+      page-break-after: avoid;
+    }
+
+    /*Reset Style*/
+    body {
+        margin:0;
+        padding:0;
+        line-height: 1.4em;
+        word-spacing:1px;
+        letter-spacing:0.2px;
+        font: 13px Arial, Helvetica,"Lucida Grande", serif;
+        color: #000;
+    }
+
+    .noprint {
+        display: none ;
+        }
+}

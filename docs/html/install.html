@@ -1,0 +1,273 @@
+<!DOCTYPE Html>
+<html lang="en">
+<head>
+    <title>KB4IT - Basico installation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Asciidoctor 2.0.10">
+    <meta name="description" content="KB4IT document">
+    <meta name="author" content="KB4IT by t00mlabs.net">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="resources/common/uikit/css/uikit.min.css">
+    <link rel="stylesheet" href="resources/common/uikit/css/coderay-asciidoctor.css">
+    <link rel="stylesheet" href="resources/common/uikit/css/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="resources/common/uikit/css/kb4it.css">
+    <script src="resources/common/uikit/js/uikit.min.js"></script>
+    <script src="resources/common/uikit/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<div>
+<div id="container-1" class="uk-container uk-container-center">
+    <div id="kb4it-menu" style="z-index: 980;" uk-sticky="show-on-up: true">
+        <nav class="uk-navbar-container uk-border-rounded uk-card-hover uk-margin" style="background-color: white;" uk-navbar>
+            <div class="uk-navbar-left noprint">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-link-toggle">
+                        <a class="uk-logo uk-card uk-card-hover" href="index.html">
+                            <img src="resources/themes/default/images/logo.png" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">Go To</a>
+                        <div class="uk-navbar-dropdown">
+                            <ul class="uk-nav uk-navbar-dropdown-nav">
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="properties.html"><span class="uk-padding-small">Properties</span></a>
+                                </li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="stats.html"><span class="uk-padding-small">Stats</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="uk-navbar-nav">
+                    <!-- MENU CONTENTS :: START -->
+                            <li class="noprint">
+                                <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">Contents</a>
+                                <div class="uk-navbar-dropdown">
+                                    <ul class="uk-nav uk-navbar-dropdown-nav">
+<ul class="uk-nav uk-nav-default">
+<li><a class="uk-link-heading" href="#_from_source_code">From source code</a></li>
+<li><a class="uk-link-heading" href="#_from_pypi">From Pypi</a></li>
+</ul>
+                                    </ul>
+                                </div>
+                            </li>
+                    <!-- MENU CONTENTS :: END -->
+                </ul>
+            </div>
+            <div class="uk-navbar-center">
+                <!-- DOCUMENT TITLE :: START -->
+                <ul class="uk-navbar-nav">
+                    <li>
+                       <a href="#"><span class="uk-text-bolder uk-text-truncate">Basico installation</span></a><!-- install.adoc -->
+                        <div class="uk-navbar-dropdown">
+                            <ul class="uk-nav uk-navbar-dropdown-nav">
+                                <li>
+                                    <!-- View Metadata Button :: START -->
+                                    <a class="uk-button uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading" href="#modal-full-metadata" uk-toggle><span class="">Metadata</span></a>
+                                    <div id="modal-full-metadata" class="uk-modal-full" uk-modal>
+                                        <div class="uk-modal-dialog">
+                                            <button class="uk-modal-close-full uk-close-large uk-background-muted" type="button" uk-close></button>
+                                            <div class="uk-grid-collapse uk-child-width-expand@s uk-flex-middle" uk-grid>
+                                                <div class="uk-padding-large uk-background-muted">
+                                                    <div class="uk-text-lead uk-text-center uk-text-danger">Metadata</div>
+<!-- METADATA :: START -->
+        <table class="uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-card uk-card-hover">
+        <tr>
+            <td>
+                <div class="uk-text-bolder uk-text-secondary uk-text-bold uk-text-meta">Timestamp</div>
+            </td>
+            <td><div class="uk-flex uk-flex-row uk-flex-wrap uk-text-meta uk-padding-small uk-padding-remove-top uk-padding-remove-bottom">2020-07-21 00:06:21</div></td>
+        </tr>
+
+            </table>
+
+<!-- METADATA :: END -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- View Metadata Button :: END -->
+                                </li>
+                                <li>
+                                    <!-- View Asciidoc Source Button :: START -->
+                                    <a class="uk-button uk-card uk-card-hover uk-button uk-card uk-card-hover uk-border-rounded uk-link-heading" href="#modal-full-source" uk-toggle><span class="">Source</span></a>
+                                    <div id="modal-full-source" class="uk-modal-full" uk-modal>
+                                        <div class="uk-modal-dialog">
+                                            <button class="uk-modal-close-full uk-close-large uk-background-muted" type="button" uk-close></button>
+                                            <div class="uk-grid-collapse uk-child-width-expand@s uk-flex-middle" uk-grid>
+                                                <div class="uk-padding-large uk-background-muted">
+                                                    <div class="uk-text-lead uk-text-center uk-text-danger">Source</div>
+                                                    <div class="uk-text-lead">install.adoc&nbsp;<a onclick="copyToClipboard()" class="uk-icon-link uk-margin-small-right" uk-icon="copy"></a></div>
+                                                    <textarea id="source-code" class="uk-width-1-1 uk-height-viewport">= Basico installation
+
+
+== From source code
+
+. *Clone* project: `git clone https://github.com/t00m/Basico.git`
+. *Install* it:
+.. *Local*: `python3 setup install --user` (*recommended*)
+.. *System*: `sudo python3 setup install`
+. Execute it:
+.. Local: $HOME/.local/bin/basico
+.. System: /usr/bin/basico
+
+== From Pypi
+
+* Optionally, uninstall previous versions: `pip3 uninstall basico -qy`
+* Install:
+** *Local*: `pip3 install basico --user`
+** *System*: `sudo pip3 install basico`
+</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- View Source Button :: END -->
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </u>
+                <!-- DOCUMENT TITLE :: END -->
+            </div>
+            <div class="uk-navbar-right noprint">
+                <ul class="uk-navbar-nav">
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">About</a>
+                        <div class="uk-navbar-dropdown">
+                            <ul class="uk-nav uk-navbar-dropdown-nav">
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="about_app.html"><span class="uk-padding-small">About this app</span></a>
+                                </li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="about_theme.html"><span class="uk-padding-small">About this theme</span></a>
+                                </li>
+                                <li class="uk-nav-divider"></li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="about_kb4it.html"><span class="uk-padding-small">About KB4IT</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<div class="uk-container uk-container-center">
+<div hidden>
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_from_source_code">From source code</a></li>
+<li><a href="#_from_pypi">From Pypi</a></li>
+</ul>
+</div>
+<div class="uk-margin-small-bottom uk-card uk-card-body uk-card-hover uk-border-rounded">
+<h2 id="_from_source_code">From source code</h2>
+<div class="uk-container">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Clone</strong> project: <code>git clone <a href="https://github.com/t00m/Basico.git" class="bare">https://github.com/t00m/Basico.git</a></code></p>
+</li>
+<li>
+<p><strong>Install</strong> it:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><strong>Local</strong>: <code>python3 setup install --user</code> (<strong>recommended</strong>)</p>
+</li>
+<li>
+<p><strong>System</strong>: <code>sudo python3 setup install</code></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Execute it:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Local: $HOME/.local/bin/basico</p>
+</li>
+<li>
+<p>System: /usr/bin/basico</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="uk-margin-small-bottom uk-card uk-card-body uk-card-hover uk-border-rounded">
+<h2 id="_from_pypi">From Pypi</h2>
+<div class="uk-container">
+<div class="ulist">
+<ul>
+<li>
+<p>Optionally, uninstall previous versions: <code>pip3 uninstall basico -qy</code></p>
+</li>
+<li>
+<p>Install:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Local</strong>: <code>pip3 install basico --user</code></p>
+</li>
+<li>
+<p><strong>System</strong>: <code>sudo pip3 install basico</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>            <!-- FOOTER :: START -->
+            <div class="uk-flex uk-flex-center uk-flex-wrap">
+<!--
+                <div class="uk-card uk-card-body">
+                    <span class="uk-text-meta">Last update on Tue, Jul 21, 2020 at 00:15</span>
+                </div>
+-->
+            </div>
+            <!-- FOOTER :: END -->
+        </div>
+    </div>
+    <!-- CONTENTS (Document) :: END -->
+<script>
+<!-- Necessary javascript for filtering results -->
+<!-- Hack found in: https://codepen.io/acidrums4/pen/GBpYbO -->
+var input = document.getElementById('text_filter');
+var filter = document.getElementById('filter');
+
+input.addEventListener( 'keyup', function(event)
+{
+    if ( input.value == "" )
+    {
+        filter.setAttribute( 'uk-filter-control', '' );
+    }
+
+    else
+    {
+        filter.setAttribute( 'uk-filter-control', 'filter:[data-title*=\'' + input.value + '\'i]' );
+    }
+
+    filter.click();
+});
+</script>
+<script>
+function copyToClipboard() {
+  var copyText = document.getElementById("source-code");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
+  alert("Text copied to clipboard");
+}
+</script>
+<!-- GRID LAYOUT :: END -->
+</body>
+</html>

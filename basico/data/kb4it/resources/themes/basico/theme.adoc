@@ -1,0 +1,9 @@
+{
+    "id": "basico",
+    "name": "Basico",
+    "description": "Basico theme for KB4IT",
+    "version": "0.0.3",
+    "kb4it": "0.7.4",
+    "ignored_keys": ["feedupdate", "releasedon", "title"],
+    "date_attributes": ["releasedon"]
+}

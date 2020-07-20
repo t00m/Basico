@@ -10,24 +10,32 @@
 import os
 import sys
 import signal
-from gi.repository import GObject
-from basico.core.mod_env import APP, LPATH, GPATH, FILE
-from basico.core.mod_log import get_logger
-from basico.services.srv_utils import Utils
-from basico.services.srv_gui import GUI
-from basico.services.srv_iconmgt import IconManager
-from basico.services.srv_bnr import BackupRestoreMan
-from basico.services.srv_sap import SAP
-from basico.services.srv_settings import Settings
-from basico.services.srv_uif import UIFuncs
-from basico.services.srv_callbacks import Callback
-from basico.services.srv_notify import Notification
-from basico.services.srv_db import Database
-from basico.services.srv_driver import SeleniumDriver
-from basico.services.srv_cols import Collections
-from basico.services.srv_annot import Annotation
-from basico.services.srv_notify import Notification
+import shutil
+import queue
+import logging
 
+import selenium
+
+from gi.repository import GLib
+from gi.repository import GObject
+
+from basico.core.env import APP, LPATH, GPATH, FILE
+from basico.core.log import LogIntercepter, queue_log, get_logger
+from basico.services.kb4it import KB4Basico
+from basico.services.util import Utils
+from basico.services.gui import GUI
+from basico.services.icons import IconManager
+from basico.services.sap import SAP
+from basico.services.settings import Settings
+from basico.services.uif import UIFuncs
+from basico.services.callbacks import Callback
+from basico.services.database import Database
+from basico.services.download import DownloadManager
+from basico.services.collections import Collections
+from basico.widgets.splash import Splash
+
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)25s | %(asctime)s | %(message)s")
 
 #DOC: http://stackoverflow.com/questions/16410852/keyboard-interrupt-with-with-python-gtk
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -36,51 +44,67 @@ class Basico(object):
     """
     Basico Application class
     """
+    intercepter = LogIntercepter()
+
     def __init__(self):
         """
         Basico class
         """
-        self.setup_environment()
+
         self.setup_logging()
+        self.setup_environment()
         self.setup_services()
+        self.setup_splash()
+        self.setup_post()
+
+
+    def get_splash(self):
+        return self.splash
+
+
+    def setup_splash(self):
+        self.splash = Splash(title="Basico\n0.4", font='Roboto Slab 24', font_weight='bold', font_color="#FFFFFF", background_image=FILE['SPLASH'], app=self)
 
 
     def setup_environment(self):
         """
         Setup Basico environment
         """
-        # Add webdriver path to System PATH
-        os.environ["PATH"] += os.pathsep + LPATH['DRIVERS']
-        
         # Create local paths if they do not exist
+        self.log.debug("Checking directories for Basico")
         for entry in LPATH:
             if not os.path.exists(LPATH[entry]):
                 os.makedirs(LPATH[entry])
+                self.log.debug("Directory %s created", LPATH[entry])
+        self.log.debug("Basico directory structure ok")
 
+        # ~ self.log.debug("Global path: %s", GPATH['ROOT'])
+        # ~ self.log.debug("Local path: %s", LPATH['ROOT'])
 
     def setup_logging(self):
         """
         Setup Basico logging
         """
         # Truncate existing log file
-        if os.path.exists(FILE['LOG']):
-            with open(FILE['LOG'], 'w') as flog:
-                pass
-                
-        #Initialize logging        
+        # ~ if os.path.exists(FILE['LOG']):
+            # ~ with open(FILE['LOG'], 'w') as flog:
+                # ~ pass
+
+        #Initialize logging
+        # ~ self.log = logging.getLogger(__class__.__name__)
         self.log = get_logger(__class__.__name__)
+        self.log.addHandler(self.intercepter)
         self.log.info("Basico %s started", APP['version'])
-        self.log.debug("Global path: %s", GPATH['ROOT'])
-        self.log.debug("Local path: %s", LPATH['ROOT'])
-        self.log.debug("Logging all messages to file: %s", FILE['LOG'])
-        self.log.debug("Logging only events: %s", FILE['EVENTS'])
+
+        # ~ self.log.debug("Logging all messages to file: %s", FILE['LOG'])
+        # ~ self.log.debug("Logging only events: %s", FILE['EVENTS'])
 
 
     def setup_services(self):
         """
         Setup Basico Services
         """
-        
+
         # Declare and register services
         self.services = {}
         try:
@@ -90,15 +114,12 @@ class Basico(object):
                 'UIF'           :   UIFuncs(),
                 'SAP'           :   SAP(),
                 'Settings'      :   Settings(),
-                'Notify'        :   Notification(),
                 'IM'            :   IconManager(),
                 'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
-                'Driver'        :   SeleniumDriver(),
+                'Driver'        :   DownloadManager(),
                 'Collections'   :   Collections(),
-                'Annotation'    :   Annotation(),
-                'BNR'           :   BackupRestoreMan(),
-                'Notify'        :   Notification()
+                'KB4IT'         :   KB4Basico()
             }
 
             for name in services:
@@ -106,6 +127,26 @@ class Basico(object):
         except Exception as error:
             self.log.error(error)
             raise
+
+
+    def setup_post(self):
+        # Patch Selenium 4
+        FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'] = os.path.join(os.path.dirname(selenium.__file__), 'webdriver/firefox/webdriver_prefs.json')
+        if not os.path.exists(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET']):
+            try:
+                shutil.copy(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'], FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
+                self.log.debug("Webdriver preferences config file not found. Python Selenium libs patched locally")
+            except:
+                self.log.warning("Firefox Webdriver preferences not found in: ")
+                self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
+                self.log.warning("Copied missing file from: ")
+                self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'])
+
+        if not os.path.exists(FILE['L_SAP_PRODUCTS']):
+            shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
+            self.log.debug("SAP Products file copied to local database resources directory")
+
+        self.get_service('KB4IT')
 
 
     def get_service(self, name):
@@ -147,6 +188,7 @@ class Basico(object):
         (if any) to finalize them properly.
         """
 
+        self.splash.show()
         # Deregister all services loaded starting by the GUI service
         self.deregister_service('GUI')
         for name in self.services:
@@ -156,6 +198,7 @@ class Basico(object):
             except Exception as error:
                 self.log.error(error)
                 raise
+        self.splash.destroy()
         self.log.info("Basico %s finished", APP['version'])
 
 
@@ -163,9 +206,8 @@ class Basico(object):
         """
         Start Basico
         """
-        self.srvdrv = self.get_service('Driver')
-        self.srvgui = self.get_service('GUI')
-        self.srvgui.run()
+        GUI = self.get_service('GUI')
+        GUI.run()
 
 
 def main():

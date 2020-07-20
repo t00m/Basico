@@ -11,9 +11,24 @@
 
 import os
 from os.path import sep as SEP
+import glob
 import sys
 import subprocess
 from setuptools import setup
+
+# ~ from setuptools.command.install import install
+
+
+# ~ class CustomInstallCommand(install):
+    # ~ """Customized setuptools install command - prints a friendly greeting."""
+    # ~ def run(self):
+        # ~ from kb4it.kb4it import KB4IT
+        # ~ from argparse import Namespace
+        # ~ params = Namespace(FORCE=True, LOGLEVEL='DEBUG', SORT_ATTRIBUTE=None, SOURCE_PATH='/tmp/myapp', TARGET_PATH='/tmp/output', THEME=None)
+        # ~ kb = KB4IT(params)
+        # ~ print(dir(kb))
+        # ~ install.run(self)
+
 
 if sys.platform == 'win32':
     import os.path
@@ -28,89 +43,57 @@ HOME_ICONS_DIR = HOME + SEP + '.local' + SEP + 'share' + SEP + 'icons'
 with open('README.adoc') as f:
     long_description = f.read()
 
+def add_data_from_dir(root_data):
+    """Add data files from a given directory."""
+    dir_files = []
+    resdirs = set()
+    for root, dirs, files in os.walk(root_data):
+        resdirs.add(os.path.realpath(root))
 
-def add_data():
+    # ~ resdirs.remove(os.path.realpath(root_data))
+
+    for directory in resdirs:
+        files = glob.glob(os.path.join(directory, '*'))
+        relfiles = []
+        for thisfile in files:
+            if not os.path.isdir(thisfile):
+                relfiles.append(os.path.relpath(thisfile))
+
+        num_files = len(files)
+        if num_files > 0:
+            dir_files.append((os.path.relpath(directory), relfiles))
+
+    return dir_files
+
+
+def add_data_basico():
     try:
-        data_files = [
+        data_files_basico = [
             ('share/applications', ['basico/data/desktop/basico.desktop']),
             ('share/icons', ['basico/data/icons/basico-component.svg']),
+            ('basico/data/res/selenium',
+                [
+                    'basico/data/res/selenium/webdriver_prefs.json'
+                ]),
             ('basico/data/res/selenium/drivers',
                 [
                     'basico/data/res/selenium/drivers/geckodriver',
-                    'basico/data/res/selenium/drivers/geckodriver.exe',
                     'basico/data/res/selenium/drivers/geckodriver.README'
                 ]),
-            ('basico/data/tpl', ['basico/data/tpl/report.html']),
-            ('basico/data/icons',
+            ('basico/data/res/css',
                 [
-                    'basico/data/icons/basico.svg',
-                    'basico/data/icons/basico-about.svg',
-                    'basico/data/icons/basico-add.svg',
-                    'basico/data/icons/basico-annotation.svg',
-                    'basico/data/icons/basico-annotation-type-bookmark.svg',
-                    'basico/data/icons/basico-annotation-type-note.svg',
-                    'basico/data/icons/basico-annotation-type-fixme.svg',
-                    'basico/data/icons/basico-annotation-type-incident.svg',
-                    'basico/data/icons/basico-annotation-type-procedure.svg',
-                    'basico/data/icons/basico-annotation-type-snippet.svg',
-                    'basico/data/icons/basico-annotation-type-template.svg',
-                    'basico/data/icons/basico-annotation-type-todo.svg',
-                    'basico/data/icons/basico-annotation-type-email.svg',
-                    'basico/data/icons/basico-annotation-type-meeting.svg',
-                    'basico/data/icons/basico-archived.svg',
-                    'basico/data/icons/basico-backup.svg',
-                    'basico/data/icons/basico-backup-text-generic.svg',
-                    'basico/data/icons/basico-backup-text-csv.svg',
-                    'basico/data/icons/basico-backup-ms-excel.svg',
-                    'basico/data/icons/basico-backup-restore.svg',
-                    'basico/data/icons/basico-bookmark-off.svg',
-                    'basico/data/icons/basico-bookmark-on.svg',
-                    'basico/data/icons/basico-bookmarks.svg',
-                    'basico/data/icons/basico-browse.svg',
-                    'basico/data/icons/basico-category.svg',
-                    'basico/data/icons/basico-chart.svg',
-                    'basico/data/icons/basico-check-accept.svg',
-                    'basico/data/icons/basico-check-cancel.svg',
-                    'basico/data/icons/basico-chronologic.svg',
-                    'basico/data/icons/basico-clipboard.svg',
-                    'basico/data/icons/basico-comments.svg',
-                    'basico/data/icons/basico-component.svg',
-                    'basico/data/icons/basico-dashboard.svg',
-                    'basico/data/icons/basico-drafts.svg',
-                    'basico/data/icons/basico-delete.svg',
-                    'basico/data/icons/basico-description.svg',
-                    'basico/data/icons/basico-dialog-error.svg',
-                    'basico/data/icons/basico-dialog-information.svg',
-                    'basico/data/icons/basico-dialog-ok.svg',
-                    'basico/data/icons/basico-dialog-question.svg',
-                    'basico/data/icons/basico-dialog-warning.svg',
-                    'basico/data/icons/basico-duplicate.svg',
-                    'basico/data/icons/basico-empty.svg',
-                    'basico/data/icons/basico-filter.svg',
-                    'basico/data/icons/basico-find.svg',
-                    'basico/data/icons/basico-fullscreen.svg',
-                    'basico/data/icons/basico-help.svg',
-                    'basico/data/icons/basico-inbox.svg',
-                    'basico/data/icons/basico-info.svg',
-                    'basico/data/icons/basico-jump-sapnote.svg',
-                    'basico/data/icons/basico-logviewer.svg',
-                    'basico/data/icons/basico-menu-system.svg',
-                    'basico/data/icons/basico-priority.svg',
-                    'basico/data/icons/basico-annotation-priority-high.svg',
-                    'basico/data/icons/basico-annotation-priority-normal.svg',
-                    'basico/data/icons/basico-annotation-priority-low.svg',
-                    'basico/data/icons/basico-refresh.svg',
-                    'basico/data/icons/basico-restore.svg',
-                    'basico/data/icons/basico-select.svg',
-                    'basico/data/icons/basico-settings.svg',
-                    'basico/data/icons/basico-sid.svg',
-                    'basico/data/icons/basico-stats.svg',
-                    'basico/data/icons/basico-tag.svg',
-                    'basico/data/icons/basico-tags.svg',
-                    'basico/data/icons/basico-collection.svg',
-                    'basico/data/icons/basico-type.svg',
-                    'basico/data/icons/basico-unfullscreen.svg',
+                    'basico/data/res/css/basico.css',
+                    'basico/data/res/css/custom-asciidoc.css',
                 ]),
+            ('basico/data/res/splash',
+                [
+                    'basico/data/res/splash/basico-splash-400x250.png',
+                ]),
+            ('basico/data/res/sap',
+                [
+                    'basico/data/res/sap/products.txt',
+                ]),
+            ('basico/data/tpl', ['basico/data/tpl/report.html']),
             ('basico/data/share', []),
             ("basico/data/share/docs",
                     [
@@ -122,58 +105,40 @@ def add_data():
                     'Changelog'
                     ]),
             ]
-
-        # ~ if not os.path.isdir('mo'):
-            # ~ os.mkdir('mo')
-        # ~ for pofile in os.listdir('po'):
-            # ~ if pofile.endswith('po'):
-                # ~ lang = pofile.strip('.po')
-                # ~ modir = os.path.join('mo', lang)
-                # ~ if not os.path.isdir(modir):
-                    # ~ os.mkdir(modir)
-                # ~ mofile = os.path.join(modir, 'basico.mo')
-                # ~ subprocess.call('msgfmt {} -o {}'.format(os.path.join('po', pofile), mofile), shell=True)
-                # ~ data_files.append(['share/locale/{}/LC_MESSAGES/'.format(lang), [mofile]])
-        return data_files
+        return data_files_basico
     except:
         return []
 
-if os.name == 'posix':
-    data_files = add_data()
-else:
-    data_files = []
-
-# ~ try:
-    # ~ bcommit = subprocess.check_output("svn info", shell=True)
-    # ~ ucommit = bcommit.decode(encoding='UTF-8')
-    # ~ icommit = int(ucommit.split('\n')[6].split(':')[1])
-    # ~ dcommit = ucommit.split('\n')[11][19:29]
-# ~ except Exception as error:
-    # ~ print (error)
-    # ~ dcommit = 'None'
-    # ~ icommit = 0
-
+data_files = []
+data_files += add_data_basico()
+data_files += add_data_from_dir('basico/data/help')
+data_files += add_data_from_dir('basico/data/kb4it')
+data_files += add_data_from_dir('basico/data/icons')
 
 def main():
     setup(
         name='basico',
-        version='0.3',
+        version='0.4',
         author='Tomás Vírseda',
         author_email='tomasvirseda@gmail.com',
-        url='http://subversion.t00mlabs.net/basico',
+        url='https://github.com/t00m/Basico',
         description='SAP Notes Manager for SAP Consultants',
         long_description=long_description,
-        download_url = 'http://t00mlabs.net/downloads/basico-0.3.tar.gz',
+        download_url = 'https://github.com/t00m/Basico/archive/master.zip',
         license='GPLv3',
         packages=['basico', 'basico.core', 'basico.services', 'basico.widgets'],
         # distutils does not support install_requires, but pip needs it to be
         # able to automatically install dependencies
+        # ~ cmdclass={
+        # ~ 'install': CustomInstallCommand,
+        # ~ },
         install_requires=[
-              'python-dateutil',
-              'selenium',
-              'feedparser',
-              'requests',
-              'openpyxl',
+            'kb4it',
+            'python-dateutil',
+            'selenium',
+            'feedparser',
+            'webdriver_manager',
+            'psutil'
         ],
         include_package_data=True,
         data_files=data_files,
@@ -201,7 +166,6 @@ def main():
                 ]
             },
     )
-
 
 if __name__ == '__main__':
     main()
