@@ -1,0 +1,7 @@
+{
+    "id": "default",
+    "name": "Default",
+    "description": "Default theme for KB4IT",
+    "version": "0.0.1",
+    "kb4it": "0.7.4"
+}
