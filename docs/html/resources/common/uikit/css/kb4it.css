@@ -1,0 +1,27 @@
+/* KB4IT.css custom stylesheet based on Asciidoctor default stylesheet */
+/* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
+
+/*
+address, dl, fieldset, figure, ol, p, ul {
+    margin: 0 0 00px 0;
+}
+*/
+
+/*
+pre {
+    font: .875rem/1.5 Consolas,monaco,monospace;
+    color: #000;
+    overflow: auto;
+    padding: 10px;
+    border: 1px solid #b3b0b0;
+    border-radius: 3px;
+    background: #ffec8b;
+    padding: 20px;
+    margin: 10px;
+}*/
+
+pre {
+    padding: 10px;
+    overflow: auto;
+    margin: 10px;
+}

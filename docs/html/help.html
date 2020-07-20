@@ -1,0 +1,805 @@
+<!DOCTYPE Html>
+<html lang="en">
+<head>
+    <title>KB4IT - How to write asciidoc documents for KB4IT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Asciidoctor 2.0.10">
+    <meta name="description" content="KB4IT document">
+    <meta name="author" content="KB4IT by t00mlabs.net">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="resources/common/uikit/css/uikit.min.css">
+    <link rel="stylesheet" href="resources/common/uikit/css/coderay-asciidoctor.css">
+    <link rel="stylesheet" href="resources/common/uikit/css/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="resources/common/uikit/css/kb4it.css">
+    <script src="resources/common/uikit/js/uikit.min.js"></script>
+    <script src="resources/common/uikit/js/uikit-icons.min.js"></script>
+</head>
+<body>
+<div>
+<div id="container-1" class="uk-container uk-container-center">
+    <div id="kb4it-menu" style="z-index: 980;" uk-sticky="show-on-up: true">
+        <nav class="uk-navbar-container uk-border-rounded uk-card-hover uk-margin" style="background-color: white;" uk-navbar>
+            <div class="uk-navbar-left noprint">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-link-toggle">
+                        <a class="uk-logo uk-card uk-card-hover" href="index.html">
+                            <img src="resources/themes/default/images/logo.png" alt="">
+                        </a>
+                    </li>
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">Go To</a>
+                        <div class="uk-navbar-dropdown">
+                            <ul class="uk-nav uk-navbar-dropdown-nav">
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="properties.html"><span class="uk-padding-small">Properties</span></a>
+                                </li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="stats.html"><span class="uk-padding-small">Stats</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="uk-navbar-nav">
+                    <!-- MENU CONTENTS :: START -->
+                            <li class="noprint">
+                                <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">Contents</a>
+                                <div class="uk-navbar-dropdown">
+                                    <ul class="uk-nav uk-navbar-dropdown-nav">
+<ul class="uk-nav uk-nav-default">
+<li><a class="uk-link-heading" href="#idname">Introduction</a></li>
+<li><a class="uk-link-heading" href="#_kb4it_documents">KB4IT Documents</a>
+<ul class="uk-nav-sub">
+<li><a class="uk-link-heading" href="#_header">Header</a></li>
+<li><a class="uk-link-heading" href="#_body">Body</a></li>
+</ul>
+</li>
+<li><a class="uk-link-heading" href="#Cheatsheet">Asciidoc Cheatsheet</a>
+<ul class="uk-nav-sub">
+<li><a class="uk-link-heading" href="#_paragraphs">Paragraphs</a></li>
+<li><a class="uk-link-heading" href="#_text_formatting">Text Formatting</a></li>
+<li><a class="uk-link-heading" href="#_admonitions">Admonitions</a></li>
+<li><a class="uk-link-heading" href="#_links">Links</a></li>
+<li><a class="uk-link-heading" href="#_anchors">Anchors</a></li>
+<li><a class="uk-link-heading" href="#_lists">Lists</a></li>
+<li><a class="uk-link-heading" href="#_sections">Sections</a>
+<ul class="uk-nav-sub">
+<li><a class="uk-link-heading" href="#_level_3">Level 3</a></li>
+<li><a class="uk-link-heading" href="#_back_at_level_3">Back at Level 3</a></li>
+</ul>
+</li>
+<li><a class="uk-link-heading" href="#_tables">Tables</a></li>
+<li><a class="uk-link-heading" href="#_multimedia">Multimedia</a></li>
+</ul>
+</li>
+<li><a class="uk-link-heading" href="#References">References</a></li>
+</ul>
+                                    </ul>
+                                </div>
+                            </li>
+                    <!-- MENU CONTENTS :: END -->
+                </ul>
+            </div>
+            <div class="uk-navbar-center">
+                <!-- DOCUMENT TITLE :: START -->
+<span class="uk-text-danger uk-text-truncate uk-text-bolder">How to write asciidoc documents for KB4IT</span>
+                <!-- DOCUMENT TITLE :: END -->
+            </div>
+            <div class="uk-navbar-right noprint">
+                <ul class="uk-navbar-nav">
+                    <li>
+                        <a class="uk-button uk-card uk-card-hover uk-link-heading" href="#">About</a>
+                        <div class="uk-navbar-dropdown">
+                            <ul class="uk-nav uk-navbar-dropdown-nav">
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="about_app.html"><span class="uk-padding-small">About this app</span></a>
+                                </li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="about_theme.html"><span class="uk-padding-small">About this theme</span></a>
+                                </li>
+                                <li class="uk-nav-divider"></li>
+                                <li class="uk-link-toggle">
+                                    <a class="uk-card uk-card-hover uk-border-rounded uk-link-heading" href="about_kb4it.html"><span class="uk-padding-small">About KB4IT</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+<!-- CONTENT :: START -->
+<div class="uk-container uk-container-center">
+<div hidden>
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#idname">Introduction</a></li>
+<li><a href="#_kb4it_documents">KB4IT Documents</a>
+<ul class="sectlevel2">
+<li><a href="#_header">Header</a></li>
+<li><a href="#_body">Body</a></li>
+</ul>
+</li>
+<li><a href="#Cheatsheet">Asciidoc Cheatsheet</a>
+<ul class="sectlevel2">
+<li><a href="#_paragraphs">Paragraphs</a></li>
+<li><a href="#_text_formatting">Text Formatting</a></li>
+<li><a href="#_admonitions">Admonitions</a></li>
+<li><a href="#_links">Links</a></li>
+<li><a href="#_anchors">Anchors</a></li>
+<li><a href="#_lists">Lists</a></li>
+<li><a href="#_sections">Sections</a>
+<ul class="sectlevel3">
+<li><a href="#_level_3">Level 3</a></li>
+<li><a href="#_back_at_level_3">Back at Level 3</a></li>
+</ul>
+</li>
+<li><a href="#_tables">Tables</a></li>
+<li><a href="#_multimedia">Multimedia</a></li>
+</ul>
+</li>
+<li><a href="#References">References</a></li>
+</ul>
+</div>
+<div class="uk-margin-small-bottom uk-card uk-card-body uk-card-hover uk-border-rounded">
+<h2 id="idname">Introduction</h2>
+<div class="uk-container">
+<div class="paragraph">
+<p>In this page you will learn:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>How to write a KB4IT document</p>
+</li>
+<li>
+<p>The most commonly used AsciiDoc syntax.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="uk-margin-small-bottom uk-card uk-card-body uk-card-hover uk-border-rounded">
+<h2 id="_kb4it_documents">KB4IT Documents</h2>
+<div class="uk-container">
+<div class="paragraph">
+<p>Taking as an example this page, a KB4IT document is made of two main parts:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Header</p>
+</li>
+<li>
+<p>Body</p>
+</li>
+</ol>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_header">Header</h3>
+<div class="paragraph">
+<p>By using a first level section (<code>=</code>) you set the <strong>title of the document</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Then, enclosed by (<code>:</code>) you set its <strong>properties</strong>.</p>
+</div>
+<div class="paragraph">
+<p>There are <strong>six core properties</strong> (Author, Category, Scope, Status, Priority and Team).</p>
+</div>
+<div class="paragraph">
+<p>Moreover, you can add any property you imagine. There is no limits.</p>
+</div>
+<div class="paragraph">
+<p>Finally, you must indicate the end of the header with this line:</p>
+</div>
+<div class="paragraph">
+<p><code>// END-OF-HEADER. DO NOT MODIFY OR DELETE THIS LINE</code></p>
+</div>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre>= How to write asciidoc documents for KB4IT
+:Author:        t00mlabs
+:Category:      Help
+:Scope:         Technical documentation
+:Status:        Released
+:Priority:      Normal
+:Team:          IT Plumbers
+
+// Extra properties
+:Periodicity:   Daily
+
+// END-OF-HEADER. DO NOT MODIFY OR DELETE THIS LINE</pre>
+</div>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_body">Body</h3>
+<div class="paragraph">
+<p>After you write the header, you can start writing your document.</p>
+</div>
+<div class="paragraph">
+<p>Use the source code of other KB4IT pages as templates or write your own page from the scratch.</p>
+</div>
+<div class="paragraph">
+<p>Bellow, you have some <a href="#References">Asciidoc references</a> for an extended documentation and a brief <a href="#Cheatsheet">Asciidoc cheatsheet</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="uk-margin-small-bottom uk-card uk-card-body uk-card-hover uk-border-rounded">
+<h2 id="Cheatsheet">Asciidoc Cheatsheet</h2>
+<div class="uk-container">
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_paragraphs">Paragraphs</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">A normal paragraph.
+Line breaks are not preserved.
+// line comments, which are lines that start with //, are skipped
+
+A blank line separates paragraphs.
+
+ An indented (literal) paragraph disables text formatting,
+ preserves spaces and line breaks, and is displayed in a
+ monospaced font.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="paragraph">
+<p>A normal paragraph.
+Line breaks are not preserved.</p>
+</div>
+<div class="paragraph">
+<p>A blank line separates paragraphs.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>An indented (literal) paragraph disables text formatting,
+preserves spaces and line breaks, and is displayed in a
+monospaced font.</pre>
+</div>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_text_formatting">Text Formatting</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">*strong importance* (aka bold)
+_stress emphasis_ (aka italic)
+`monospaced` (aka typewriter text)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="paragraph">
+<p><em>stress emphasis</em> (aka italic)</p>
+</div>
+<div class="paragraph">
+<p><strong>strong importance</strong> (aka bold)</p>
+</div>
+<div class="paragraph">
+<p><code>monospaced</code> (aka typewriter text)</p>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_admonitions">Admonitions</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre>NOTE: This is a note
+TIP: This is a tip
+IMPORTANT: This is important
+CAUTION: This is a caution message
+WARNING: This is a warning</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i uk-icon="comment" class="uk-text-emphasis" title="Note"></i>
+</td>
+<td class="content">
+This is a note
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i uk-icon="info" class="uk-text-emphasis" title="Tip"></i>
+</td>
+<td class="content">
+This is a tip
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i uk-icon="bookmark" class="uk-text-emphasis uk-text-bolder" title="Important"></i>
+</td>
+<td class="content">
+This is important
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i uk-icon="bolt" class="uk-text-danger" title="Caution"></i>
+</td>
+<td class="content">
+This is a caution message
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i uk-icon="warning" class="uk-text-warning" title="Warning"></i>
+</td>
+<td class="content">
+This is a warning
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_links">Links</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">https://example.org/page[A webpage]
+link:../path/to/file.txt[A local file]
+xref:document.adoc[A sibling document]
+mailto:hello@example.org[Email to say hello!]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="paragraph">
+<p><a href="https://example.org/page">A webpage</a></p>
+</div>
+<div class="paragraph">
+<p><a href="../path/to/file.txt">A local file</a></p>
+</div>
+<div class="paragraph">
+<p><a href="document.html">A sibling document</a></p>
+</div>
+<div class="paragraph">
+<p><a href="mailto:hello@example.org">Email to say hello!</a></p>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_anchors">Anchors</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">[[id-name, reference text]]
+// or written using normal block attributes as `[#id-name,reftext=reference text]`
+A paragraph (or any block) with an anchor (aka ID) and reftext.
+
+See &lt;&lt;idname&gt;&gt; or &lt;&lt;idname,optional text of internal link&gt;&gt;.
+
+xref:document.adoc#idname[Jumps to anchor in another document].
+
+This paragraph has a footnote.footnote:[This is the text of the footnote.]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div id="id-name" class="paragraph">
+<p>A paragraph (or any block) with an anchor (aka ID) and reftext.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="#idname">Introduction</a> or <a href="#idname">optional text of internal link</a>.</p>
+</div>
+<div class="paragraph">
+<p><a href="document.html#idname">Jumps to anchor in another document</a>.</p>
+</div>
+<div class="paragraph">
+<p>This paragraph has a footnote.<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_lists">Lists</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">*Unordered*
+
+* level 1
+** level 2
+*** level 3
+**** level 4
+***** etc.
+* back at level 1
++
+Attach a block or paragraph to a list item using a list continuation (which you can enclose in an open block).
+
+.Some Authors
+[circle]
+- Edgar Allen Poe
+- Sheri S. Tepper
+- Bill Bryson
+
+*Ordered*
+
+. Step 1
+. Step 2
+.. Step 2a
+.. Step 2b
+. Step 3
+
+.Remember your Roman numerals?
+[upperroman]
+. is one
+. is two
+. is three
+
+*Checklist*
+
+* [x] checked
+* [ ] not checked
+
+
+*Callout*
+
+// enable callout bubbles by adding `:icons: font` to the document header
+[,ruby]
+ puts 'Hello, World!' <i class="conum" data-value="1"></i><b>(1)</b>
+&lt;1&gt; Prints `Hello, World!` to the console.
+
+*Descriptions*
+
+first term:: description of first term
+
+second term::
+
+description of second term</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Unordered</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>level 1</p>
+<div class="ulist">
+<ul>
+<li>
+<p>level 2</p>
+<div class="ulist">
+<ul>
+<li>
+<p>level 3</p>
+<div class="ulist">
+<ul>
+<li>
+<p>level 4</p>
+<div class="ulist">
+<ul>
+<li>
+<p>etc.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>back at level 1</p>
+<div class="paragraph">
+<p>Attach a block or paragraph to a list item using a list continuation (which you can enclose in an open block).</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist circle">
+<div class="title">Some Authors</div>
+<ul class="circle">
+<li>
+<p>Edgar Allen Poe</p>
+</li>
+<li>
+<p>Sheri S. Tepper</p>
+</li>
+<li>
+<p>Bill Bryson</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Ordered</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Step 1</p>
+</li>
+<li>
+<p>Step 2</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Step 2a</p>
+</li>
+<li>
+<p>Step 2b</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Step 3</p>
+</li>
+</ol>
+</div>
+<div class="olist upperroman">
+<div class="title">Remember your Roman numerals?</div>
+<ol class="upperroman" type="I">
+<li>
+<p>is one</p>
+</li>
+<li>
+<p>is two</p>
+</li>
+<li>
+<p>is three</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>Checklist</strong></p>
+</div>
+<div class="ulist checklist">
+<ul class="checklist">
+<li>
+<p><i class="fa fa-check-square-o"></i> checked</p>
+</li>
+<li>
+<p><i class="fa fa-square-o"></i> not checked</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Callouts</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="ruby">puts <span class="string"><span class="delimiter">'</span><span class="content">Hello, World!</span><span class="delimiter">'</span></span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Prints <code>Hello, World!</code> to the console.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Descriptions</strong></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">first term</dt>
+<dd>
+<p>description of first term</p>
+</dd>
+<dt class="hdlist1">second term</dt>
+<dd>
+<p>description of second term</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_sections">Sections</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">= Document Title (Level 0)
+== Level 1
+=== Level 2
+==== Level 3
+===== Level 4
+====== Level 5
+== Back at Level 1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="sect3 uk-card-hover uk-border-rounded uk-padding-small">
+<h4 id="_level_3">Level 3</h4>
+<div class="sect4 uk-card-hover uk-border-rounded uk-padding-small">
+<h5 id="_level_4">Level 4</h5>
+
+</div>
+</div>
+<div class="sect3 uk-card-hover uk-border-rounded uk-padding-small">
+<h4 id="_back_at_level_3">Back at Level 3</h4>
+
+</div>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_tables">Tables</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">[options=&quot;header&quot;, width=&quot;100%&quot;, cols=&quot;10%,70%,10%,10%&quot;]
+|===
+| Active
+| Server
+| User
+| Pass
+
+| No
+| `Server1`
+| `.\adminuser`
+| `adminpass.345`
+
+| Yes
+| `Server2`
+| `.\adminuser`
+| `passadmin.543`
+|===</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<table class="uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-card uk-card-hover">
+
+<colgroup>
+<col style="width: 10%;">
+<col style="width: 70%;">
+<col style="width: 10%;">
+<col style="width: 10%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Active</th>
+<th class="tableblock halign-left valign-top">Server</th>
+<th class="tableblock halign-left valign-top">User</th>
+<th class="tableblock halign-left valign-top">Pass</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Server1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>.\adminuser</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>adminpass.345</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Server2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>.\adminuser</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>passadmin.543</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2 uk-card-hover uk-border-rounded uk-padding-small">
+<h3 id="_multimedia">Multimedia</h3>
+<div class="listingblock">
+<div class="title"><strong>Source</strong></div>
+<div class="content">
+<pre class="CodeRay highlight uk-card-hover"><code data-lang="adoc">image::resources/images/logo.png[]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Output</strong></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="resources/images/logo.png" alt="logo">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="uk-margin-small-bottom uk-card uk-card-body uk-card-hover uk-border-rounded">
+<h2 id="References">References</h2>
+<div class="uk-container">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://asciidoctor.org/docs/asciidoc-writers-guide/">AsciiDoc Writer’s Guide</a></p>
+</li>
+<li>
+<p><a href="https://powerman.name/doc/asciidoc">AsciiDoc cheatsheet</a></p>
+</li>
+<li>
+<p><a href="https://asciidoctor.org/docs/what-is-asciidoc/">What is AsciiDoc? Why do we need it?</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. This is the text of the footnote.
+</div>
+</div>            <!-- FOOTER :: START -->
+            <div class="uk-flex uk-flex-center uk-flex-wrap">
+<!--
+                <div class="uk-card uk-card-body">
+                    <span class="uk-text-meta">Last update on Tue, Jul 21, 2020 at 00:07</span>
+                </div>
+-->
+            </div>
+            <!-- FOOTER :: END -->
+        </div>
+    </div>
+    <!-- CONTENTS (Document) :: END -->
+<script>
+<!-- Necessary javascript for filtering results -->
+<!-- Hack found in: https://codepen.io/acidrums4/pen/GBpYbO -->
+var input = document.getElementById('text_filter');
+var filter = document.getElementById('filter');
+
+input.addEventListener( 'keyup', function(event)
+{
+    if ( input.value == "" )
+    {
+        filter.setAttribute( 'uk-filter-control', '' );
+    }
+
+    else
+    {
+        filter.setAttribute( 'uk-filter-control', 'filter:[data-title*=\'' + input.value + '\'i]' );
+    }
+
+    filter.click();
+});
+</script>
+<script>
+function copyToClipboard() {
+  var copyText = document.getElementById("source-code");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand("copy");
+  alert("Text copied to clipboard");
+}
+</script>
+<!-- GRID LAYOUT :: END -->
+</body>
+</html>
