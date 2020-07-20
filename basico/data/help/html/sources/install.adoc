@@ -1,0 +1,19 @@
+= Basico installation
+
+
+== From source code
+
+. *Clone* project: `git clone https://github.com/t00m/Basico.git`
+. *Install* it:
+.. *Local*: `python3 setup install --user` (*recommended*)
+.. *System*: `sudo python3 setup install`
+. Execute it:
+.. Local: $HOME/.local/bin/basico
+.. System: /usr/bin/basico
+
+== From Pypi
+
+* Optionally, uninstall previous versions: `pip3 uninstall basico -qy`
+* Install:
+** *Local*: `pip3 install basico --user`
+** *System*: `sudo pip3 install basico`
