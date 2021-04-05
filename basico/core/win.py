@@ -35,7 +35,7 @@ from basico.widgets.settingsview import SettingsView
 from basico.widgets.logviewer import LogViewer
 from basico.widgets.statusbar import Statusbar
 from basico.widgets.browser import BasicoBrowser
-from basico.widgets.kb import KBUI
+# ~ from basico.widgets.kb import KBUI
 
 
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
@@ -122,15 +122,15 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         lhbox.pack_start(button, False, False, 0)
 
         ## Visor KB
-        button = Gtk.Button()
-        icon = self.srvicm.get_pixbuf_icon('basico-school', 24, 24)
-        image = Gtk.Image()
-        image.set_from_pixbuf(icon)
-        button.set_image(image)
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        self.srvgui.add_widget('gtk_button_visor_kb', button)
-        self.srvgui.add_signal('gtk_button_visor_kb', 'clicked', 'self.srvclb.display_visor_kb')
-        lhbox.pack_start(button, False, False, 0)
+        # ~ button = Gtk.Button()
+        # ~ icon = self.srvicm.get_pixbuf_icon('basico-school', 24, 24)
+        # ~ image = Gtk.Image()
+        # ~ image.set_from_pixbuf(icon)
+        # ~ button.set_image(image)
+        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
+        # ~ self.srvgui.add_widget('gtk_button_visor_kb', button)
+        # ~ self.srvgui.add_signal('gtk_button_visor_kb', 'clicked', 'self.srvclb.display_visor_kb')
+        # ~ lhbox.pack_start(button, False, False, 0)
 
         return lhbox
 
@@ -170,19 +170,19 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         box.pack_end(button, False, False, 0)
 
         ### Help
-        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-help', 24, 24)
-        image = Gtk.Image()
-        image.set_from_pixbuf(icon)
-        label = Gtk.Label("Help")
-        hbox.pack_start(image, False, False, 3)
-        hbox.pack_start(label, False, False, 3)
-        button = Gtk.Button()
-        button.add(hbox)
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        self.srvgui.add_widget('gtk_button_help', button)
-        self.srvgui.add_signal('gtk_button_help', 'clicked', 'self.srvclb.display_help')
-        box.pack_end(button, False, False, 0)
+        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        # ~ icon = self.srvicm.get_pixbuf_icon('basico-help', 24, 24)
+        # ~ image = Gtk.Image()
+        # ~ image.set_from_pixbuf(icon)
+        # ~ label = Gtk.Label("Help")
+        # ~ hbox.pack_start(image, False, False, 3)
+        # ~ hbox.pack_start(label, False, False, 3)
+        # ~ button = Gtk.Button()
+        # ~ button.add(hbox)
+        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
+        # ~ self.srvgui.add_widget('gtk_button_help', button)
+        # ~ self.srvgui.add_signal('gtk_button_help', 'clicked', 'self.srvclb.display_help')
+        # ~ box.pack_end(button, False, False, 0)
 
         ### Log viewer
         # ~ # Disabled temporary
@@ -201,19 +201,19 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         # ~ self.srvgui.add_signal('gtk_button_logviewer', 'clicked', 'self.srvclb.display_log')
 
         ### Settings
-        hbox = Gtk.Box(spacing = 0, orientation="horizontal")
-        icon = self.srvicm.get_pixbuf_icon('basico-menu-system', 24, 24)
-        image = Gtk.Image()
-        image.set_from_pixbuf(icon)
-        label = Gtk.Label("Settings")
-        hbox.pack_start(image, False, False, 3)
-        hbox.pack_start(label, False, False, 3)
-        button = Gtk.Button()
-        button.add(hbox)
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        self.srvgui.add_widget('gtk_button_settings', button)
-        self.srvgui.add_signal('gtk_button_settings', 'clicked', 'self.srvclb.display_settings')
-        box.pack_start(button, False, False, 0)
+        # ~ hbox = Gtk.Box(spacing = 0, orientation="horizontal")
+        # ~ icon = self.srvicm.get_pixbuf_icon('basico-menu-system', 24, 24)
+        # ~ image = Gtk.Image()
+        # ~ image.set_from_pixbuf(icon)
+        # ~ label = Gtk.Label("Settings")
+        # ~ hbox.pack_start(image, False, False, 3)
+        # ~ hbox.pack_start(label, False, False, 3)
+        # ~ button = Gtk.Button()
+        # ~ button.add(hbox)
+        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
+        # ~ self.srvgui.add_widget('gtk_button_settings', button)
+        # ~ self.srvgui.add_signal('gtk_button_settings', 'clicked', 'self.srvclb.display_settings')
+        # ~ box.pack_start(button, False, False, 0)
 
         return rhbox
 
@@ -301,9 +301,9 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         stack_visors.child_set_property (stack_child, "icon-name", "basico-sapnote")
 
         #### Stack for Visor KB
-        stack_child = self.setup_stack_visor_kb()
-        stack_visors.add_titled(stack_child, "visor-kb", "Basico KB")
-        stack_visors.child_set_property (stack_child, "icon-name", "basico-annotation")
+        # ~ stack_child = self.setup_stack_visor_kb()
+        # ~ stack_visors.add_titled(stack_child, "visor-kb", "Basico KB")
+        # ~ stack_visors.child_set_property (stack_child, "icon-name", "basico-annotation")
 
         return box
 

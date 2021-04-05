@@ -8,10 +8,16 @@
 """
 
 import os
-import time
+import html
 import glob
+import time
+import uuid
 import traceback
 from shutil import which
+
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 from gi.repository import GObject
 
@@ -27,6 +33,8 @@ ODATA_NOTE_URL_LONGTEXT = "https://launchpad.support.sap.com/services/odata/svt/
 SAP_NOTE_URL = "https://launchpad.support.sap.com/#/notes/%s"
 SAP_NOTE_URL_PDF = "https://launchpad.support.sap.com/services/pdf/notes/%s/E"
 TIMEOUT = 10
+
+stopWords = set(stopwords.words('english'))
 
 """
 <link href="TrunkSet(SapNotesNumber='0002258035',Version='4',Language='E')/RefBy"
@@ -101,37 +109,38 @@ class SAP(Service):
                 pass
         self.log.debug("Fixed %d SAP Notes", n)
 
-    def analyze_sapnote(self, rid, content):
-        '''
-        Get metadata details from SAP Note
-        '''
-        sapnote = {}
-        try:
-            f = self.srvutl.feedparser_parse(content)
-            sid = f.entries[0].d_sapnotesnumber
-            sapnote['id'] = sid
-            sapnote['componentkey'] = f.entries[0].d_componentkey
-            comptxt = f.entries[0].d_componenttext
-            if comptxt == "Please use note 1433157 for finding the right component":
-                comptxt = ""
-            sapnote['componenttxt'] = comptxt
-            sapnote['category'] = f.entries[0].d_category_detail['value']
-            sapnote['language'] = f.entries[0].d_languagetext_detail['value']
-            sapnote['title'] = f.entries[0].d_title_detail['value']
-            sapnote['priority'] = f.entries[0].d_priority_detail['value']
-            sapnote['releasedon'] = f.entries[0].d_releasedon
-            sapnote['type'] = f.entries[0].d_type_detail['value']
-            sapnote['version'] = f.entries[0].d_version_detail['value']
-            sapnote['feedupdate'] = f.entries[0].updated
-            sapnote['bookmark'] = False
-            sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
-            self.log.debug ("[%s] SAP Note %s analyzed successfully", rid, sid)
-        except Exception as error:
-            self.log.warning("[%s] Content has no valid metadata. Skip.", rid)
+    # ~ def analyze_sapnote(self, rid, content):
+        # ~ '''
+        # ~ Get metadata details from SAP Note
+        # ~ '''
+        # ~ sapnote = {}
+        # ~ try:
+            # ~ f = self.srvutl.feedparser_parse(content)
+            # ~ sid = f.entries[0].d_sapnotesnumber
+            # ~ sapnote['id'] = sid
+            # ~ sapnote['componentkey'] = f.entries[0].d_componentkey
+            # ~ comptxt = f.entries[0].d_componenttext
+            # ~ if comptxt == "Please use note 1433157 for finding the right component":
+                # ~ comptxt = ""
+            # ~ sapnote['componenttxt'] = comptxt
+            # ~ sapnote['category'] = f.entries[0].d_category_detail['value']
+            # ~ sapnote['language'] = f.entries[0].d_languagetext_detail['value']
+            # ~ sapnote['title'] = f.entries[0].d_title_detail['value']
+            # ~ sapnote['priority'] = f.entries[0].d_priority_detail['value']
+            # ~ sapnote['releasedon'] = f.entries[0].d_releasedon
+            # ~ sapnote['type'] = f.entries[0].d_type_detail['value']
+            # ~ sapnote['version'] = f.entries[0].d_version_detail['value']
+            # ~ sapnote['feedupdate'] = f.entries[0].updated
+            # ~ sapnote['bookmark'] = False
+            # ~ sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
+            # ~ self.log.debug ("[%s] SAP Note %s analyzed successfully", rid, sid)
+        # ~ except Exception as error:
+            # ~ self.log.warning("[%s] Content has no valid metadata. Skip.", rid)
+            # ~ sapnote = []
 
-        return sapnote
+        # ~ return sapnote
 
-    def analyze_sapnote_new(self, rid, content):
+    def analyze_sapnote(self, rid, content, sid):
         '''
         Get metadata details from SAP Note by using the new url:
         ODATA_NOTE_URL_LONGTEXT
@@ -156,7 +165,7 @@ class SAP(Service):
 
         sapnote = {}
         try:
-            f = self.srvutl.feedparser_parse(content)
+            # ~ f = self.srvutl.feedparser_parse(content)
             properties = get_properties(content)
             sapnote['id'] = get_property(properties, 'SapNotesNumber')
             sapnote['componentkey'] = get_property(properties, 'ComponentKey')
@@ -169,23 +178,48 @@ class SAP(Service):
             sapnote['title'] = get_property(properties, 'Title')
             sapnote['priority'] = get_property(properties, 'Priority')
             sapnote['releasedon'] = get_property(properties, 'ReleasedOn')
+            sapnote['feedupdate'] = sapnote['releasedon']
             sapnote['type'] = get_property(properties, 'Type')
             sapnote['version'] = get_property(properties, 'Version')
             sapnote['downloaded'] = ""
             sapnote['bookmark'] = get_property(properties, 'Favorite')
+
+            # Get tags
+            tagmark = "<d:TypeText>Other Terms</d:TypeText>"
+            ts = content.find(tagmark) + len(tagmark)
+            txts = content.find("<d:Text>", ts) + len("<d:Text>")
+            txte = content.find("</d:Text>", ts)
+            html_tags = html.unescape(content[txts:txte])
+            t1 = html_tags.find("<p>") + len("<p>")
+            t2 = html_tags.find("</p>")
+            tags = html_tags[t1:t2].strip()
+            if tags.startswith("<"):
+                sapnote['tags'] = []
+            else:
+                tagset = set()
+                for word in word_tokenize("%s %s" % (tags, sapnote['title'])):
+                    if word not in stopWords and len(word) > 2 and not word.isdigit():
+                        tagset.add(word)
+                sapnote['tags'] = list(tagset)
+
+            # Add SAP Note to an empty collection
             sapnote['collections'] = ["00000000-0000-0000-0000-000000000000"]
+
             self.log.debug ("[%s] SAP Note %s analyzed successfully", rid, sid)
         except Exception as error:
-            self.log.warning("[%s] Content has no valid metadata. Skip.", rid)
+            self.log.warning("[%s] Analysis of SAP Note %s. Content has no valid metadata. Skip.", rid, sid)
+            raise
+            sapnote = []
 
         return sapnote
 
     def dispatch_sapnote(self, data, content):
         rid = data['url_rid']
         sid = data['url_sid']
-        sapnote = self.analyze_sapnote(rid, content)
+
+        sapnote = self.analyze_sapnote(rid, content, sid)
         if len(sapnote) > 0:
-            sid = sapnote['id']
+            # ~ sid = sapnote['id']
             self.srvdtb.store(self.srvutl.format_sid(sid), content)
             self.srvdtb.add([sapnote])
         else:
@@ -196,9 +230,9 @@ class SAP(Service):
 
     def request_complete(self, webdrvsrv, data):
         self.srvuif.activity(True)
-        self.log.info("[%s] Request received", data['url_rid'])
+        self.log.info("[%s] Data received for SAP Note %s", data['url_rid'], data['url_sid'])
         driver = webdrvsrv.get_driver()
-        self.log.debug("[%s] %s - URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
+        # ~ self.log.debug("[%s] %s - URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
         content = driver.page_source
         eval("self.dispatch_%s(data, content)" % data['url_typ'])
 
@@ -221,21 +255,30 @@ class SAP(Service):
         self.srvuif.activity(False)
 
     def download_complete(self, *args):
-        # ~ visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
-        # ~ visor_sapnotes.update()
         self.srvuif.activity(False)
         self.log.info("SAP Notes downloaded")
 
     def download(self, bag):
         self.srvuif.activity(True)
         for sid in bag:
+            uuid4 = str(uuid.uuid4())
+            rid = uuid4[:uuid4.find('-')]
             try:
-                self.log.info("[        ] Requested SAP Note %s" % sid)
-                self.bag_download.add(sid)
-                self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
+                content = self.srvdtb.get_sapnote_content(sid)
+                if content is None:
+                    self.bag_download.add(sid)
+                    # ~ self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
+                    self.log.info("[%s] Requested SAP Note %s", rid, sid)
+                    self.srvweb.request(rid, sid, ODATA_NOTE_URL_LONGTEXT % sid, 'sapnote')
+                else:
+                    self.log.info("SAP Note %s already in database", sid)
+                    data = {}
+                    data['url_rid'] = rid
+                    data['url_sid'] = sid
+                    self.dispatch_sapnote(data, content)
             except Exception as error:
-                pass
-                # ~ self.log.error(error)
+                # ~ pass
+                self.log.error(error)
                 # ~ self.print_traceback()
 
     def set_bookmark(self, bag):

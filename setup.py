@@ -133,10 +133,11 @@ def main():
         # ~ 'install': CustomInstallCommand,
         # ~ },
         install_requires=[
-            'kb4it',
+            # ~ 'kb4it',
+            'nltk',
             'python-dateutil',
             'selenium',
-            'feedparser',
+            # ~ 'feedparser',
             'webdriver_manager',
             'psutil'
         ],
