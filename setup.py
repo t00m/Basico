@@ -16,20 +16,6 @@ import sys
 import subprocess
 from setuptools import setup
 
-# ~ from setuptools.command.install import install
-
-
-# ~ class CustomInstallCommand(install):
-    # ~ """Customized setuptools install command - prints a friendly greeting."""
-    # ~ def run(self):
-        # ~ from kb4it.kb4it import KB4IT
-        # ~ from argparse import Namespace
-        # ~ params = Namespace(FORCE=True, LOGLEVEL='DEBUG', SORT_ATTRIBUTE=None, SOURCE_PATH='/tmp/myapp', TARGET_PATH='/tmp/output', THEME=None)
-        # ~ kb = KB4IT(params)
-        # ~ print(dir(kb))
-        # ~ install.run(self)
-
-
 if sys.platform == 'win32':
     import os.path
     HOME = os.path.expanduser('~')
@@ -49,8 +35,6 @@ def add_data_from_dir(root_data):
     resdirs = set()
     for root, dirs, files in os.walk(root_data):
         resdirs.add(os.path.realpath(root))
-
-    # ~ resdirs.remove(os.path.realpath(root_data))
 
     for directory in resdirs:
         files = glob.glob(os.path.join(directory, '*'))
@@ -127,19 +111,13 @@ def main():
         download_url = 'https://github.com/t00m/Basico/archive/master.zip',
         license='GPLv3',
         packages=['basico', 'basico.core', 'basico.services', 'basico.widgets'],
-        # distutils does not support install_requires, but pip needs it to be
-        # able to automatically install dependencies
-        # ~ cmdclass={
-        # ~ 'install': CustomInstallCommand,
-        # ~ },
         install_requires=[
             # ~ 'kb4it',
             'nltk',
-            'python-dateutil',
-            'selenium',
-            # ~ 'feedparser',
-            'webdriver_manager',
-            'psutil'
+            # ~ 'python-dateutil',
+            # ~ 'selenium',
+            # ~ 'webdriver_manager',
+            # ~ 'psutil'
         ],
         include_package_data=True,
         data_files=data_files,

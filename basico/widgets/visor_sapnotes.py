@@ -82,7 +82,7 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
         self.srvutl = self.get_service('Utils')
-        self.srvweb = self.get_service('Driver')
+        # ~ self.srvweb = self.get_service('Driver')
         self.srvclb = self.get_service('Callbacks')
 
 
@@ -739,12 +739,12 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
         button = self.srvuif.get_popover_button("<b>Browse</b> SAP Note %d" % isid, 'basico-browse-web')
         self.srvgui.add_widget('gtk_button_sapnote_browse', button)
         # ~ self.srvgui.add_signal('gtk_button_sapnote_browse', 'clicked', 'self.srvweb.browse_note', sid)
-        button.connect('clicked', self.srvweb.browse_note, sid)
+        # ~ button.connect('clicked', self.srvweb.browse_note, sid)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Download SAP Note in PDF"
         button = self.srvuif.get_popover_button("See SAP Note %d in <b>PDF</b>" % isid, 'basico-browse-pdf')
-        button.connect('clicked', self.srvweb.browse_pdf, sid)
+        # ~ button.connect('clicked', self.srvweb.browse_pdf, sid)
         box.pack_start(button, False, False, 0)
 
         # Popover button "Bookmark"

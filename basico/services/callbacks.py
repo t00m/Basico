@@ -67,7 +67,7 @@ class Callback(Service):
         self.srvicm = self.get_service('IM')
         self.srvutl = self.get_service('Utils')
         self.srvclt = self.get_service('Collections')
-        self.srvweb = self.get_service('Driver')
+        # ~ self.srvweb = self.get_service('Driver')
         # ~ self.srvbkb = self.get_service('KB4IT')
         self.srvclb = self # Trick
         self.srvgui.connect('new-signal', self.connect_signal)
@@ -176,8 +176,8 @@ class Callback(Service):
             menuview.populate_by_bookmarks()
             button.set_active(False)
 
-    def gui_visor_sapnotes_update_sapnotes(self, bag):
-        self.srvsap.download(bag)
+    # ~ def gui_visor_sapnotes_update_sapnotes(self, bag):
+        # ~ self.srvsap.download(bag)
 
     ## Menuview callabacks ##
     def gui_menuview_toggled(self, *args):

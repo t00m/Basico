@@ -30,7 +30,7 @@ from basico.services.settings import Settings
 from basico.services.uif import UIFuncs
 from basico.services.callbacks import Callback
 from basico.services.database import Database
-from basico.services.download import DownloadManager
+# ~ from basico.services.download import DownloadManager
 from basico.services.collections import Collections
 from basico.widgets.splash import Splash
 
@@ -55,7 +55,7 @@ class Basico(object):
         self.setup_environment()
         self.setup_services()
         self.setup_splash()
-        self.setup_post()
+        # ~ self.setup_post()
 
 
     def get_splash(self):
@@ -117,7 +117,7 @@ class Basico(object):
                 'IM'            :   IconManager(),
                 'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
-                'Driver'        :   DownloadManager(),
+                # ~ 'Driver'        :   DownloadManager(),
                 'Collections'   :   Collections()
                 # ~ 'KB4IT'         :   KB4Basico()
             }
@@ -129,24 +129,24 @@ class Basico(object):
             raise
 
 
-    def setup_post(self):
-        # Patch Selenium 4
-        FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'] = os.path.join(os.path.dirname(selenium.__file__), 'webdriver/firefox/webdriver_prefs.json')
-        if not os.path.exists(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET']):
-            try:
-                shutil.copy(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'], FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
-                self.log.debug("Webdriver preferences config file not found. Python Selenium libs patched locally")
-            except:
-                self.log.warning("Firefox Webdriver preferences not found in: ")
-                self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
-                self.log.warning("Copied missing file from: ")
-                self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'])
+    # ~ def setup_post(self):
+        # ~ # Patch Selenium 4
+        # ~ FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'] = os.path.join(os.path.dirname(selenium.__file__), 'webdriver/firefox/webdriver_prefs.json')
+        # ~ if not os.path.exists(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET']):
+            # ~ try:
+                # ~ shutil.copy(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'], FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
+                # ~ self.log.debug("Webdriver preferences config file not found. Python Selenium libs patched locally")
+            # ~ except:
+                # ~ self.log.warning("Firefox Webdriver preferences not found in: ")
+                # ~ self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
+                # ~ self.log.warning("Copied missing file from: ")
+                # ~ self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'])
 
-        if not os.path.exists(FILE['L_SAP_PRODUCTS']):
-            shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
-            self.log.debug("SAP Products file copied to local database resources directory")
+        # ~ if not os.path.exists(FILE['L_SAP_PRODUCTS']):
+            # ~ shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
+            # ~ self.log.debug("SAP Products file copied to local database resources directory")
 
-        # ~ self.get_service('KB4IT')
+
 
 
     def get_service(self, name):

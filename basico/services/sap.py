@@ -63,10 +63,10 @@ class SAP(Service):
         self.connect_signals()
 
     def connect_signals(self):
-        self.connect('sap-download-complete', self.download_complete)
-        self.srvweb.connect('request-complete', self.request_complete)
-        self.srvweb.connect('request-canceled', self.request_canceled)
-        self.srvweb.connect('download-canceled-user', self.donwload_canceled)
+        # ~ self.connect('sap-download-complete', self.download_complete)
+        # ~ self.srvweb.connect('request-complete', self.request_complete)
+        # ~ self.srvweb.connect('request-canceled', self.request_canceled)
+        # ~ self.srvweb.connect('download-canceled-user', self.donwload_canceled)
         self.log.debug("Listening to Webdriver Service")
 
     def get_services(self):
@@ -75,7 +75,7 @@ class SAP(Service):
         self.srvutl = self.get_service('Utils')
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')
-        self.srvweb = self.get_service('Driver')
+        # ~ self.srvweb = self.get_service('Driver')
         self.srvuif = self.get_service("UIF")
 
     def __fix_collections(self):
@@ -228,58 +228,57 @@ class SAP(Service):
             self.log.warning("[%s] \t   Edit profile: firefox --profile %s", rid, LPATH['FIREFOX_PROFILE'])
             self.log.warning("[%s] \t2. SAP Note %s is not available or doesn't exist", rid, sid)
 
-    def request_complete(self, webdrvsrv, data):
-        self.srvuif.activity(True)
-        self.log.info("[%s] Data received for SAP Note %s", data['url_rid'], data['url_sid'])
-        driver = webdrvsrv.get_driver()
+    # ~ def request_complete(self, webdrvsrv, data):
+        # ~ self.srvuif.activity(True)
+        # ~ self.log.info("[%s] Data received for SAP Note %s", data['url_rid'], data['url_sid'])
+        # ~ driver = webdrvsrv.get_driver()
         # ~ self.log.debug("[%s] %s - URL: %s", data['url_rid'], data['url_typ'], driver.current_url)
-        content = driver.page_source
-        eval("self.dispatch_%s(data, content)" % data['url_typ'])
+        # ~ content = driver.page_source
+        # ~ eval("self.dispatch_%s(data, content)" % data['url_typ'])
 
-        try:
-            self.bag_download.remove(data['url_sid'])
-        except KeyError:
-            self.log.warning("Request already completed for SAP Note %s", data['url_sid'])
-        bag_empty = len(self.bag_download) == 0
-        self.log.debug("SAP Download basket: %s (Empty=%s)", len(self.bag_download), bag_empty)
-        if bag_empty:
-            self.emit('sap-download-complete')
+        # ~ try:
+            # ~ self.bag_download.remove(data['url_sid'])
+        # ~ except KeyError:
+            # ~ self.log.warning("Request already completed for SAP Note %s", data['url_sid'])
+        # ~ bag_empty = len(self.bag_download) == 0
+        # ~ self.log.debug("SAP Download basket: %s (Empty=%s)", len(self.bag_download), bag_empty)
+        # ~ if bag_empty:
+            # ~ self.emit('sap-download-complete')
 
-    def request_canceled(self, webdrvsrv, data):
-        self.srvuif.activity(True)
-        self.log.error("[%s] Request canceled", data['url_rid'])
-        self.bag_download.remove(data['url_sid'])
-        self.bag_download = set()
+    # ~ def request_canceled(self, webdrvsrv, data):
+        # ~ self.srvuif.activity(True)
+        # ~ self.log.error("[%s] Request canceled", data['url_rid'])
+        # ~ self.bag_download.remove(data['url_sid'])
+        # ~ self.bag_download = set()
 
-    def donwload_canceled(self, *args):
-        self.srvuif.activity(False)
+    # ~ def donwload_canceled(self, *args):
+        # ~ self.srvuif.activity(False)
 
-    def download_complete(self, *args):
-        self.srvuif.activity(False)
-        self.log.info("SAP Notes downloaded")
+    # ~ def download_complete(self, *args):
+        # ~ self.srvuif.activity(False)
+        # ~ self.log.info("SAP Notes downloaded")
 
-    def download(self, bag):
-        self.srvuif.activity(True)
-        for sid in bag:
-            uuid4 = str(uuid.uuid4())
-            rid = uuid4[:uuid4.find('-')]
-            try:
-                content = self.srvdtb.get_sapnote_content(sid)
-                if content is None:
-                    self.bag_download.add(sid)
+    # ~ def download(self, bag):
+        # ~ self.srvuif.activity(True)
+        # ~ for sid in bag:
+            # ~ uuid4 = str(uuid.uuid4())
+            # ~ rid = uuid4[:uuid4.find('-')]
+            # ~ try:
+                # ~ content = self.srvdtb.get_sapnote_content(sid)
+                # ~ if content is None:
+                    # ~ self.bag_download.add(sid)
                     # ~ self.srvweb.request(sid, ODATA_NOTE_URL % sid, 'sapnote')
-                    self.log.info("[%s] Requested SAP Note %s", rid, sid)
-                    self.srvweb.request(rid, sid, ODATA_NOTE_URL_LONGTEXT % sid, 'sapnote')
-                else:
-                    self.log.info("SAP Note %s already in database", sid)
-                    data = {}
-                    data['url_rid'] = rid
-                    data['url_sid'] = sid
-                    self.dispatch_sapnote(data, content)
-            except Exception as error:
-                # ~ pass
-                self.log.error(error)
-                # ~ self.print_traceback()
+                    # ~ self.log.info("[%s] Requested SAP Note %s", rid, sid)
+                    # ~ self.srvweb.request(rid, sid, ODATA_NOTE_URL_LONGTEXT % sid, 'sapnote')
+                # ~ else:
+                    # ~ self.log.info("SAP Note %s already in database", sid)
+                    # ~ data = {}
+                    # ~ data['url_rid'] = rid
+                    # ~ data['url_sid'] = sid
+                    # ~ self.dispatch_sapnote(data, content)
+            # ~ except Exception as error:
+                # ~ self.log.error(error)
+
 
     def set_bookmark(self, bag):
         sapnotes = self.srvdtb.get_notes()
