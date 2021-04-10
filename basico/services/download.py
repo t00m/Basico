@@ -12,12 +12,12 @@ import sys
 import time
 import glob
 import logging
+import random
 import subprocess
 from enum import IntEnum
 import threading
 import queue
-import time
-import uuid
+
 
 from gi.repository import GLib
 from gi.repository import GObject
@@ -91,8 +91,8 @@ class DownloadManager(Service):
     def check_profile(self, rid):
         files = glob.glob(os.path.join(LPATH['FIREFOX_PROFILE'], '*'))
         has_profile = len(files) > 0
-        self.log.debug("[%s] Webdriver profile available? %s", rid, has_profile)
         if not has_profile:
+            self.log.warning("[%s] Webdriver profile available? %s", rid, has_profile)
             self.emit('download-profile-missing')
         return has_profile
 
@@ -114,13 +114,13 @@ class DownloadManager(Service):
     def get_url_type(self):
         return self.url_type
 
-    def request(self, url_sid, url_uri, url_type):
-        uuid4 = str(uuid.uuid4())
-        rid = uuid4[:uuid4.find('-')]
-
+    def request(self, rid, url_sid, url_uri, url_type):
+        wait_time = 30 * random.random() # random wait from 0 to 5s
+        self.log.debug("Download waiting time: %2.2f" % wait_time)
+        time.sleep(wait_time)
         try:
             alive = self.th.is_alive()
-            self.log.debug("[%s] Download thread alive? %s" , rid, alive)
+            # ~ self.log.debug("[%s] Download thread alive? %s" , rid, alive)
             if not alive:
                 self.log.debug("[%s] Restarting download process", rid)
                 self.th = threading.Thread(name='download', target=self.download)
@@ -136,7 +136,7 @@ class DownloadManager(Service):
             return
 
 
-        self.log.info("[%s] Request enqueued", rid)
+        self.log.info("[%s] Request enqueued for SAP Note %s", rid, url_sid)
         self.requests[rid] = {}
         self.requests[rid]['url_rid'] = rid
         self.requests[rid]['url_sid'] = url_sid
@@ -148,19 +148,18 @@ class DownloadManager(Service):
         while True:
             rid = self.queue.get()
             url = self.requests[rid]['url_uri']
-            self.log.debug("[%s] Request download: %s", rid, url)
+            sid = self.requests[rid]['url_sid']
+            self.log.debug("[%s] Request download for SAP Note %s", rid, sid)
             if self.retry > 2:
                 self.__set_driver_status(DriverStatus.DISABLE)
 
             status = self.get_driver_status()
-            self.log.debug("[%s] WebDriver status: %s", rid, status)
-
+            # ~ self.log.debug("[%s] WebDriver status: %s", rid, status)
             if status == DriverStatus.DISABLE:
                 self.log.error("[%s] Webdriver not working anymore", rid)
                 return None
 
             while status == DriverStatus.RUNNING:
-                time.sleep(1)
                 status = self.get_driver_status()
 
             if status == DriverStatus.STOPPED:
@@ -192,7 +191,7 @@ class DownloadManager(Service):
                 except TimeoutException:
                     self.__set_driver_status(DriverStatus.WAITING)
                 except Exception as error:
-                    self.log.error(error)
+                    self.log.debug("[%s] Webdriver Error: %s", rid, error)
                     self.retry += 1
                     self.__set_driver_status(DriverStatus.STOPPED)
                     self.request(url)

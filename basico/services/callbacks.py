@@ -68,7 +68,7 @@ class Callback(Service):
         self.srvutl = self.get_service('Utils')
         self.srvclt = self.get_service('Collections')
         self.srvweb = self.get_service('Driver')
-        self.srvbkb = self.get_service('KB4IT')
+        # ~ self.srvbkb = self.get_service('KB4IT')
         self.srvclb = self # Trick
         self.srvgui.connect('new-signal', self.connect_signal)
 

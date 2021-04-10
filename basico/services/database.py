@@ -74,11 +74,14 @@ class Database(Service):
 
 
     def get_sapnote_content(self, sid):
-        fname = sid + '.xml'
-        FSAPNOTE = os.path.join(LPATH['CACHE_XML'], fname)
-        content = open(FSAPNOTE, 'r').read()
-        return content
-
+        sid = self.normalize_sid(sid)
+        try:
+            fname = sid + '.xml'
+            FSAPNOTE = os.path.join(LPATH['CACHE_XML'], fname)
+            content = open(FSAPNOTE, 'r').read()
+            return content
+        except:
+            return None
 
     def is_saved(self, sid):
         metadata = self.get_sapnote_metadata(sid)
