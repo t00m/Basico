@@ -114,14 +114,10 @@ def main():
         license='GPLv3',
         packages=['basico', 'basico.core', 'basico.services', 'basico.widgets'],
         install_requires=[
-            # ~ 'kb4it',
             'nltk',
             'inotify',
-            'GitPython'
-            # ~ 'python-dateutil',
-            # ~ 'selenium',
-            # ~ 'webdriver_manager',
-            # ~ 'psutil'
+            'GitPython',
+            'Yapsy==1.12.0'
         ],
         include_package_data=True,
         data_files=data_files,
