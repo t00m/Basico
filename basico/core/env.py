@@ -9,8 +9,18 @@
 
 import sys
 import os
+
+
+from git import Repo
+
 from os.path import abspath, sep as SEP
 
+# Git Repo info
+repo = Repo('.', search_parent_directories=True)
+sha = repo.head.commit.hexsha
+short_sha = repo.git.rev_parse(sha, short=8)
+
+# Directory initialization
 ROOT = abspath(sys.modules[__name__].__file__ + "/../../")
 USER_DIR = os.path.expanduser('~')
 
@@ -19,11 +29,11 @@ APP = {}
 APP['short'] = "basico"
 APP['name'] = "SAP Notes Manager for SAP Consultants"
 APP['license'] = "The code is licensed under the terms of the  GPL v3\nso you're free to grab, extend, improve and fork the code\nas you want"
-APP['copyright'] = "Copyright \xa9 2016-2020 Tomás Vírseda"
+APP['copyright'] = u"Copyright \xa9 Tomás Vírseda"
 APP['desc'] = "SAP Notes Manager for SAP Consultants\n\nThe code is licensed under the terms of the  GPL v3 so you're free to grab, extend, improve and fork the code as you want"
-APP['version'] = "0.4"
-APP['authors'] = ["Tomás Vírseda <tomasvirseda@gmail.com>"]
-APP['documenters'] = ["Tomás Vírseda <tomasvirseda@gmail.com>"]
+APP['version'] = "0.4-%s" % short_sha
+APP['authors'] = [u"Tomás Vírseda <tomasvirseda@gmail.com>"]
+APP['documenters'] = []
 APP['email'] = "tomasvirseda@gmail.com"
 
 

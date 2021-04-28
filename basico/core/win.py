@@ -70,6 +70,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
     def get_services(self):
         self.srvicm = self.controller.get_service('IM')
         self.srvclb = self.controller.get_service('Callbacks')
+        self.srvnfy = self.controller.get_service('Notify')
 
     def setup_controller(self, uiapp):
         self.controller = uiapp.get_controller()
@@ -98,7 +99,8 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
     def setup_headerbar(self):
         hb = self.srvgui.add_widget('gtk_headerbar_container', Gtk.HeaderBar())
         hb.set_show_close_button(True)
-        hb.props.title = "Basico"
+        title = "%s %s" % (APP['short'].title(), APP['version'])
+        hb.props.title = title
         hb.props.subtitle = "SAP Notes Manager for SAP Consultants"
         lhbox = self.setup_headerbar_left(hb)
         hb.pack_start(lhbox)

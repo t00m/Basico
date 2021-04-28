@@ -50,19 +50,23 @@ class Service(GObject.GObject):
         Configure and Start a service
         Use 'initialize' for writinga custom init method
         """
+        self.name = name
         self.started = True
         self.app = app
         self.section = section_name
-        # ~ self.log = logging.getLogger(name)
         self.log = get_logger(name)
         self.log.addHandler(self.app.intercepter)
         self.init_section(section_name)
         self.get_services()
         try:
             self.initialize()
+            self.log.debug("Service '%s' started" , name)
         except Exception as error:
-            self.log.debug (self.get_traceback())
-        self.log.debug("Service '%s' started" , name)
+            self.log.error (self.get_traceback())
+        plugins = app.get_service('Plugins')
+        if name != 'Plugins':
+            plugins.run(category=name)
+
 
     def end(self):
         """
@@ -72,8 +76,9 @@ class Service(GObject.GObject):
         self.started = False
         try:
             self.finalize()
+            self.log.debug("Service '%s' stopped" , self.name)
         except Exception as error:
-            self.log.debug (self.get_traceback())
+            self.log.error (self.get_traceback())
 
     def initialize(self):
         """Initialize service.

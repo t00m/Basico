@@ -58,7 +58,7 @@ class SAP(Service):
         '''
         Setup AppLogic Service
         '''
-        GObject.signal_new('sap-download-complete', SAP, GObject.SignalFlags.RUN_LAST, None, () )
+        # ~ GObject.signal_new('sap-download-complete', SAP, GObject.SignalFlags.RUN_LAST, None, () )
         self.__fix_collections()
         self.connect_signals()
 
@@ -67,6 +67,7 @@ class SAP(Service):
         # ~ self.srvweb.connect('request-complete', self.request_complete)
         # ~ self.srvweb.connect('request-canceled', self.request_canceled)
         # ~ self.srvweb.connect('download-canceled-user', self.donwload_canceled)
+        self.srvnfy.connect('notify-sapnote-new', self.download_complete)
         self.log.debug("Listening to Webdriver Service")
 
     def get_services(self):
@@ -75,6 +76,8 @@ class SAP(Service):
         self.srvutl = self.get_service('Utils')
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')
+        self.srvnfy = self.get_service('Notify')
+
         # ~ self.srvweb = self.get_service('Driver')
         self.srvuif = self.get_service("UIF")
 
@@ -254,9 +257,9 @@ class SAP(Service):
     # ~ def donwload_canceled(self, *args):
         # ~ self.srvuif.activity(False)
 
-    # ~ def download_complete(self, *args):
-        # ~ self.srvuif.activity(False)
-        # ~ self.log.info("SAP Notes downloaded")
+    def download_complete(self, signal, filename):
+        self.srvuif.activity(False)
+        self.log.info("SAP Note downloaded: %s", filename)
 
     # ~ def download(self, bag):
         # ~ self.srvuif.activity(True)

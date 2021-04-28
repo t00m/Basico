@@ -27,7 +27,6 @@ class BasicoWidget(object):
         """Initialize Service instance"""
         self.app = app
         self.name = name
-        # ~ self.log = logging.getLogger(name)
         self.log = get_logger(name)
         self.log.addHandler(self.app.intercepter)
         self.srvstg = self.get_service('Settings')

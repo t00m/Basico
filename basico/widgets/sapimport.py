@@ -119,5 +119,5 @@ class ImportWidget(BasicoWidget, Gtk.VBox):
         # downloaded in background one by one.
         if len(lbag) > 0:
             self.log.debug("Number of SAP Notes to be downloaded: %d", len(lbag))
-            self.srvsap.download(lbag)
+            # ~ self.srvsap.download(lbag)
         dlbuffer.set_text('')

@@ -34,6 +34,7 @@ def add_data_from_dir(root_data):
     dir_files = []
     resdirs = set()
     for root, dirs, files in os.walk(root_data):
+        print("%s -> %s" % (root, dirs))
         resdirs.add(os.path.realpath(root))
 
     for directory in resdirs:
@@ -98,6 +99,7 @@ data_files += add_data_basico()
 data_files += add_data_from_dir('basico/data/help')
 data_files += add_data_from_dir('basico/data/kb4it')
 data_files += add_data_from_dir('basico/data/icons')
+data_files += add_data_from_dir('basico/data/plugins')
 
 def main():
     setup(
@@ -114,6 +116,8 @@ def main():
         install_requires=[
             # ~ 'kb4it',
             'nltk',
+            'inotify',
+            'GitPython'
             # ~ 'python-dateutil',
             # ~ 'selenium',
             # ~ 'webdriver_manager',

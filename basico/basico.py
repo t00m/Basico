@@ -19,8 +19,11 @@ import selenium
 from gi.repository import GLib
 from gi.repository import GObject
 
+from yapsy.PluginManager import PluginManager
+
 from basico.core.env import APP, LPATH, GPATH, FILE
 from basico.core.log import LogIntercepter, queue_log, get_logger
+
 # ~ from basico.services.kb4it import KB4Basico
 from basico.services.util import Utils
 from basico.services.gui import GUI
@@ -30,6 +33,9 @@ from basico.services.settings import Settings
 from basico.services.uif import UIFuncs
 from basico.services.callbacks import Callback
 from basico.services.database import Database
+from basico.services.notify import Notify
+from basico.services.plugins import Plugins
+
 # ~ from basico.services.download import DownloadManager
 from basico.services.collections import Collections
 from basico.widgets.splash import Splash
@@ -37,40 +43,37 @@ from basico.widgets.splash import Splash
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)25s | %(asctime)s | %(message)s")
 
-#DOC: http://stackoverflow.com/questions/16410852/keyboard-interrupt-with-with-python-gtk
+# DOC: http://stackoverflow.com/questions/16410852/keyboard-interrupt-with-with-python-gtk
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 class Basico(object):
     """
     Basico Application class
     """
+    plugins = None
     intercepter = LogIntercepter()
 
     def __init__(self):
         """
         Basico class
         """
-
         self.setup_logging()
         self.setup_environment()
         self.setup_services()
         self.setup_splash()
-        # ~ self.setup_post()
-
 
     def get_splash(self):
         return self.splash
 
 
     def setup_splash(self):
-        self.splash = Splash(title="Basico\n0.4", font='Roboto Slab 24', font_weight='bold', font_color="#FFFFFF", background_image=FILE['SPLASH'], app=self)
-
+        title = "%s\n%s\n%s" % (APP['short'].title(), APP['name'], APP['version'])
+        self.splash = Splash(title=title, font='Roboto Slab 24', font_weight='bold', font_color="#FFFFFF", background_image=FILE['SPLASH'], app=self)
 
     def setup_environment(self):
         """
         Setup Basico environment
         """
-        # Create local paths if they do not exist
         self.log.debug("Checking directories for Basico")
         for entry in LPATH:
             if not os.path.exists(LPATH[entry]):
@@ -78,34 +81,23 @@ class Basico(object):
                 self.log.debug("Directory %s created", LPATH[entry])
         self.log.debug("Basico directory structure ok")
 
-        # ~ self.log.debug("Global path: %s", GPATH['ROOT'])
-        # ~ self.log.debug("Local path: %s", LPATH['ROOT'])
+        self.log.debug("Global path: %s", GPATH['ROOT'])
+        self.log.debug("Local path: %s", LPATH['ROOT'])
 
     def setup_logging(self):
         """
         Setup Basico logging
         """
-        # Truncate existing log file
-        # ~ if os.path.exists(FILE['LOG']):
-            # ~ with open(FILE['LOG'], 'w') as flog:
-                # ~ pass
-
-        #Initialize logging
-        # ~ self.log = logging.getLogger(__class__.__name__)
         self.log = get_logger(__class__.__name__)
         self.log.addHandler(self.intercepter)
         self.log.info("Basico %s started", APP['version'])
-
-        # ~ self.log.debug("Logging all messages to file: %s", FILE['LOG'])
-        # ~ self.log.debug("Logging only events: %s", FILE['EVENTS'])
-
 
     def setup_services(self):
         """
         Setup Basico Services
         """
 
-        # Declare and register services
+        self.log.debug("Declare and register services")
         self.services = {}
         try:
             services = {
@@ -113,41 +105,24 @@ class Basico(object):
                 'Utils'         :   Utils(),
                 'UIF'           :   UIFuncs(),
                 'SAP'           :   SAP(),
-                'Settings'      :   Settings(),
                 'IM'            :   IconManager(),
                 'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
-                # ~ 'Driver'        :   DownloadManager(),
+                'Notify'        :   Notify(),
                 'Collections'   :   Collections()
-                # ~ 'KB4IT'         :   KB4Basico()
             }
 
+            self.register_service('Settings', Settings())
+            self.get_service('Settings')
+            self.register_service('Plugins', Plugins())
+            self.plugins = self.get_service('Plugins')
+            self.plugins.start(self, 'Plugins', 'Plugins')
             for name in services:
                 self.register_service(name, services[name])
+
         except Exception as error:
             self.log.error(error)
             raise
-
-
-    # ~ def setup_post(self):
-        # ~ # Patch Selenium 4
-        # ~ FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'] = os.path.join(os.path.dirname(selenium.__file__), 'webdriver/firefox/webdriver_prefs.json')
-        # ~ if not os.path.exists(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET']):
-            # ~ try:
-                # ~ shutil.copy(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'], FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
-                # ~ self.log.debug("Webdriver preferences config file not found. Python Selenium libs patched locally")
-            # ~ except:
-                # ~ self.log.warning("Firefox Webdriver preferences not found in: ")
-                # ~ self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_TARGET'])
-                # ~ self.log.warning("Copied missing file from: ")
-                # ~ self.log.warning(FILE['SELENIUM_FIREFOX_WEBDRIVER_CONFIG_SOURCE'])
-
-        # ~ if not os.path.exists(FILE['L_SAP_PRODUCTS']):
-            # ~ shutil.copy(FILE['G_SAP_PRODUCTS'], FILE['L_SAP_PRODUCTS'])
-            # ~ self.log.debug("SAP Products file copied to local database resources directory")
-
-
-
 
     def get_service(self, name):
         """
@@ -156,12 +131,18 @@ class Basico(object):
         try:
             service = self.services[name]
             logname = service.__class__.__name__
-            if not service.is_started():
-                service.start(self, logname, name)
+            if service is not None and not service.is_started():
+                self.log.debug(name)
+                if self.plugins is not None and name != 'Plugins':
+                    service.start(self, logname, name)
             return service
         except KeyError as service:
             self.log.error("Service %s not registered or not found", service)
             raise
+
+    def get_services(self):
+        """Get all services registered"""
+        return list(self.services.keys())
 
 
     def register_service(self, name, service):
@@ -178,8 +159,11 @@ class Basico(object):
         """
         Deregister a running service
         """
-        self.services[name].end()
-        self.services[name] = None
+        try:
+            self.services[name].end()
+            self.services[name] = None
+        except AttributeError:
+            self.log.debug("Service %s was not running!" % name)
 
 
     def stop(self):

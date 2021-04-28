@@ -409,7 +409,7 @@ class Database(Service):
         self.save_notes()
         self.emit('database-updated')
 
-    def end(self):
+    def finalize(self):
         self.save_notes()
         self.emit('database-closed')
 
