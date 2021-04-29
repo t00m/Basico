@@ -132,20 +132,6 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
         tool.set_expand(False)
         self.toolbar.insert(tool, -1)
 
-        # Fullscreen toggle button
-        # ~ tool = Gtk.ToolItem()
-        # ~ tool.set_expand(False)
-        # ~ icon = self.srvicm.get_new_image_icon('basico-fullscreen', 24, 24)
-        # ~ box = self.srvgui.add_widget('gtk_box_container_icon_fullscreen', Gtk.Box())
-        # ~ box.pack_start(icon, False, False, 0)
-        # ~ button = Gtk.ToggleButton()
-        # ~ button.set_relief(Gtk.ReliefStyle.NONE)
-        # ~ button.connect('toggled', self.srvclb.gui_toggle_fullscreen)
-        # ~ button.add(box)
-        # ~ tool.add(button)
-        # ~ tool.set_tooltip_markup('<b>Fullscreen/Window mode</b>')
-        # ~ self.toolbar.insert(tool, -1)
-
         ## Import button
         tool = Gtk.ToolButton()
         tool.set_icon_name('basico-add')
@@ -333,3 +319,6 @@ class VisorToolbar(BasicoWidget, Gtk.VBox):
     def entry_filter(self, *args):
         visor_sapnotes = self.srvgui.get_widget('visor_sapnotes')
         visor_sapnotes.filter()
+
+    def get_toolbar(self):
+        return self.toolbar

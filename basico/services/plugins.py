@@ -9,31 +9,37 @@
 
 import sys
 import logging
+from configparser import ConfigParser
 
 from gi.repository import GLib
 from gi.repository import GObject
 
 # ~ from yapsy.IPlugin import IPlugin
 from yapsy.PluginManager import PluginManager
+from yapsy.ConfigurablePluginManager import ConfigurablePluginManager
 
 from basico.core.env import GPATH, LPATH
 from basico.core.srv import Service
 import basico.core.plg as plugintypes
 
+# ~ CONFIG_SECTION_NAME = 'Plugin Management'
 
 class Plugins(Service):
-    manager = None
+    manager = None    
 
     def initialize(self):
         self.log.debug("Init Plugin System")
         logging.getLogger('yapsy').setLevel(logging.INFO)
-        self.manager = PluginManager()
+        # ~ self.manager = PluginManager()
+        self.manager = ConfigurablePluginManager(configparser_instance=ConfigParser())
+        self.log.debug(dir(self.manager))
         self.add_plugin_dir(GPATH['PLUGINS'])
         self.add_plugin_dir(LPATH['PLUGINS'])
         # ~ for name in self.app.get_services():
         self.add_category_filter("Reporting", plugintypes.IBasicoReporting)
         self.add_category_filter("Database", plugintypes.IBasicoDatabase)
         self.add_category_filter("SAP", plugintypes.IBasicoSAP)
+        self.add_category_filter("GUI", plugintypes.IBasicoGUI)
         self.manager.collectPlugins()
         self.init()
         self.log.debug("Plugin System initialized")
@@ -69,6 +75,9 @@ class Plugins(Service):
                 plugin.run(self.app)
         else:
             self.log.warning("No plugins found for category '%s'", category)
+        
+        cp = self.manager.config_parser
+        self.log.debug("Config Parser: %s", list(cp.keys()))
 
     def init(self):
         plugins = self.get_plugins()
@@ -77,6 +86,7 @@ class Plugins(Service):
             plugin = pluginInfo.plugin_object
             try:
                 plugin.init(self.app)
+                self.manager.activatePluginByName(pluginInfo.name, ', '.join(pluginInfo.categories))
                 self.log.debug("\t-> %s (%s) by %s on category %s" % (pluginInfo.name, pluginInfo.description, pluginInfo.author, "'%s'" % ', '.join(pluginInfo.categories)))
             except Exception as error:
                 self.log.error(error)

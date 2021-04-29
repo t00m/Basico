@@ -64,7 +64,7 @@ class Service(GObject.GObject):
         except Exception as error:
             self.log.error (self.get_traceback())
         plugins = app.get_service('Plugins')
-        if name != 'Plugins':
+        if name not in ['Plugins', 'GUI']:
             plugins.run(category=name)
 
 

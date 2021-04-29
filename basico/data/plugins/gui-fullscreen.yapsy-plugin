@@ -1,0 +1,9 @@
+[Core]
+Name = Enable fullscreen
+Module = gui-fullscreen
+
+[Documentation]
+Author = Tomas Virseda
+Version = 0.1
+Website = http://lotsofplugins.com
+Description = Basico GUI Plugin for enabling GUI fullscreen

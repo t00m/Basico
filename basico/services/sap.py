@@ -16,7 +16,9 @@ import traceback
 from shutil import which
 
 import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
+    
 from nltk.tokenize import word_tokenize
 
 from gi.repository import GObject

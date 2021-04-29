@@ -16,6 +16,9 @@ class IBasico(IPlugin):
 
     def init(self, *args):
         self.log.debug(args)
+    
+    def run(self, *args):
+        self.install()
 
 class IBasicoDatabase(IBasico):
     def __init__(self, *args):
@@ -36,3 +39,8 @@ class IBasicoReporting(IBasico):
 class IBasicoSAP(IBasico):
     def __init__(self, *args):
         self.log = get_logger(__class__.__name__)
+        
+class IBasicoGUI(IBasico):
+    def __init__(self, *args):
+        self.log = get_logger(__class__.__name__)
+    

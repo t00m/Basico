@@ -83,6 +83,10 @@ class Callback(Service):
 
         # Connect signals
         self.connect_signals()
+        
+        # Execute GUI plugins
+        plugins = self.get_service('Plugins')        
+        plugins.run(category='GUI')  
 
         # Alive
         self.srvgui.set_running(True)

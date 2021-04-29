@@ -132,7 +132,6 @@ class Basico(object):
             service = self.services[name]
             logname = service.__class__.__name__
             if service is not None and not service.is_started():
-                self.log.debug(name)
                 if self.plugins is not None and name != 'Plugins':
                     service.start(self, logname, name)
             return service
