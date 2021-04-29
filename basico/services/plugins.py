@@ -9,29 +9,48 @@
 
 import sys
 import logging
-from configparser import ConfigParser
+from configparser import SafeConfigParser
 
 from gi.repository import GLib
 from gi.repository import GObject
 
-# ~ from yapsy.IPlugin import IPlugin
 from yapsy.PluginManager import PluginManager
 from yapsy.ConfigurablePluginManager import ConfigurablePluginManager
+from yapsy.ConfigurablePluginManager import ConfigurablePluginManager
+from yapsy.VersionedPluginManager import VersionedPluginManager
+from yapsy.PluginManager import PluginManagerSingleton
 
-from basico.core.env import GPATH, LPATH
+from basico.core.env import APP, FILE, GPATH, LPATH
 from basico.core.srv import Service
 import basico.core.plg as plugintypes
 
 # ~ CONFIG_SECTION_NAME = 'Plugin Management'
 
+APP_NAME = APP['short']
+
 class Plugins(Service):
     manager = None    
+    config = None
 
     def initialize(self):
-        self.log.debug("Init Plugin System")
-        logging.getLogger('yapsy').setLevel(logging.INFO)
-        # ~ self.manager = PluginManager()
-        self.manager = ConfigurablePluginManager(configparser_instance=ConfigParser())
+        self.log.debug("Init Plugin System")                
+        logging.getLogger('yapsy').setLevel(logging.INFO) # Disable Yaspy logging
+        
+        # Define plugins configuration file
+        self.config_file = FILE['PLUGINS_CONF']
+        self.config = SafeConfigParser()
+        self.config.read(self.config_file)
+        
+        # Create plugin manager
+        PluginManagerSingleton.setBehaviour([
+            ConfigurablePluginManager,
+            VersionedPluginManager,
+        ])
+        self.manager = PluginManagerSingleton.get()
+        self.manager.app = self.app
+        self.manager.setConfigParser(self.config, self.write_config)
+        
+        # ~ self.manager = ConfigurablePluginManager(configparser_instance=ConfigParser())
         self.log.debug(dir(self.manager))
         self.add_plugin_dir(GPATH['PLUGINS'])
         self.add_plugin_dir(LPATH['PLUGINS'])
@@ -43,6 +62,16 @@ class Plugins(Service):
         self.manager.collectPlugins()
         self.init()
         self.log.debug("Plugin System initialized")
+
+    def write_config(self):
+        """Write configuration to disk"""
+        self.log.debug("Writing configuration file: %s" % self.config_file)
+        with open(self.config_file, "w") as f:
+            self.config.write(f)
+            
+        # ~ f = open(self.config_file, "w")
+        # ~ self.config.write(f)
+        # ~ f.close()
 
     def add_plugin_dir(self, plugin_dir):
         locator = self.manager.getPluginLocator()
