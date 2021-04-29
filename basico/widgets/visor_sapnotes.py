@@ -79,10 +79,8 @@ class SAPNotesVisor(BasicoWidget, Gtk.VBox):
     def get_services(self):
         self.srvsap = self.get_service('SAP')
         self.srvicm = self.get_service('IM')
-        self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
         self.srvutl = self.get_service('Utils')
-        # ~ self.srvweb = self.get_service('Driver')
         self.srvclb = self.get_service('Callbacks')
 
 

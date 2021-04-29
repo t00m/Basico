@@ -23,7 +23,7 @@ from basico.core.log import get_logger
 
 
 class Splash():
-    def __init__(self, title, width=400, height=250, font=36, font_weight='normal', font_color='000000', background_color='ffffff', background_image=None, app=None):
+    def __init__(self, title, width=400, height=250, font=24, font_weight='normal', font_color='000000', background_color='ffffff', background_image=None, app=None):
         self.app = app
         self.log = get_logger(__class__.__name__)
         self.log = logging.getLogger(__class__.__name__)
@@ -39,8 +39,8 @@ class Splash():
 
         # Window settings
         self.window = Gtk.Window(Gtk.WindowType.POPUP)
-        self.window.set_type_hint(Gdk.WindowTypeHint.SPLASHSCREEN)
         self.window.set_position(Gtk.WindowPosition.CENTER)
+        self.window.set_type_hint(Gdk.WindowTypeHint.SPLASHSCREEN)
         self.window.set_title(self.title)
 
         # Create overlay with a background image

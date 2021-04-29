@@ -18,7 +18,7 @@ from shutil import which
 import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-    
+
 from nltk.tokenize import word_tokenize
 
 from gi.repository import GObject
@@ -74,7 +74,7 @@ class SAP(Service):
 
     def get_services(self):
         self.srvgui = self.get_service('GUI')
-        self.srvstg = self.get_service('Settings')
+        # ~ self.srvstg = self.get_service('Settings')
         self.srvutl = self.get_service('Utils')
         self.srvdtb = self.get_service('DB')
         self.srvclt = self.get_service('Collections')

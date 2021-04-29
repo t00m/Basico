@@ -154,6 +154,8 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
         # Popover body
         box = Gtk.Box(spacing = 0, orientation="vertical")
+        self.srvgui.add_widget('gtk_popover_box_system_button', box)
+
         popover.add(box)
 
         ### About

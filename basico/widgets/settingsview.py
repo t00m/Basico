@@ -113,8 +113,7 @@ class SettingsView(BasicoWidget, Gtk.ScrolledWindow):
     def update(self):
         self.log.debug("Updating settings stats")
         self.model.clear()
-        self.srvstg = self.get_service('Settings')
-        config = self.srvstg.get_config()
+        config = self.app.settings.get_config()
         sdict = {}
 
         # ENVIRONMENT NODE

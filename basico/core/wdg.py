@@ -29,7 +29,7 @@ class BasicoWidget(object):
         self.name = name
         self.log = get_logger(name)
         self.log.addHandler(self.app.intercepter)
-        self.srvstg = self.get_service('Settings')
+        # ~ self.srvstg = self.get_service('Settings')
         self.__init_section(name)
         self._get_services()
         self.get_services()
@@ -46,12 +46,12 @@ class BasicoWidget(object):
     def __init_section(self, name):
         """Check if section exists in config. If not, create it"""
         self.section = 'Widget#%s' % name
-        config = self.srvstg.get_config()
+        config = self.app.settings.get_config()
         try:
             config[self.section]
         except:
             config[self.section] = {}
-            self.srvstg.save(config)
+            self.app.settings.save(config)
             self.log.debug("Section '%s' initialized in config file" % name)
 
     def _setup_widget(self):
@@ -78,7 +78,7 @@ class BasicoWidget(object):
         return self.name
 
     def set_config_value(self, key, value):
-        self.srvstg.set_value(self.section, key, value)
+        self.app.settings.set_value(self.section, key, value)
 
     def get_config_value(self, key):
-        return self.srvstg.get_value(self.section, key)
+        return self.app.settings.get_value(self.section, key)

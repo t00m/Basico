@@ -23,20 +23,16 @@ from yapsy.PluginManager import PluginManager
 
 from basico.core.env import APP, LPATH, GPATH, FILE
 from basico.core.log import LogIntercepter, queue_log, get_logger
-
-# ~ from basico.services.kb4it import KB4Basico
+from basico.core.cnf import Settings
 from basico.services.util import Utils
 from basico.services.gui import GUI
 from basico.services.icons import IconManager
 from basico.services.sap import SAP
-from basico.services.settings import Settings
 from basico.services.uif import UIFuncs
 from basico.services.callbacks import Callback
 from basico.services.database import Database
 from basico.services.notify import Notify
 from basico.services.plugins import Plugins
-
-# ~ from basico.services.download import DownloadManager
 from basico.services.collections import Collections
 from basico.widgets.splash import Splash
 
@@ -50,6 +46,7 @@ class Basico(object):
     """
     Basico Application class
     """
+    settings = None
     plugins = None
     intercepter = LogIntercepter()
 
@@ -57,10 +54,25 @@ class Basico(object):
         """
         Basico class
         """
+        self.setup_settings()
         self.setup_logging()
         self.setup_environment()
         self.setup_services()
         self.setup_splash()
+
+    def setup_settings(self):
+        """
+        Setup Basico settings
+        """
+        self.settings = Settings()
+
+    def setup_logging(self):
+        """
+        Setup Basico logging
+        """
+        self.log = get_logger(__class__.__name__)
+        self.log.addHandler(self.intercepter)
+        self.log.info("Basico %s started", APP['version'])
 
     def get_splash(self):
         return self.splash
@@ -84,14 +96,6 @@ class Basico(object):
         self.log.debug("Global path: %s", GPATH['ROOT'])
         self.log.debug("Local path: %s", LPATH['ROOT'])
 
-    def setup_logging(self):
-        """
-        Setup Basico logging
-        """
-        self.log = get_logger(__class__.__name__)
-        self.log.addHandler(self.intercepter)
-        self.log.info("Basico %s started", APP['version'])
-
     def setup_services(self):
         """
         Setup Basico Services
@@ -112,11 +116,10 @@ class Basico(object):
                 'Collections'   :   Collections()
             }
 
-            self.register_service('Settings', Settings())
-            self.get_service('Settings')
             self.register_service('Plugins', Plugins())
             self.plugins = self.get_service('Plugins')
             self.plugins.start(self, 'Plugins', 'Plugins')
+            self.plugins.run(category='CORE')
             for name in services:
                 self.register_service(name, services[name])
 

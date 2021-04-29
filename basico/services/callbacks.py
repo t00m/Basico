@@ -59,7 +59,7 @@ class Callback(Service):
 
 
     def get_services(self):
-        self.srvstg = self.get_service('Settings')
+        # ~ self.srvstg = self.get_service('Settings')
         self.srvdtb = self.get_service('DB')
         self.srvgui = self.get_service('GUI')
         self.srvuif = self.get_service("UIF")
@@ -83,10 +83,10 @@ class Callback(Service):
 
         # Connect signals
         self.connect_signals()
-        
+
         # Execute GUI plugins
-        plugins = self.get_service('Plugins')        
-        plugins.run(category='GUI')  
+        plugins = self.get_service('Plugins')
+        plugins.run(category='GUI')
 
         # Alive
         self.srvgui.set_running(True)
@@ -123,6 +123,7 @@ class Callback(Service):
         """
         widget, signal, callback, data = args[1]
         self.srvuif.connect_signal(widget, signal, callback, data)
+        self.log.debug("Connected signal '%s' to widget '%s' with callback '%s'", signal, widget, callback)
 
     ## GTK APP WINDOW ##
     def gui_appwindow_changed(self, widget, e):

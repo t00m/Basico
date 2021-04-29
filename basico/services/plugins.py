@@ -17,6 +17,7 @@ from gi.repository import GObject
 from yapsy.PluginManager import PluginManager
 from yapsy.ConfigurablePluginManager import ConfigurablePluginManager
 from yapsy.VersionedPluginManager import VersionedPluginManager
+from yapsy.AutoInstallPluginManager import AutoInstallPluginManager
 from yapsy.PluginManager import PluginManagerSingleton
 
 from basico.core.env import APP, FILE, GPATH, LPATH
@@ -44,7 +45,11 @@ class Plugins(Service):
         PluginManagerSingleton.setBehaviour([
             ConfigurablePluginManager,
             VersionedPluginManager,
+            AutoInstallPluginManager,
         ])
+
+        # 'getInstallDir', 'install', 'installFromZIP', 'install_dir', 'plugins_places', 'setInstallDir'
+
         self.manager = PluginManagerSingleton.get()
         self.manager.app = self.app
         self.manager.setConfigParser(self.config, self.write_config)

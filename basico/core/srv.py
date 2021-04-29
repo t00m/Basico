@@ -94,13 +94,12 @@ class Service(GObject.GObject):
 
     def init_section(self, section):
         """Check if section exists in config. If not, create it"""
-        self.srvstg = self.get_service('Settings')
-        config = self.srvstg.get_config()
+        config = self.app.settings.get_config()
         try:
             config[section]
         except:
             config[section] = {}
-            self.srvstg.save(config)
+            self.app.settings.save(config)
             self.log.debug("Section '%s' initialized in config file" % section)
 
     def get_traceback(self):
@@ -116,14 +115,13 @@ class Service(GObject.GObject):
         return self.app.get_service(name)
 
     def get_config(self):
-        self.srvstg = self.get_service('Settings')
-        return self.srvstg.load()
+        return self.app.settings.load()
 
     def get_splash(self):
         return self.app.get_splash()
 
     def set_config_value(self, key, value):
-        self.srvstg.set_value(self.section, key, value)
+        self.app.settings.set_value(self.section, key, value)
 
     def get_config_value(self, key):
-        return self.srvstg.get_value(self.section, key)
+        return self.app.settings.get_value(self.section, key)
