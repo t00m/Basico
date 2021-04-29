@@ -3,28 +3,18 @@
 
 from gi.repository import Gtk
 
-# Interfaces
-
 import basico.core.plg as plugintypes
 
-class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
-    def init(self, app):
-        self.app = app        
-        self.log.debug("%s => %s", __class__.__name__, app)
-        self.log.debug(self.app.get_services())
 
-    # ~ def run(self, *args):
-        # ~ self.log.debug("This is a plugin for Basico GUI with args %s", args)        
-        # ~ self.install()
-        
-    def install(self, *args):        
+class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
+    def install(self):
         """
         Install Fullscreen toggle button
         """
         self.srvgui = self.app.get_service('GUI')
         toolbar_widget = self.srvgui.get_widget('visor_sapnotes_toolbar')
-        toolbar = toolbar_widget.get_toolbar()        
-        
+        toolbar = toolbar_widget.get_toolbar()
+
         tool = Gtk.ToolItem()
         tool.set_expand(False)
         srvicm = self.app.get_service('IM')
@@ -40,10 +30,10 @@ class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
         tool.show_all()
         toolbar.insert(tool, -1)
         self.log.debug("Plugin fullscreen installed")
-    
-    def uninstall(self, *args):        
+
+    def uninstall(self, *args):
         pass
-        
+
     def gui_toggle_fullscreen(self, button):
         window = self.srvgui.get_window()
         if button.get_active():
@@ -52,5 +42,4 @@ class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
             window.unfullscreen()
             box = self.srvgui.get_widget('gtk_box_container_icon_fullscreen')
             del(box)
-            
-        
+
