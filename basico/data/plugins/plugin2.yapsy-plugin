@@ -1,0 +1,9 @@
+[Core]
+Name = Plugin 2
+Module = plugin2
+
+[Documentation]
+Author = Tomas Virseda
+Version = 0.1
+Website = http://lotsofplugins.com
+Description = My second plugin
