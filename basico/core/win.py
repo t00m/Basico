@@ -36,7 +36,7 @@ from basico.widgets.statusbar import Statusbar
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
     size_pos = None
 
-    def __init__(self, uiapp):        
+    def __init__(self, uiapp):
         GObject.signal_new('window-keypress-event', self, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.uiapp = uiapp
         self.setup_controller(uiapp)
@@ -65,7 +65,7 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
 
     def get_services(self):
         self.srvicm = self.controller.get_service('IM')
-        
+
     def setup_controller(self, uiapp):
         self.controller = uiapp.get_controller()
 
@@ -76,6 +76,15 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         Gtk.Window.__init__(self, title=APP['name'], application=uiapp)
         icon = self.srvicm.get_icon('basico-component', 36, 36)
         self.set_icon(icon)
+        """
+        Change Gtk+ Style
+        """
+        screen = Gdk.Screen.get_default()
+        css_provider = Gtk.CssProvider()
+        # ~ css_provider.load_from_path(FILE['CSS'])
+        context = Gtk.StyleContext()
+        context.add_provider_for_screen(screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER)
+
         self.set_default_size(1024, 728)
         self.setup_headerbar()
         self.show_all()
@@ -225,4 +234,4 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         keyname = Gdk.keyval_name(event.keyval)
         self.emit('window-keypress-event', keyname)
         # ~ if keyname == 'Escape':
-            # ~ self.unfullscreen() 
+            # ~ self.unfullscreen()

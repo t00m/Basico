@@ -92,9 +92,8 @@ class Plugins(Service):
             plugins = self.manager.getPluginsOfCategory(category)
         self.log.debug("Selected %d plugins from category '%s'", len(plugins), category)
         return plugins
-        
 
-    def run(self, category=None):        
+    def run(self, category=None):
         if self.manager is None:
             self.log.warning("Requested plugins from category '%s', but Plugin Manager is not available yet")
             return
@@ -126,7 +125,7 @@ class Plugins(Service):
 
 
     def init(self):
-        plugins = self.get_plugins()        
+        plugins = self.get_plugins()
         for pluginInfo in plugins:
             plugin = pluginInfo.plugin_object
             try:
