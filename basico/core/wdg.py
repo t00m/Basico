@@ -41,7 +41,7 @@ class BasicoWidget(object):
     def _get_services(self):
         """ Services loaded by default"""
         self.srvgui = self.app.get_service('GUI')
-        self.srvuif = self.app.get_service('UIF')
+        # ~ self.srvuif = self.app.get_service('UIF')
 
     def __init_section(self, name):
         """Check if section exists in config. If not, create it"""

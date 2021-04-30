@@ -117,8 +117,8 @@ class Service(GObject.GObject):
     def get_config(self):
         return self.app.settings.load()
 
-    def get_splash(self):
-        return self.app.get_splash()
+    # ~ def get_splash(self):
+        # ~ return self.app.get_splash()
 
     def set_config_value(self, key, value):
         self.app.settings.set_value(self.section, key, value)

@@ -33,7 +33,17 @@ class IBasico(IPlugin):
         It must be overrided by your plugin
         """
         pass
+    
+    def uninstall(self):
+        """Uninstall plugin.
 
+        It must be overrided by your plugin
+        """
+        pass
+
+class IBasicoCORE(IBasico):
+    def __init__(self, *args):
+        self.log = get_logger(__class__.__name__)
 
 class IBasicoDatabase(IBasico):
     def __init__(self, *args):

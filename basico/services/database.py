@@ -58,7 +58,8 @@ class Database(Service):
 
 
     def get_services(self):
-        self.srvclt = self.get_service('Collections')
+        pass
+        # ~ self.srvclt = self.get_service('Collections')
 
     def store(self, sid, html):
         fname = sid + '.xml'
@@ -379,7 +380,7 @@ class Database(Service):
                             continue
                         if cid not in new_cols:
                             new_cols.append(cid)
-                            self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid))
+                            # ~ self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid))
                 else:
                     try:
                         current_collections = self.sapnotes[sid]['collections']
@@ -390,7 +391,7 @@ class Database(Service):
                                 continue
                             if cid not in bag:
                                 bag.append(cid)
-                                self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid))
+                                # ~ self.log.info("\tCollection: %s", self.srvclt.get_name_by_cid(cid))
                         self.sapnotes[sid]['collections'] = bag
                     except:
                         pass

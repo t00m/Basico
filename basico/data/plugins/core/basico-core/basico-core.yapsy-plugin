@@ -1,0 +1,9 @@
+[Core]
+Name = Basico Core
+Module = basico-core
+
+[Documentation]
+Author = Tomas Virseda
+Version = 0.1
+Website = http://lotsofplugins.com
+Description = Basico CORE Plugin for Basico App

@@ -59,6 +59,7 @@ class Plugins(Service):
 
         self.add_category_filter("Reporting", plugintypes.IBasicoReporting)
         self.add_category_filter("Database", plugintypes.IBasicoDatabase)
+        self.add_category_filter("CORE", plugintypes.IBasicoCORE)
         self.add_category_filter("SAP", plugintypes.IBasicoSAP)
         self.add_category_filter("GUI", plugintypes.IBasicoGUI)
 
@@ -86,17 +87,24 @@ class Plugins(Service):
 
     def get_plugins(self, category=None):
         if category is None:
-            return self.manager.getAllPlugins()
+            plugins = self.manager.getAllPlugins()
+        else:
+            plugins = self.manager.getPluginsOfCategory(category)
+        self.log.debug("Selected %d plugins from category '%s'", len(plugins), category)
+        return plugins
+        
 
-    def run(self, category=None):
+    def run(self, category=None):        
         if self.manager is None:
+            self.log.warning("Requested plugins from category '%s', but Plugin Manager is not available yet")
             return
 
-        self.log.debug("Running pluggins of category '%s'", category)
+        self.log.debug("Run all plugins under category '%s'", category)
         if category is None:
             for pluginInfo in self.get_plugins():
                 plugin = pluginInfo.plugin_object
                 try:
+                    self.log.debug("Running plugin[%s][%s]", category, pluginInfo.name)
                     plugin.run()
                 except Exception as error:
                     self.log.error(error)
@@ -106,20 +114,19 @@ class Plugins(Service):
             for pluginInfo in self.manager.getPluginsOfCategory(category):
                 plugin = pluginInfo.plugin_object
                 try:
+                    self.log.debug("Running plugin[%s][%s]", category, pluginInfo.name)
                     plugin.run()
                 except Exception as error:
                     self.log.error("Plugin %s: %s", pluginInfo.name, error)
                     self.log.error(self.get_traceback())
 
         else:
-            self.log.warning("No plugins found for category '%s'", category)
+            # No plugins found
+            pass
 
-        # ~ cp = self.manager.config_parser
-        # ~ self.log.debug("Config Parser: %s", list(cp.keys()))
 
     def init(self):
-        plugins = self.get_plugins()
-        self.log.debug("Found %d plugins:", len(plugins))
+        plugins = self.get_plugins()        
         for pluginInfo in plugins:
             plugin = pluginInfo.plugin_object
             try:

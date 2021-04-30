@@ -11,14 +11,14 @@ import sys
 import os
 
 
-from git import Repo
+# ~ from git import Repo
 
 from os.path import abspath, sep as SEP
 
 # Git Repo info
-repo = Repo('.', search_parent_directories=True)
-sha = repo.head.commit.hexsha
-short_sha = repo.git.rev_parse(sha, short=8)
+# ~ repo = Repo('.', search_parent_directories=True)
+# ~ sha = repo.head.commit.hexsha
+# ~ short_sha = repo.git.rev_parse(sha, short=8)
 
 # Directory initialization
 ROOT = abspath(sys.modules[__name__].__file__ + "/../../")
@@ -31,7 +31,7 @@ APP['name'] = "SAP Notes Manager for SAP Consultants"
 APP['license'] = "The code is licensed under the terms of the  GPL v3\nso you're free to grab, extend, improve and fork the code\nas you want"
 APP['copyright'] = u"Copyright \xa9 Tomás Vírseda"
 APP['desc'] = "SAP Notes Manager for SAP Consultants\n\nThe code is licensed under the terms of the  GPL v3 so you're free to grab, extend, improve and fork the code as you want"
-APP['version'] = "0.4-%s" % short_sha
+APP['version'] = "0.4"
 APP['authors'] = [u"Tomás Vírseda <tomasvirseda@gmail.com>"]
 APP['documenters'] = []
 APP['email'] = "tomasvirseda@gmail.com"
@@ -80,7 +80,7 @@ GPATH['DOC'] = os.path.join(GPATH['SHARE'], 'docs')
 GPATH['RES'] = os.path.join(GPATH['DATA'], 'res')
 GPATH['CSS'] = os.path.join(GPATH['RES'], 'css')
 GPATH['SAP'] = os.path.join(GPATH['RES'], 'sap')
-GPATH['SPLASH'] = os.path.join(GPATH['RES'], 'splash')
+# ~ GPATH['SPLASH'] = os.path.join(GPATH['RES'], 'splash')
 GPATH['SELENIUM'] = os.path.join(GPATH['RES'], 'selenium')
 GPATH['DRIVERS'] = os.path.join(GPATH['SELENIUM'], 'drivers')
 GPATH['HELP'] = os.path.join(GPATH['DATA'], 'help')
@@ -100,7 +100,7 @@ FILE['CREDITS'] = os.path.join(GPATH['DOC'], 'CREDITS')
 FILE['KB4IT_INDEX'] = os.path.join(LPATH['DOC_TARGET'], 'index.html')
 FILE['HELP_INDEX'] = os.path.join(GPATH['HELP_HTML'], 'index.html')
 FILE['HELP_FIREFOX_PROFILE'] = os.path.join(GPATH['HELP_HTML'], 'firefox_profile.html')
-FILE['SPLASH'] = os.path.join(GPATH['SPLASH'], 'basico-splash-400x250.png')
+# ~ FILE['SPLASH'] = os.path.join(GPATH['SPLASH'], 'basico-splash-400x250.png')
 FILE['G_SAP_PRODUCTS'] = os.path.join(GPATH['SAP'], 'products.txt')
 FILE['L_SAP_PRODUCTS'] = os.path.join(LPATH['RESOURCES'], 'products.txt')
 FILE['FIREFOX_DRIVER'] = os.path.join(LPATH['DRIVERS'], 'geckodriver')

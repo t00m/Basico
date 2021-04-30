@@ -27,14 +27,9 @@ from basico.core.cnf import Settings
 from basico.services.util import Utils
 from basico.services.gui import GUI
 from basico.services.icons import IconManager
-from basico.services.sap import SAP
 from basico.services.uif import UIFuncs
-from basico.services.callbacks import Callback
 from basico.services.database import Database
-from basico.services.notify import Notify
 from basico.services.plugins import Plugins
-from basico.services.collections import Collections
-from basico.widgets.splash import Splash
 
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)25s | %(asctime)s | %(message)s")
@@ -54,11 +49,10 @@ class Basico(object):
         """
         Basico class
         """
-        self.setup_settings()
         self.setup_logging()
+        self.setup_settings()        
         self.setup_environment()
         self.setup_services()
-        self.setup_splash()
 
     def setup_settings(self):
         """
@@ -73,14 +67,6 @@ class Basico(object):
         self.log = get_logger(__class__.__name__)
         self.log.addHandler(self.intercepter)
         self.log.info("Basico %s started", APP['version'])
-
-    def get_splash(self):
-        return self.splash
-
-
-    def setup_splash(self):
-        title = "%s\n%s\n%s" % (APP['short'].title(), APP['name'], APP['version'])
-        self.splash = Splash(title=title, font='Roboto Slab 24', font_weight='bold', font_color="#FFFFFF", background_image=FILE['SPLASH'], app=self)
 
     def setup_environment(self):
         """
@@ -107,13 +93,9 @@ class Basico(object):
             services = {
                 'GUI'           :   GUI(),
                 'Utils'         :   Utils(),
-                'UIF'           :   UIFuncs(),
-                'SAP'           :   SAP(),
+                # ~ 'UIF'           :   UIFuncs(),
                 'IM'            :   IconManager(),
-                'Callbacks'     :   Callback(),
                 'DB'            :   Database(),
-                'Notify'        :   Notify(),
-                'Collections'   :   Collections()
             }
 
             self.register_service('Plugins', Plugins())
@@ -172,9 +154,17 @@ class Basico(object):
         """
         For each service registered, it executes the 'end' method
         (if any) to finalize them properly.
-        """
-
-        self.splash.show()
+        """       
+        # Uninstall plugins        
+        for pluginInfo in self.plugins.get_plugins():
+            plugin = pluginInfo.plugin_object
+            try:
+                self.log.debug("Uninstalling plugin '%s'", pluginInfo.name)
+                plugin.uninstall()
+            except Exception as error:
+                self.log.error(error)
+                self.log.error(self.plugins.get_traceback())
+                    
         # Deregister all services loaded starting by the GUI service
         self.deregister_service('GUI')
         for name in self.services:
@@ -184,9 +174,7 @@ class Basico(object):
             except Exception as error:
                 self.log.error(error)
                 raise
-        self.splash.destroy()
         self.log.info("Basico %s finished", APP['version'])
-
 
     def run(self):
         """

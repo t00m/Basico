@@ -70,10 +70,6 @@ def add_data_basico():
                     'basico/data/res/css/basico.css',
                     'basico/data/res/css/custom-asciidoc.css',
                 ]),
-            ('basico/data/res/splash',
-                [
-                    'basico/data/res/splash/basico-splash-400x250.png',
-                ]),
             ('basico/data/res/sap',
                 [
                     'basico/data/res/sap/products.txt',
@@ -114,9 +110,9 @@ def main():
         license='GPLv3',
         packages=['basico', 'basico.core', 'basico.services', 'basico.widgets'],
         install_requires=[
-            'nltk',
-            'inotify',
-            'GitPython',
+            # ~ 'nltk',
+            # ~ 'inotify',
+            # ~ 'GitPython',
             'Yapsy==1.12.0'
         ],
         include_package_data=True,

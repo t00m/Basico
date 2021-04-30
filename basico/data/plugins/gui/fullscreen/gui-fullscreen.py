@@ -12,14 +12,14 @@ class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
         Install Fullscreen toggle button
         """
         self.srvgui = self.app.get_service('GUI')
-        self.srvclb = self.app.get_service('Callbacks')
         self.srvicm = self.app.get_service('IM')
         toolbar_widget = self.srvgui.get_widget('visor_sapnotes_toolbar')
+        if toolbar_widget is None:
+            return 
+            
         toolbar = toolbar_widget.get_toolbar()
-
         tool = Gtk.ToolItem()
         tool.set_expand(False)
-
         icon = self.srvicm.get_new_image_icon('basico-fullscreen', 24, 24)
         box = self.srvgui.add_widget('gtk_box_container_icon_fullscreen', Gtk.Box())
         box.pack_start(icon, False, False, 0)
@@ -45,7 +45,7 @@ class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
         hbox.pack_start(image, False, False, 3)
         hbox.pack_start(label, False, False, 3)
         button = Gtk.Button()
-        button.connect('clicked', self.srvclb.display_settings)
+        # ~ button.connect('clicked', self.srvclb.display_settings)
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
         self.srvgui.add_widget('gtk_button_settings', button)
@@ -63,7 +63,7 @@ class PluginBasicoGUIFullscreen(plugintypes.IBasicoGUI):
         button = Gtk.Button()
         button.add(hbox)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect('clicked', self.srvclb.display_log)
+        # ~ button.connect('clicked', self.srvclb.display_log)
         box.pack_end(button, False, False, 0)
         self.srvgui.add_widget('gtk_button_logviewer', button)
         self.srvgui.add_signal('gtk_button_logviewer', 'clicked', 'self.srvclb.display_log')

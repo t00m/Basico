@@ -7,6 +7,7 @@
 # Description: GUI service
 """
 
+import time
 import logging
 import threading
 
@@ -34,19 +35,18 @@ class UIApp(Gtk.Application):
 
     def __init__(self, *args, **kwargs):
         """
-        Missing method docstring (missing-docstring)
+        The GTK Application main window
         """
         super().__init__(application_id="net.t00mlabs.basico", flags=Gio.ApplicationFlags.FLAGS_NONE)
         self.app = args[0]
         GLib.set_application_name("Basico")
-        GLib.set_prgname('basico')
-        # ~ self.log = logging.getLogger('UIApp')
+        GLib.set_prgname('basico')        
         self.log = get_logger('UIApp')
         self.log.addHandler(self.app.intercepter)
-        self._get_services()
-        self.connect('startup', self._on_startup)
+        self.get_services()
+        self.connect('startup', self.on_startup)
 
-    def _on_startup(self, *args):
+    def on_startup(self, *args):        
         self.log.debug("Gtk Application loaded")
 
     def do_activate(self):
@@ -57,25 +57,16 @@ class UIApp(Gtk.Application):
             self.my_app_settings = "Primary application instance."
             self.window = self.srvgui.add_widget('gtk_app_window_main', GtkAppWindow(self))
             self.srvgui.add_signal('gtk_app_window_main', 'delete_event', self.srvgui.quit)
-            # ~ self.srvgui.add_signal('gtk_app_window_main', 'key-press-event', self.srvgui.quit)
-            # ~ self.window.connect("key-press-event",self._on_key_press_event)
             self.log.debug("New Basico instance created")
         else:
             self.log.debug("Basico is already running!")
-        splash = self.app.get_splash()
-        splash.hide()
 
-    # ~ def _on_key_press_event(self, widget, event):
-        # ~ if Gdk.keyval_name(event.keyval) == 'Escape':
-            # ~ # self.srvclb.action_annotation_cancel()
-            # ~ pass
-
-    def _get_services(self):
+    def get_services(self):
         """
         Missing method docstring (missing-docstring)
         """
         self.srvgui = self.app.get_service('GUI')
-        self.srvuif = self.app.get_service('UIF')
+        # ~ self.srvuif = self.app.get_service('UIF')
 
     def get_window(self):
         """
@@ -106,13 +97,63 @@ class GUI(Service):
         Setup GUI Service
         """
         GObject.signal_new('new-signal', self, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
+        GObject.signal_new('gui-started', self, GObject.SignalFlags.RUN_LAST, None, () )        
+        self.connect('gui-started', self.gui_started)
+        self.th = threading.Thread(name='startup', target=self.on_startup)
+        self.th.setDaemon(True)
+        self.th.start()
 
+    def on_startup(self, *args):
+        """
+        Awesome way :( to know when all widgets are ready to work...
+        It waits until statusbar widget is loaded and then emit
+        the signal 'gui-started'...
+        """
+        self.log.debug("Check if GUI is ready...")
+        GUI_READY = False
+        while not GUI_READY:
+            try:
+                statusbar = self.get_widget('widget_statusbar')
+                if statusbar is not None:
+                    self.log.debug("GUI is ready")
+                    GUI_READY = True
+                    break
+            except Exception as error:
+                self.log.debug(error)
+                GUI_READY = False
+            time.sleep(1)
+
+        if GUI_READY:
+            self.emit('gui-started')
+            
+    def gui_started(self, *args):
+        # Update statusbar and logviewer
+        statusbar = self.get_widget('widget_statusbar')
+        statusbar.alive()
+        # ~ self.th = threading.Thread(name='statusbar', target=self.gui_statusbar_update)
+        # ~ self.th.setDaemon(True)
+        # ~ self.th.start()
+        self.log.debug("UI Logging activated")
+
+        # Connect signals
+        self.connect_signals()
+
+        # Execute GUI plugins
+        plugins = self.get_service('Plugins')
+        plugins.run(category='GUI')
+
+        # Alive
+        self.set_running(True)
+        self.log.debug("Signals connected")
+        self.log.debug("Basico ready!")
+        
     def run(self):
         """
         Let GUI service start
         """
         GObject.threads_init()
         self.uiapp = UIApp(self.app)
+        self.connect_signals()
         self.log.debug("Setting up GUI")
         self.uiapp.run()
 
@@ -193,6 +234,25 @@ class GUI(Service):
         """
         return self.signals
 
+    def connect_signal(self, widget_name, signal, callback, data=None):
+        """
+        Connect a signal
+        """
+        widget = self.get_widget(widget_name)
+        if isinstance(callback, str):
+            widget.connect(signal, eval(callback), data)
+        else:
+            widget.connect(signal, callback, data)
+        self.log.debug("Signal '%s' connected for widget '%s'", signal, widget_name)
+
+    def connect_signals(self):
+        """Auto connect all those signals registered for widgets"""
+        wsdict = self.get_signals()
+        for widget in wsdict:
+            for signal in wsdict[widget]:
+                callback, data = wsdict[widget][signal]
+                self.connect_signal(widget, signal, callback, data)
+                
     def add_widget(self, name, obj=None):
         """
         Add widget to cache
