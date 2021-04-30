@@ -36,11 +36,13 @@ from basico.widgets.statusbar import Statusbar
 class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
     size_pos = None
 
-    def __init__(self, uiapp):
+    def __init__(self, uiapp):        
+        GObject.signal_new('window-keypress-event', self, GObject.SignalFlags.RUN_LAST, GObject.TYPE_PYOBJECT, (GObject.TYPE_PYOBJECT,) )
         self.uiapp = uiapp
         self.setup_controller(uiapp)
         self.app = uiapp.get_controller()
         super().__init__(self.app, __class__.__name__)
+        self.connect("key-press-event", self.key_press)
 
     def _setup_widget(self):
         self.size_pos = self.get_size_pos_from_config()
@@ -219,4 +221,8 @@ class GtkAppWindow(BasicoWidget, Gtk.ApplicationWindow):
         box.show_all()
         return box
 
-
+    def key_press (self, window, event):
+        keyname = Gdk.keyval_name(event.keyval)
+        self.emit('window-keypress-event', keyname)
+        # ~ if keyname == 'Escape':
+            # ~ self.unfullscreen() 

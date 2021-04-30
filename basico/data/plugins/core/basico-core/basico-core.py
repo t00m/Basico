@@ -3,13 +3,14 @@
 
 import basico.core.plg as plugintypes
 
-
-class PluginBasicoGUIFullscreen(plugintypes.IBasicoCORE):
+class PluginBasicoCOREInfo(plugintypes.IBasicoCORE):
     def install(self):
         """
-        Install Fullscreen toggle button
+        Display Basico Core Info
         """
-        self.log.debug(self.app)
+        config = self.app.get_envvar("FILE", "CNF")
+        self.log.debug("FILE['CNF']: %s", config)
+        # ~ self.app.stop()
 
     def uninstall(self, *args):
         pass

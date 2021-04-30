@@ -11,14 +11,14 @@ from basico.core.srv import Service
 class IBasico(IPlugin):
     log = None
 
-    def __init__(self):
-        pass
-
-    def init(self):
+    def init(self, name=None):
         """Basic plugin initialization."""
+        self.name = name
         self.manager = PluginManagerSingleton.get()
         self.app = self.manager.app
-        self.log = get_logger(__class__.__name__)
+        if self.name is None:
+            self.name = __class__.__name__
+        self.log = get_logger(self.name)
 
     def run(self):
         """Execute plugin.

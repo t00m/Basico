@@ -130,7 +130,7 @@ class Plugins(Service):
         for pluginInfo in plugins:
             plugin = pluginInfo.plugin_object
             try:
-                plugin.init()
+                plugin.init("P[%s]" % pluginInfo.name)
                 self.manager.activatePluginByName(pluginInfo.name, ', '.join(pluginInfo.categories))
                 self.log.debug("\t-> %s (%s) by %s on category %s" % (pluginInfo.name, pluginInfo.description, pluginInfo.author, "'%s'" % ', '.join(pluginInfo.categories)))
             except Exception as error:

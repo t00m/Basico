@@ -27,10 +27,7 @@ from basico.core.cnf import Settings
 from basico.services.util import Utils
 from basico.services.gui import GUI
 from basico.services.icons import IconManager
-from basico.services.uif import UIFuncs
-from basico.services.database import Database
 from basico.services.plugins import Plugins
-
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)7s | %(lineno)4d  |%(name)25s | %(asctime)s | %(message)s")
 
@@ -53,6 +50,12 @@ class Basico(object):
         self.setup_settings()        
         self.setup_environment()
         self.setup_services()
+    
+    def get_envvar(self, section, key):
+        try:
+            return eval("%s['%s']" % (section, key))
+        except:
+            return None
 
     def setup_settings(self):
         """
@@ -86,16 +89,13 @@ class Basico(object):
         """
         Setup Basico Services
         """
-
         self.log.debug("Declare and register services")
         self.services = {}
         try:
             services = {
                 'GUI'           :   GUI(),
                 'Utils'         :   Utils(),
-                # ~ 'UIF'           :   UIFuncs(),
                 'IM'            :   IconManager(),
-                'DB'            :   Database(),
             }
 
             self.register_service('Plugins', Plugins())
@@ -147,7 +147,9 @@ class Basico(object):
             self.services[name].end()
             self.services[name] = None
         except AttributeError:
-            self.log.debug("Service %s was not running!" % name)
+            self.log.debug("Service '%s' was not running!" % name)
+        except KeyError:
+            self.log.debug("Service '%s' was not registered!" % name)
 
 
     def stop(self):
@@ -173,15 +175,17 @@ class Basico(object):
                     self.deregister_service(name)
             except Exception as error:
                 self.log.error(error)
-                raise
+                self.log.debug(self.plugins.get_traceback())
         self.log.info("Basico %s finished", APP['version'])
+        sys.exit()
 
     def run(self):
         """
         Start Basico
         """
         GUI = self.get_service('GUI')
-        GUI.run()
+        if GUI is not None:
+            GUI.run()
 
 
 def main():
